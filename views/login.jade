@@ -1,0 +1,26 @@
+!!! 5
+html(lang="en")
+  head
+    title nodechat
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
+    script(src="/browserify.js")
+
+    link(rel='stylesheet', href='/css/style.css')
+    style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
+  head
+    title Login
+  body
+    #wrapper
+      #login
+        h1 Login
+       
+        form(method="post", action="/login")
+          p
+            label Username:
+              input(type='text', name='username')
+          p
+            label Password:
+              input(type='text', name='password')
+          P
+            input(type='submit', value='send')

@@ -1,0 +1,83 @@
+!!! 5
+html(lang="en")
+  head
+    title nodechat
+    script(src="jquery-1.5.1.js")
+    script(src="underscore-min.js")
+    script(src="backbone.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
+    script(src="jquery.livequery.js")
+    script(src="mustache.js")
+    script(src="jquery.masonry.js")
+    script(src="json.js")
+    script(src="/dnode.js")
+    script(src="synchronize.js")
+
+    script#user-template(type='text/template')
+      a.gravatar(href='#/user/{{ username }}')
+        span
+          img(src='{{ gravatar }}')
+      span.username
+        {{ username }}
+    
+    script#list-template(type='text/template')
+
+    script#channel-template(type='text/template')
+      .voting
+      .feature
+        .feature-content
+          h2 {{ name }}
+      .changeable
+        .subscribers
+
+    script#world-template(type='text/template')
+      .feature.box
+        .feature-content
+          h2 {{ name }}
+          form(method="post", action="#", onsubmit="return false")
+            input.join-room(type='text', name='chat', placeholder='Create chat...')
+          p.menu
+            a(href='/logout') Logout
+          p.users
+            | Username: 
+            span.username 
+              = locals.name
+      div(style='clear:both;')
+      .chat-list
+      .user-list
+
+    script#channel-list-template(type='text/template')
+
+    script#chat-template(type='text/template')
+      h3.name {{ name }}
+      form(method="post", action="#", onsubmit="return false")
+        button Chat
+        input.chat-box(type='text', name='message', placeholder='Say something...')
+      .message-list
+    
+    script#message-template(type='text/template')
+      span.icon
+        span.avatar
+      a.username(href='#{{ username }}')
+        {{ username }}
+      span.data
+        {{ text }}
+    
+    script#message-list-template(type='text/template')
+    
+   
+    script(src="models/models.js")
+    script(src="controllers/controllers.js")
+    script(src="views/views.js")
+    script(src="client.js")
+    
+    link(rel='stylesheet', href='css/style.css')
+    style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
+  body
+    #wrapper
+      div.offline
+    #client(style='display:none;')
+      div.username= name
+    #webcam-test
+    #webcam-receive
+    #webcam-debug
