@@ -9,13 +9,13 @@ html(lang="en")
     link(rel='stylesheet', href='/css/style.css')
     style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
   head
-    title Login
+    title Register
   body
     #wrapper
       #login
-        h1 Login
+        h1 Register
        
-        form(method="post", action="/login")
+        form(method="post", action="/register")
           p
             label Username:
               input(type='text', name='username')
@@ -24,4 +24,4 @@ html(lang="en")
               input(type='text', name='password')
           P
             input(type='submit', value='send')
-            a(href="/register") Register
+            a(href="/login") Login
