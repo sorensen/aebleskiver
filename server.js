@@ -1,19 +1,24 @@
 (function(){
     // Application Server
     // ------------------
+    require.paths.unshift(__dirname + '/lib');
+    
+    // Dependancies
     var express  = require('express'),
         connect  = require('connect'),
-        fugue    = require('./lib/fugue'),
+        fugue    = require('fugue'),
         Store    = require('connect-redis');
         keys     = require('keys');
-        Protocol = require('./lib/protocol'),
+        Protocol = require('protocol'),
         _        = require('underscore')._,
         dnode    = require('dnode'),
-        Auth     = require('./lib/auth'),
+        Auth     = require('auth'),
+        REST     = require('rest'),
         server   = express.createServer();
     
     // Server configuration
     server.configure(function() {
+        //server.use('/api', REST);
         server.use(express.logger());
         server.use(express.bodyParser());
         server.use(express.cookieParser());
@@ -26,9 +31,6 @@
         server.use(express.static(__dirname + '/public'));
         server.set('view options', {layout: false});
     });
-    
-    // Initialize DNode
-    dnode(Protocol).listen(server);
     
     // Public facing application
     server.get('/', function(req, res) {
@@ -58,14 +60,11 @@
     // Login
     server.get('/login', function(req, res) {
         if (req.session.user) {
-            req.session.success = 'Authenticated as ' + req.session.user.name
+            req.flash('success', 'Authenticated as ' + req.session.user.name
               + ' click to <a href="/logout">logout</a>. '
-              + ' You may now access <a href="/restricted">/restricted</a>.';
+              + ' You may now access <a href="/restricted">/restricted</a>.');
         }
-        res.render('login.jade', {
-            locals: {
-            }
-        });
+        res.render('login.jade');
     });
 
     // Login execution
@@ -80,7 +79,7 @@
                     res.redirect('/main');
                 });
             } else {
-                req.session.error = 'Authentication failed, please check your username and password.';
+                req.flash('error', 'Authentication failed, please check your username and password.');
                 res.redirect('back');
             }
         });
@@ -91,10 +90,7 @@
         if (req.session.user) {
             res.redirect('/main');
         }
-        res.render('register.jade', {
-            locals: {
-            }
-        });
+        res.render('register.jade');
     });
 
     // Register execution
@@ -109,17 +105,16 @@
                     res.redirect('/main');
                 });
             } else {
-                req.session.error = 'Registration failed, please check your username and password.';
+                req.flash('error', 'Registration failed, please check your username and password.');
                 res.redirect('back');
             }
         });
     });
 
     // Start serving
-    fugue.start(server, 8080, null, 5, {
-        verbose      : true,
-        working_path : __dirname,
-        tmp_path     : __dirname + "/tmp"
-    });  
+    server.listen(8000);
+
+    // Initialize DNode
+    dnode(Protocol).listen(8080).listen(server);
 })()
     

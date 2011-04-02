@@ -85,8 +85,7 @@
             this.model.messages.bind('add',     this.addMessage);
             this.model.messages.bind('all',     this.render);
             
-            //this.rpc = new Synchronize(self.model.messages, {fetch : true});
-            this.rpc = new Synchronize(this.model.messages, {fetch : true});
+            Synchronize(this.model.messages, {fetch : {add : true}});
         },
         
         // Refresh
@@ -225,7 +224,7 @@
             this.model.chats.bind('add',    this.addChat);
             this.model.chats.bind('all',    this.render);
             
-            this.rpc = new Synchronize(this.model.chats, {fetch : true});
+            Synchronize(this.model.chats, {fetch : {add : true}});
         },
         
         // Refresh
@@ -306,8 +305,6 @@
             // Since there is only one world, set directly
             this.view.render();
             $(this.el).html(this.view.el);
-            
-            //this.rpc = new Synchronize(self.model, {fetch : true});
         },
         
         // Render contents

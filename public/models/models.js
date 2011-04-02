@@ -60,7 +60,6 @@
         model : Models.UserModel,
         url   : 'users',
         name  : 'users',
-        //rpc   : new Synchronize(this, {fetch : true}),
         
         // Initialize
         initialize : function(options) {
@@ -76,9 +75,6 @@
         
         // Initialize
         initialize : function(options) {
-        
-            var self = this;
-            //this.rpc = new Synchronize(self, {fetch : true});
         }
     });
     
@@ -88,16 +84,9 @@
         model : Models.ChatModel,
         url   : 'chats',
         name  : 'chats',
-        //rpc   : new Synchronize(this, {fetch : true}),
         
         // Initialize
         initialize : function(options) {
-        
-            var self = this;
-            console.log('model', this);
-            console.log('model', self);
-            
-            //this.rpc = new Synchronize(this, {fetch : true});
         }
     });
     

@@ -1,6 +1,9 @@
 (function() {
     // Backbone dnode sync
     // -------------------
+    var server = {};
+    var synced = {};
+    var seperator = ':';
     
     // Helper function to get a URL from a Model or Collection as a property
     // or as a function.
@@ -12,28 +15,22 @@
     // Transport methods for model storage, sending data 
     // through the socket instance to be saved on the server 
     this.Synchronize = function(model, options) {
-        var name = model.name || model.collection.name;
-        if (!options) options = {};
-        
-        var url = model.url || getUrl(model);
-        
-        // Setup our dnode listeners for server callbacks
-        // as well as model bindings on connection
-        DNode(function() {
+    
+        // Remote protocol
+        var Protocol = function() {
             // Created model            
             this.created = function(data, opt, cb) {
                 if (!data) return;
-                var compare = model.url + ':' + data.id;
-                if (data.url !== compare) return;
+                if (model.url + seperator + data.id !== data.url) return;
                 if (!model.get(data.id)) model.add(data);
             };
             
             // Fetched model
             this.read = function(data, opt, cb) {
                 // Compare URL's to update the right collection
-                if (!data) return;
                 if (!data.id && !_.first(data)) return;
-                if ((data.url || _.first(data).url) !== model.url + ':' + data.id) return;
+                if (model.url + seperator + (data.id || _.first(data).id) !== data.url) return;
+                
                 if (!model.get(data.id)) model.add(data);
             };
             
@@ -41,22 +38,31 @@
             this.updated = function(data, opt, cb) {
                 // Compare URL's to update the right collection
                 if (!data) return;
-                if (data.url !== model.url + ':' + data.id) return;
+                if (model.url + seperator + data.id !== data.url) return;
                 model.get(data.id).set(data);
             };
             
             // Destroyed model
             this.destroyed = function(data, opt, cb) {
                 if (!data) return;
-                if (data.url !== model.url + ':' + data.id) return;
+                if (model.url + seperator + data.id !== data.url) return;
                 model.remove(data);
             };
-            
-        }).connect(function(remote) {
-            if (!model.server) model.server = remote;
-            // Check for initial bootstrapping
-            if (options.fetch) model.fetch(options.fetch);
-        });
+        };
+        var name = model.name || model.collection.name;
+        if (!options) options = {};
+        
+        var url = model.url || getUrl(model);
+        synced[model.url] = model;
+        
+        // Setup our dnode listeners for server callbacks
+        // as well as model bindings on connection
+        var port = 8000;
+        var block = function(remote) {
+            server = remote;
+            options.fetch && model.fetch(options.fetch);
+        };
+        DNode(Protocol).connect(port, block);
         
         return this;
     };
@@ -67,58 +73,32 @@
     Backbone.Model.prototype.url = function() {
       var base = getUrl(this.collection) || this.urlRoot || urlError();
       if (this.isNew()) return base;
-      return base + (base.charAt(base.length - 1) == ':' ? '' : ':') + encodeURIComponent(this.id);
+      return base + (base.charAt(base.length - 1) == seperator ? '' : seperator) + encodeURIComponent(this.id);
     },
     
-    // Override `Backbone.sync` to use delegate to the model or collection's
-    // *localStorage* property, which should be an instance of `Store`.
-    Backbone.Collection.prototype.sync = function(method, model, options) {
-        // Remote storage settings
-        var settings = {
-            url   : getUrl(model),
-            model : model.toJSON(),
-            store : {
-                name : model.name,
-                type : 'memory'
-            }
-        };
-        
-        // Callback testing
-        var callback = function(cb) {
-            console.log('sync model callback?', cb);
-        };
-        if (!model.server) return;
-        switch (method) {
-            case 'create' : model.server.create(settings,  options, callback); break;
-            case 'read'   : model.server.read(settings,    options, callback); break;
-            case 'update' : model.server.update(settings,  options, callback); break;
-            case 'delete' : model.server.destroy(settings, options, callback); break;
-        };
-    };
     
     // Override `Backbone.sync` to use delegate to the model or collection's
     // *localStorage* property, which should be an instance of `Store`.
-    Backbone.Model.prototype.sync = function(method, model, options) {    
-        if (!model.url) model.url = getUrl(model);
-        
+    Backbone.sync = function(method, model, options) {
+    
         // Set model url and store
-        model.set({
+        var params = _.extend({
             store : {
-                name : model.collection.name
+                name : model.name || model.collection.name
             },
-            url   : getUrl(model)
-        });
+            url : getUrl(model)
+        }, model.toJSON());
         
         // Callback testing
         var callback = function(cb) {
             console.log('sync col callback?', cb);
         };
-        if (!model.collection.server) return;
+        if (!server) return;
         switch (method) {
-            case 'create' : model.collection.server.create(model.toJSON(),  options, callback); break;
-            case 'read'   : model.collection.server.read(model.toJSON(),    options, callback); break;
-            case 'update' : model.collection.server.update(model.toJSON(),  options, callback); break;
-            case 'delete' : model.collection.server.destroy(model.toJSON(), options, callback); break;
+            case 'read'   :    server.read(params, options, callback); break;
+            case 'create' :  server.create(params, options, callback); break;
+            case 'update' :  server.update(params, options, callback); break;
+            case 'delete' : server.destroy(params, options, callback); break;
         };
-    };    
+    };
 })()

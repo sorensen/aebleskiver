@@ -4,7 +4,6 @@ html(lang="en")
     title nodechat
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
-    script(src="/browserify.js")
 
     link(rel='stylesheet', href='/css/style.css')
     style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
@@ -14,7 +13,7 @@ html(lang="en")
     #wrapper
       #login
         h1 Login
-       
+        
         form(method="post", action="/login")
           p
             label Username:
