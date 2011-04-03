@@ -24,7 +24,6 @@
     };
     
     var connected = function(model, options) {
-    
         var name = model.name || model.collection.name;
         
         // Ooh boy is that a new magazine!?
@@ -36,11 +35,16 @@
         }, model.toJSON());
         
         options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
+        synced[options.channel] = model;
+        
+        console.log('SYNCED:', synced);
+        
         // Two year membership? Sure!
         // ...this is all free, right?
         server.subscribe(magazine, options);
         
         // I'll take those now, thank you.
+        console.log('fetching', model);
         options.fetch && model.fetch(options.fetch);
     };
         
@@ -53,45 +57,39 @@
             // Created model            
             this.created = function(data, opt, cb) {
                 if (!data) return;
-                if (model.url + seperator + data.id !== data.url) return;
-                !model.get(data.id) && model.add(data);
+                if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
             };
             
             // Fetched model
             this.read = function(data, opt, cb) {
-                console.log('proto read', data);
                 // Compare URL's to update the right collection
                 if (!data.id && !_.first(data)) return;
-                if (model.url + seperator + (data.id || _.first(data).id) !== data.url) return;
-                !model.get(data.id) && model.add(data);
+                
+                console.log('read channel', opt.channel);
+                console.log('read channel', synced[opt.channel]);
+                
+                if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
             };
             
             // Updated model data
             this.updated = function(data, opt, cb) {
-                console.log('proto updated', data);
                 // Compare URL's to update the right collection
                 if (!data) return;
-                if (model.url + seperator + data.id !== data.url) return;
-                model.get(data.id).set(data);
+                synced[opt.channel].get(data.id).set(data);
             };
             
             // Destroyed model
             this.destroyed = function(data, opt, cb) {
-                console.log('proto destroyed', data);
                 if (!data) return;
-                if (model.url + seperator + data.id !== data.url) return;
-                model.remove(data);
+                synced[opt.channel].remove(data);
             };
             
             this.published = function(data, opt, cb) {
-                console.log('proto published', model);
-                console.log('proto published', data);
-                console.log('proto published', opt);
                 // Check CRUD
                 switch (opt.method) {
-                    case 'read'   :    this.read(data, opt, cb); break;
-                    case 'create' :  this.created(data, opt, cb); break;
-                    case 'update' :  this.updated(data, opt, cb); break;
+                    case 'read'   :      this.read(data, opt, cb); break;
+                    case 'create' :   this.created(data, opt, cb); break;
+                    case 'update' :   this.updated(data, opt, cb); break;
                     case 'delete' : this.destroyed(data, opt, cb); break;
                 };
             };
@@ -104,13 +102,10 @@
             server = remote;
             connected(model, options);
         };
-        DNode(Protocol).connect(port, block); return;
+        
         // Connect to DNode server only once
         if (!server) DNode(Protocol).connect(port, block);
-        else {
-            DNode(Protocol);
-            connected(model, options);
-        }
+        else connected(model, options);
     };
     if (typeof exports !== 'undefined') module.exports = Synchronize;
 

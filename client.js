@@ -5,8 +5,6 @@
     
     // Dependancies
     var dnode         = require('dnode'),
-        _             = require('underscore')._,
-        Backbone      = require('backbone'),
         Synchronize   = require('./public/synchronize'),
         Models        = require('./public/models/models');
     
@@ -42,10 +40,10 @@
     dnode(Protocol).connect(8080, function(remote) {
         
         var users = new Models.UserCollection({url : 'users'});
+        var chats = new Models.ChatCollection({url : 'world:_0:chats'});
         
-        //remote.subscribe(users.toJSON());
-        
+        // Sync via pub/sub through our RPC protocol
         Synchronize(users, {fetch : true});
-        
+        Synchronize(chats, {fetch : true});
     });
 })()
