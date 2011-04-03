@@ -33,16 +33,17 @@
     });
     
     // Public facing application
-    server.get('/', function(req, res) {
-        res.render('index'); return;
+    server.get('/todos', function(req, res) {
+        res.render('index.html'); return;
     });
     
     // Main application
-    server.get('/main', Auth.restrict, function(req, res) {
+    server.get('/', function(req, res) {
         res.render('main.jade', {
             locals: {
-                name: req.session.user.name,
-                user: req.session.user.data
+                //name: req.session.user.name,
+                name: 'anonymous',
+                //user: req.session.user.data
             }
         });
     });

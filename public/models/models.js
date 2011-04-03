@@ -126,7 +126,6 @@
     // World Model
     Models.WorldModel = Backbone.Model.extend({
         name     : 'worlds',
-        //url      : 'worlds',
         urlRoot  : 'worlds',
         defaults : {
             'name'  : 'World',

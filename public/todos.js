@@ -50,7 +50,8 @@ $(function(){
     model: Todo,
     url: 'todos',
     name: 'todos',
-
+    children: [],
+    
     // Filter down the list of all todo items that are finished.
     done: function() {
       return this.filter(function(todo){ return todo.get('done'); });
@@ -198,10 +199,24 @@ $(function(){
       this.model.bind('refresh', this.addAll);
       this.model.bind('all',     this.render);
  
-      
-      new Synchronize(this.model, {
-        fetch : { add : true }
-      });
+        var self = this;
+        // Sync up with the server through DNode
+        Synchronize(this.model, {
+            // Fetch data from server
+            finished : function(data) {
+                console.log('data',data);
+                _.each(Todos.children, function(id) {
+                    Todos.add({id : id}, {silent : true});
+                });
+                Todos.each(function(todo) {
+                    todo.fetch({
+                        finished : function(data) {
+                            Todos.add(data);
+                        },
+                    });
+                });
+            },
+        });
     },
 
     // Re-rendering the App just means refreshing the statistics -- the rest
@@ -242,6 +257,17 @@ $(function(){
       if (e.keyCode != 13) return;
       Todos.create(this.newAttributes());
       this.input.val('');
+      
+        var self = this;
+        
+        Todos.create(this.newAttributes(), {
+            finished : function(data) {
+                 var keys = _.without(Todos.get('todos'), data.id);
+                 keys.push(data.id);
+                 Todos.set({messages : keys}).save({silent : true});
+                 delete keys;
+            }
+        });
     },
 
     // Clear all done todo items, destroying their models.
