@@ -60,8 +60,7 @@
                 'updateOnEnter', 'joinChannel', 'leaveChannel'
             );
             
-            this.render = _.bind(this.render, this);            
-            if (options.client) this.client = options.client;
+            this.render = _.bind(this.render, this);           
             
             // Send model contents to Mustache
             var content = this.model.toJSON();
@@ -74,18 +73,17 @@
                 });
 
             // Set shortcut methods for DOM items
-            this.input          = $(this.el).find(".chat-box");
-            this.messagelist    = $(this.el).find(".message-list");
+            this.input       = $(this.el).find(".chat-box");
+            this.messagelist = $(this.el).find(".message-list");
             
             // Bind to model
             this.model.bind('change', this.render);
             this.model.view = this;
             
-            this.model.messages.client = this.client;
-            this.model.messages.bind('add',     this.addMessage);
-            this.model.messages.bind('all',     this.render);
+            this.model.messages.bind('add', this.addMessage);
+            this.model.messages.bind('all', this.render);
             
-            new Synchronize(this.model.messages, {fetch : {add : true}});
+            Synchronize(this.model.messages, {fetch : {add : true}});
         },
         
         // Refresh
@@ -173,6 +171,9 @@
             if (!this.input.val()) return;
             this.model.messages.create(this.newAttributes());
             this.input.val('');
+            
+            console.log('chat collection', this);
+            console.log('chat collection', this.model.toJSON());
         },
         
         // Generate the attributes
@@ -218,13 +219,13 @@
             // Set shortcuts to collection DOM
             this.input      = $(this.el).find('.join-room');
             this.chatlist   = $(this.el).find('.chat-list');
-            this.userlist   = $(this.el).find('.user-list');            
+            this.userlist   = $(this.el).find('.user-list');
             
             // Bind chats collection
             this.model.chats.bind('add',    this.addChat);
             this.model.chats.bind('all',    this.render);
             
-            new Synchronize(this.model.chats, {fetch : {add : true}});
+            Synchronize(this.model.chats, {fetch : {add : true}});
         },
         
         // Refresh
@@ -254,6 +255,9 @@
                         queue : false
                     }                    
                 });
+                
+             console.log('world collection', this);
+             console.log('world collection', this.model.toJSON());
         },
         
         // Add all items in the collection at once.
@@ -280,7 +284,7 @@
     Views.ApplicationView = Backbone.View.extend({
         // DOM element
         className : 'wrapper',
-        tagName : 'div',
+        tagName   : 'div',
         
         // Initialization
         initialize : function(options) {
@@ -293,14 +297,19 @@
             // Set the model directly
             this.model = new Models.WorldModel({
                 id   : '_0',
-                url  : 'worlds',
+                url  : 'worlds:_0',
                 name : "Location: Omaha, Nebraska"
             });
             
             // Set view directly
             this.view = new Views.WorldView({
-                model : this.model      
+                model : this.model
             });
+            
+            this.model.set({ counter : 1 });
+            Synchronize(this.model, {save : true});
+            
+            console.log('this model', this.model);
             
             /**
             var username = $('#client .username').html();
