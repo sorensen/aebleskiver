@@ -47,6 +47,7 @@
         console.log('fetching', model);
         options.save && model.save();
         options.fetch && model.fetch(options.fetch);
+        options.finished && options.finished(model);
     };
         
     // Transport methods for model storage, sending data 
@@ -54,6 +55,8 @@
     Synchronize = function(model, options) {
         options = options || {};
         
+        console.log('Synchronize:', model);
+        console.log('Synchronize:', options);
         // Remote protocol
         var Protocol = function() {
             // Created model
@@ -63,6 +66,8 @@
                 console.log('created: ', opt);
                 if (!data || !synced[opt.channel]) return;
                 if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
+                
+                opt.finished && opt.finished(data);
             };
             
             // Fetched model
@@ -78,6 +83,8 @@
                 var chan = synced[opt.channel];
                 if (chan instanceof Backbone.Model) chan.set(data);
                 else if (!chan.get(data.id)) chan.add(data);
+                
+                opt.finished && opt.finished(data);
             };
             
             // Updated model data
@@ -91,6 +98,8 @@
                 
                 if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
                 else synced[opt.channel].set(data);
+                
+                //opt.finished && opt.finished(data);
             };
             
             // Destroyed model
@@ -99,6 +108,8 @@
                 console.log('destroyed: ', opt);
                 if (!data) return;
                 synced[opt.channel].remove(data) || delete synced[opt.channel];
+                
+                opt.finished && opt.finished(data);
             };
             
             this.published = function(data, opt, cb) {

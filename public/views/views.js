@@ -83,7 +83,25 @@
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('all', this.render);
             
-            Synchronize(this.model.messages, {fetch : {add : true}});
+            var self = this;
+            // Sync up with the server through DNode
+            Synchronize(this.model.messages, {
+                // Fetch data from server
+                finished : function(data) {
+                    _.each(self.model.attributes.messages, function(id) {
+                        self.model.messages.add({id : id}, {silent : true});
+                    });
+                    self.model.messages.each(function(message) {
+                        message.fetch({
+                            finished : function(data) {
+                                //self.model.messages.get(data.id).set(data);
+                                //self.addMessage(data);
+                                self.model.messages.add(data);
+                            },
+                        });
+                    });
+                },
+            });
         },
         
         // Refresh
@@ -169,11 +187,18 @@
         // Send a message to the server
         sendMessage : function() {
             if (!this.input.val()) return;
-            this.model.messages.create(this.newAttributes());
-            this.input.val('');
             
-            console.log('chat collection', this);
-            console.log('chat collection', this.model.toJSON());
+            var self = this;
+            this.model.messages.create(this.newAttributes(), {
+                silent : true,
+                finished : function(data) {
+                     var keys = _.without(self.model.get('messages'), data.id);
+                     keys.push(data.id);
+                     self.model.set({messages : keys}).save({silent : true});
+                     delete keys;
+                }
+            });
+            this.input.val('');
         },
         
         // Generate the attributes
@@ -225,7 +250,28 @@
             this.model.chats.bind('add',    this.addChat);
             this.model.chats.bind('all',    this.render);
             
-            Synchronize(this.model.chats, {fetch : {add : true}});
+            var self = this;
+            // Sync up with the server through DNode
+            Synchronize(this.model.chats, {
+                // Fetch data from server
+                finished : function(data) {
+                    _.each(self.model.attributes.chats, function(id) {
+                        self.model.chats.add({id : id}, {silent : true});
+                    });
+                    self.model.chats.each(function(chat) {
+                        chat.fetch({
+                            finished : function(data) {
+                                //self.model.chats.get(data.id).set(data);
+                                
+                                console.log("CHAT FROM SERVER");
+                                //self.addChat(data);
+                                self.model.chats.add(data);
+                            },
+                        });
+                    });
+                },
+            });
+            delete self;
         },
         
         // Refresh
@@ -235,6 +281,9 @@
         
         // Add a single chat room to the current veiw
         addChat : function(chat) {
+            console.log('ADDING CHAT!!', chat);
+            console.log('ADDING CHAT!!', arguments);
+            
             chat.messages.url = chat.collection.url + ":" + chat.id + ":messages";
             
             var view = new Views.ChatView({
@@ -244,8 +293,7 @@
             $(this.el)
                 .find('.chat-list')
                 .append(view.el)
-                .masonry(
-                {
+                .masonry({
                     columnWidth : 50,
                     itemSelector : '.chat',
                     animate : true,
@@ -255,9 +303,6 @@
                         queue : false
                     }                    
                 });
-                
-             console.log('world collection', this);
-             console.log('world collection', this.model.toJSON());
         },
         
         // Add all items in the collection at once.
@@ -268,7 +313,19 @@
         // Create new chat room
         createChat : function() {
             if (!this.input.val()) return;
-            this.model.chats.create(this.newChatAttributes());
+            
+            var self = this;
+            this.model.chats.create(this.newChatAttributes(), {
+                finished : function(data) {
+                    console.log('finished!!!!', data);
+                    console.log('finished!!!!', this);
+
+                    var keys = self.model.get('chats');
+                    keys.push(data.id);
+                    self.model.set({chats : _.uniq(keys)}).save();
+                    delete keys;
+                }
+            });
             this.input.val('');
         },
         
@@ -300,14 +357,35 @@
                 url  : 'worlds:_0',
                 name : "Location: Omaha, Nebraska"
             });
+            var self = this;
             
-            // Set view directly
-            this.view = new Views.WorldView({
-                model : this.model
+            var callback = function() {
+                // Set view directly
+                self.view = new Views.WorldView({
+                    model : self.model
+                });
+                // Since there is only one world, set directly
+                self.view.render();
+                $(self.el).html(self.view.el);
+            };
+            // Sync up with the server through DNode
+            Synchronize(this.model, {
+                // Fetch data from server
+                //save  : true,
+                fetch : {
+                    add : true,
+                    finished : function(data) {
+                        console.log('WTF?',data);
+                        // Increment some arbitrary number
+                        self.model.set({counter : data.counter + 1}).save();
+                        callback();
+                    },
+                    error : function(data) {
+                        self.model.save();
+                        callback();
+                    },
+                },
             });
-            
-            this.model.set({ counter : 1 });
-            Synchronize(this.model, {save : true});
             
             console.log('this model', this.model);
             
@@ -318,7 +396,7 @@
             
             Synchronize(user, {
                 fetch   : true,
-                success : function(model) {
+                finished : function(model) {
                     
                     console.log('current user', user);
                     console.log('current user', model);
@@ -329,10 +407,6 @@
                 },
             });
             **/
-            
-            // Since there is only one world, set directly
-            this.view.render();
-            $(this.el).html(this.view.el);
         },
         
         // Render contents

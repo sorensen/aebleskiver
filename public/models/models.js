@@ -58,7 +58,7 @@
             'tags' : [
                 'general'
             ],
-            'messages' : {},
+            'messages' : [],
         },
         // Initialize
         initialize : function(options) {
@@ -126,11 +126,13 @@
     // World Model
     Models.WorldModel = Backbone.Model.extend({
         name     : 'worlds',
+        //url      : 'worlds',
         urlRoot  : 'worlds',
         defaults : {
             'name'  : 'World',
-            'users' : {},
-            'chats' : {}
+            'counter' : 0,
+            'users' : [],
+            'chats' : []
         },
         initialize : function(options) {
             this.users = new Models.UserCollection();
