@@ -94,8 +94,6 @@
                     self.model.messages.each(function(message) {
                         message.fetch({
                             finished : function(data) {
-                                //self.model.messages.get(data.id).set(data);
-                                //self.addMessage(data);
                                 self.model.messages.add(data);
                             },
                         });
@@ -258,13 +256,10 @@
                     _.each(self.model.attributes.chats, function(id) {
                         self.model.chats.add({id : id}, {silent : true});
                     });
+                    
                     self.model.chats.each(function(chat) {
                         chat.fetch({
                             finished : function(data) {
-                                //self.model.chats.get(data.id).set(data);
-                                
-                                console.log("CHAT FROM SERVER");
-                                //self.addChat(data);
                                 self.model.chats.add(data);
                             },
                         });
@@ -281,9 +276,6 @@
         
         // Add a single chat room to the current veiw
         addChat : function(chat) {
-            console.log('ADDING CHAT!!', chat);
-            console.log('ADDING CHAT!!', arguments);
-            
             chat.messages.url = chat.collection.url + ":" + chat.id + ":messages";
             
             var view = new Views.ChatView({
@@ -317,9 +309,6 @@
             var self = this;
             this.model.chats.create(this.newChatAttributes(), {
                 finished : function(data) {
-                    console.log('finished!!!!', data);
-                    console.log('finished!!!!', this);
-
                     var keys = self.model.get('chats');
                     keys.push(data.id);
                     self.model.set({chats : _.uniq(keys)}).save();
@@ -364,10 +353,12 @@
                 self.view = new Views.WorldView({
                     model : self.model
                 });
+                
                 // Since there is only one world, set directly
                 self.view.render();
                 $(self.el).html(self.view.el);
             };
+            
             // Sync up with the server through DNode
             Synchronize(this.model, {
                 // Fetch data from server
@@ -397,10 +388,6 @@
             Synchronize(user, {
                 fetch   : true,
                 finished : function(model) {
-                    
-                    console.log('current user', user);
-                    console.log('current user', model);
-                    
                     user.set(model).set({status : 'online'});
                     user.save();
                     self.user = user;

@@ -55,15 +55,11 @@
     Synchronize = function(model, options) {
         options = options || {};
         
-        console.log('Synchronize:', model);
-        console.log('Synchronize:', options);
         // Remote protocol
         var Protocol = function() {
             // Created model
             // NOTE: New models must be created through sets
             this.created = function(data, opt, cb) {
-                console.log('created: ', data);
-                console.log('created: ', opt);
                 if (!data || !synced[opt.channel]) return;
                 if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
                 
@@ -72,13 +68,8 @@
             
             // Fetched model
             this.read = function(data, opt, cb) {
-                console.log('read: ', data);
-                console.log('read: ', opt);
                 // Compare URL's to update the right collection
                 if (!data.id && !_.first(data) || !synced[opt.channel]) return;
-                
-                console.log('read channel', opt.channel);
-                console.log('read channel', synced[opt.channel]);
                 
                 var chan = synced[opt.channel];
                 if (chan instanceof Backbone.Model) chan.set(data);
@@ -89,12 +80,7 @@
             
             // Updated model data
             this.updated = function(data, opt, cb) {
-                console.log('updated: ', data);
-                console.log('updated: ', opt);
-                // Compare URL's to update the right collection
                 if (!data || !synced[opt.channel]) return;
-                console.log('updated: ', synced[opt.channel]);
-                
                 
                 if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
                 else synced[opt.channel].set(data);
@@ -104,8 +90,6 @@
             
             // Destroyed model
             this.destroyed = function(data, opt, cb) {
-                console.log('destroyed: ', data);
-                console.log('destroyed: ', opt);
                 if (!data) return;
                 synced[opt.channel].remove(data) || delete synced[opt.channel];
                 
@@ -113,8 +97,6 @@
             };
             
             this.published = function(data, opt, cb) {
-                console.log('published: ', data);
-                console.log('published: ', opt);
                 // Check CRUD
                 switch (opt.method) {
                     case 'read'   :      this.read(data, opt, cb); break;
@@ -153,21 +135,11 @@
     // Callback testing
     var callback = function(data, opt) {
         console.log('sync col callback?', data);
-        console.log('sync col callback?', opt);
-        
-        if (data && opt.method === 'create') {
-            console.log('sync col callback?', synced[opt.channel]);
-            //synced[opt.channel].children[data.id] = {};
-            //synced[opt.channel].save({silent : true});
-        }
     };
     
     // Override `Backbone.sync` to use delegate to the model or collection's
     // *localStorage* property, which should be an instance of `Store`.
     Backbone.sync = function(method, model, options) {
-    
-        console.log('bb sync: ' + method, model);
-        console.log('bb sync: ' + method, options);
         // Set model url and store
         var params = _.extend({
             store : {
@@ -175,7 +147,6 @@
             },
             url :  getUrl(model) || model.url
         }, model.toJSON());
-        
         
         options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
         options.method  = method;
