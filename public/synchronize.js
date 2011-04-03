@@ -1,7 +1,18 @@
 (function() {
     // Backbone dnode sync
     // -------------------
-    var server = {};
+    //var Synchronize;
+    if (typeof exports !== 'undefined') {
+		// Dependancies
+        _         = require('underscore')._;
+        Backbone  = require('backbone');
+        DNode     = require('dnode');
+        Synchronize = module.exports;
+    } else {
+        Synchronize = this.Synchronize = {};
+    }
+    
+    var server = false;
     var synced = {};
     var seperator = ':';
     
@@ -12,9 +23,30 @@
         return _.isFunction(object.url) ? object.url() : object.url;
     };
     
+    var connected = function(model, options) {
+    
+        var name = model.name || model.collection.name;
+        
+        // Ooh boy is that a new magazine!?
+        var magazine = _.extend({
+            store : {
+                name : model.name || model.collection.name
+            },
+            url : getUrl(model)
+        }, model.toJSON());
+        
+        options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
+        // Two year membership? Sure!
+        // ...this is all free, right?
+        server.subscribe(magazine, options);
+        
+        // I'll take those now, thank you.
+        options.fetch && model.fetch(options.fetch);
+    };
+        
     // Transport methods for model storage, sending data 
     // through the socket instance to be saved on the server 
-    this.Synchronize = function(model, options) {
+    Synchronize = function(model, options) {
     
         // Remote protocol
         var Protocol = function() {
@@ -22,20 +54,21 @@
             this.created = function(data, opt, cb) {
                 if (!data) return;
                 if (model.url + seperator + data.id !== data.url) return;
-                if (!model.get(data.id)) model.add(data);
+                !model.get(data.id) && model.add(data);
             };
             
             // Fetched model
             this.read = function(data, opt, cb) {
+                console.log('proto read', data);
                 // Compare URL's to update the right collection
                 if (!data.id && !_.first(data)) return;
                 if (model.url + seperator + (data.id || _.first(data).id) !== data.url) return;
-                
-                if (!model.get(data.id)) model.add(data);
+                !model.get(data.id) && model.add(data);
             };
             
             // Updated model data
             this.updated = function(data, opt, cb) {
+                console.log('proto updated', data);
                 // Compare URL's to update the right collection
                 if (!data) return;
                 if (model.url + seperator + data.id !== data.url) return;
@@ -44,28 +77,42 @@
             
             // Destroyed model
             this.destroyed = function(data, opt, cb) {
+                console.log('proto destroyed', data);
                 if (!data) return;
                 if (model.url + seperator + data.id !== data.url) return;
                 model.remove(data);
             };
+            
+            this.published = function(data, opt, cb) {
+                console.log('proto published', model);
+                console.log('proto published', data);
+                console.log('proto published', opt);
+                // Check CRUD
+                switch (opt.method) {
+                    case 'read'   :    this.read(data, opt, cb); break;
+                    case 'create' :  this.created(data, opt, cb); break;
+                    case 'update' :  this.updated(data, opt, cb); break;
+                    case 'delete' : this.destroyed(data, opt, cb); break;
+                };
+            };
         };
-        var name = model.name || model.collection.name;
-        if (!options) options = {};
-        
-        var url = model.url || getUrl(model);
-        synced[model.url] = model;
         
         // Setup our dnode listeners for server callbacks
         // as well as model bindings on connection
         var port = 8000;
         var block = function(remote) {
             server = remote;
-            options.fetch && model.fetch(options.fetch);
+            connected(model, options);
         };
-        DNode(Protocol).connect(port, block);
-        
-        return this;
+        DNode(Protocol).connect(port, block); return;
+        // Connect to DNode server only once
+        if (!server) DNode(Protocol).connect(port, block);
+        else {
+            DNode(Protocol);
+            connected(model, options);
+        }
     };
+    if (typeof exports !== 'undefined') module.exports = Synchronize;
 
     // Default URL for the model's representation on the server -- if you're
     // using Backbone's restful methods, override this to change the endpoint
@@ -93,6 +140,10 @@
         var callback = function(cb) {
             console.log('sync col callback?', cb);
         };
+        
+        options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
+        options.method  = method;
+        
         if (!server) return;
         switch (method) {
             case 'read'   :    server.read(params, options, callback); break;

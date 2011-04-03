@@ -85,7 +85,7 @@
             this.model.messages.bind('add',     this.addMessage);
             this.model.messages.bind('all',     this.render);
             
-            Synchronize(this.model.messages, {fetch : {add : true}});
+            new Synchronize(this.model.messages, {fetch : {add : true}});
         },
         
         // Refresh
@@ -224,7 +224,7 @@
             this.model.chats.bind('add',    this.addChat);
             this.model.chats.bind('all',    this.render);
             
-            Synchronize(this.model.chats, {fetch : {add : true}});
+            new Synchronize(this.model.chats, {fetch : {add : true}});
         },
         
         // Refresh
@@ -293,7 +293,7 @@
             // Set the model directly
             this.model = new Models.WorldModel({
                 id   : '_0',
-                url  : 'worlds:_0',
+                url  : 'worlds',
                 name : "Location: Omaha, Nebraska"
             });
             
@@ -301,6 +301,25 @@
             this.view = new Views.WorldView({
                 model : this.model      
             });
+            
+            /**
+            var username = $('#client .username').html();
+            var user = new Models.UserModel({id : username});
+            var self = this;
+            
+            Synchronize(user, {
+                fetch   : true,
+                success : function(model) {
+                    
+                    console.log('current user', user);
+                    console.log('current user', model);
+                    
+                    user.set(model).set({status : 'online'});
+                    user.save();
+                    self.user = user;
+                },
+            });
+            **/
             
             // Since there is only one world, set directly
             this.view.render();

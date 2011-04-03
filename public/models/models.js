@@ -15,9 +15,29 @@
     
     // User
     Models.UserModel = Backbone.Model.extend({
+        
         defaults : {
-            "username" : "anonymous",
-            "gravatar" : "images/undefined.png"
+            'username'   : 'anonymous',
+            'gravatar'   : 'images/undefined.png',
+            'status'     : 'offline',
+            'statistics' : {
+                'games'  : 0,
+                'clicks' : 0,
+                'wins'   : 0,
+                'losses' : 0,
+                'score'  : 0
+            },
+        },
+        initialize : function(options) {
+            this.deck = new Models.CardCollection();
+        },
+    });
+    
+    // Cards
+    Models.CardModel = Backbone.Model.extend({
+        defaults : {
+            'suit' : 'clubs',
+            'value' : 1,
         },
         initialize : function(options) {
         },
@@ -34,13 +54,13 @@
     // Chat room
     Models.ChatModel = Backbone.Model.extend({
         defaults : {
-            "name" : "Unknown",
-            "tags" : [
+            'name' : 'Unknown',
+            'tags' : [
                 'general'
             ],
         },
         // Initialize
-        initialize : function(options) {            
+        initialize : function(options) {
             this.messages = new Models.MessageCollection();
         },
         // Remove this delete its view.
@@ -60,6 +80,18 @@
         model : Models.UserModel,
         url   : 'users',
         name  : 'users',
+        
+        // Initialize
+        initialize : function(options) {
+        }
+    });
+    
+    // Card Collection
+    Models.CardCollection = Backbone.Collection.extend({
+        
+        model : Models.MessageModel,
+        url   : 'cards',
+        name  : 'cards',
         
         // Initialize
         initialize : function(options) {
@@ -93,7 +125,7 @@
     // World Model
     Models.WorldModel = Backbone.Model.extend({
         defaults : {
-            "name" : "World"
+            'name' : 'World'
         },
         initialize : function(options) {
             this.users = new Models.UserCollection();
