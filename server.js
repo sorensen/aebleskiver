@@ -38,12 +38,12 @@
     });
     
     // Main application
-    server.get('/', function(req, res) {
+    server.get('/', Auth.restricted, function(req, res) {
         res.render('main.jade', {
             locals: {
-                //name: req.session.user.name,
-                name: 'anonymous',
-                //user: req.session.user.data
+                //name: 'anonymous',
+                name: req.session.user.name,
+                user: req.session.user.data
             }
         });
     });
@@ -77,7 +77,7 @@
                 // to prevent fixation 
                 req.session.regenerate(function() {
                     req.session.user = user;
-                    res.redirect('/main');
+                    res.redirect('/');
                 });
             } else {
                 req.flash('error', 'Authentication failed, please check your username and password.');
@@ -89,7 +89,7 @@
     // Register
     server.get('/register', function(req, res) {
         if (req.session.user) {
-            res.redirect('/main');
+            res.redirect('/');
         }
         res.render('register.jade');
     });
@@ -103,7 +103,7 @@
                 // to prevent fixation 
                 req.session.regenerate(function() {
                     req.session.user = user;
-                    res.redirect('/main');
+                    res.redirect('/');
                 });
             } else {
                 req.flash('error', 'Registration failed, please check your username and password.');

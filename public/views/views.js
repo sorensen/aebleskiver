@@ -12,6 +12,43 @@
         Views = this.Views = {};
     }
     
+    
+    // User ( Client )
+    Views.UserView = Backbone.View.extend({
+        tagName : 'div',
+        className : 'user chat inactive',
+        
+        // The DOM events specific to an item.
+        events : {
+            "dblclick"             : "toggleActive"
+        },
+        
+        // Mustache Template
+        template : _.template($('#user-template').html()),
+    
+        initialize : function(options) {
+            _.bindAll(this, 'render', 'clear');
+            this.model.bind('all', this.render);
+            this.model.bind('remove', this.clear);
+            this.model.view = this;
+            
+            // Send model contents to Mustache
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(content), content);            
+            $(this.el).html(view);
+        },
+    
+        // Re-render contents
+        render : function() {
+            return this;
+        },
+        
+        // Remove the item, destroy the model.
+        clear : function() {
+            this.model.clear();
+        },
+    });
+    
     // Message
     Views.MessageView = Backbone.View.extend({
         tagName : 'li',
@@ -202,9 +239,9 @@
         // Generate the attributes
         newAttributes : function() {
             return {
-                chat :        this.model.escape('id'),
-                text :        this.input.val(),
-                username :     $('#client .username').html()
+                chat     : this.model.escape('id'),
+                text     : this.input.val(),
+                username : $('#client').html()
             };
         },
     });
@@ -235,14 +272,11 @@
             var view = Mustache.to_html(this.template(content), content);            
             $(this.el).html(view);
             
-            // Get the current client by username ( TEMPORARY )    
-            var newClient = $('#client .username').html();
-            this.client = newClient;
-            
             // Set shortcuts to collection DOM
             this.input      = $(this.el).find('.join-room');
             this.chatlist   = $(this.el).find('.chat-list');
             this.userlist   = $(this.el).find('.user-list');
+            
             
             // Bind chats collection
             this.model.chats.bind('add',    this.addChat);
@@ -253,14 +287,18 @@
             Synchronize(this.model.chats, {
                 // Fetch data from server
                 finished : function(data) {
+                
+                    // Set a model for each id found for lookups
                     _.each(self.model.attributes.chats, function(id) {
                         self.model.chats.add({id : id}, {silent : true});
                     });
                     
+                    // Use backbone to fetch from the server
                     self.model.chats.each(function(chat) {
                         chat.fetch({
                             finished : function(data) {
                                 self.model.chats.add(data);
+                                
                             },
                         });
                     });
@@ -346,16 +384,43 @@
                 url  : 'worlds:_0',
                 name : "Location: Omaha, Nebraska"
             });
+            
+            var username = $('#client').html();
+            var user = new Models.UserModel({id : username});
             var self = this;
             
-            var callback = function() {
+            // Callback for when server synchronization
+            // has been completed
+            var finished = function() {
+                console.log('Synchronize callback', user);
+                Synchronize(user, {
+                    fetch : {
+                        add : true,
+                        finished : function(model) {
+                            console.log('Fetched user: ', model);
+                            
+                            user.set(model);
+                            user.set({status : 'online'});
+                            user.save();
+                            
+                            // Attatch to window for common use
+                            self.user = window.user = user;
+                        },
+                        error : function(model) {
+                            console.log('Fetched user error: ', model);
+                            
+                            user.save();
+                            
+                            // Attatch to window for common use
+                            self.user = window.user = user;
+                        },
+                    }
+                });
+            
                 // Set view directly
                 self.view = new Views.WorldView({
                     model : self.model
                 });
-                
-                // Since there is only one world, set directly
-                self.view.render();
                 $(self.el).html(self.view.el);
             };
             
@@ -369,31 +434,14 @@
                         console.log('WTF?',data);
                         // Increment some arbitrary number
                         self.model.set({counter : data.counter + 1}).save();
-                        callback();
+                        finished();
                     },
                     error : function(data) {
                         self.model.save();
-                        callback();
+                        finished();
                     },
                 },
             });
-            
-            console.log('this model', this.model);
-            
-            /**
-            var username = $('#client .username').html();
-            var user = new Models.UserModel({id : username});
-            var self = this;
-            
-            Synchronize(user, {
-                fetch   : true,
-                finished : function(model) {
-                    user.set(model).set({status : 'online'});
-                    user.save();
-                    self.user = user;
-                },
-            });
-            **/
         },
         
         // Render contents

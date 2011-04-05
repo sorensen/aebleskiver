@@ -37,14 +37,11 @@
         options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
         synced[options.channel] = model;
         
-        console.log('SYNCED:', synced);
-        
         // Two year membership? Sure!
         // ...this is all free, right?
         server.subscribe(magazine, options);
         
         // I'll take those now, thank you.
-        console.log('fetching', model);
         options.save && model.save();
         options.fetch && model.fetch(options.fetch);
         options.finished && options.finished(model);
@@ -68,6 +65,7 @@
             
             // Fetched model
             this.read = function(data, opt, cb) {
+                console.log('Protocol read: ', data);
                 // Compare URL's to update the right collection
                 if (!data.id && !_.first(data) || !synced[opt.channel]) return;
                 
@@ -75,6 +73,7 @@
                 if (chan instanceof Backbone.Model) chan.set(data);
                 else if (!chan.get(data.id)) chan.add(data);
                 
+                console.log('Protocol read finished');
                 opt.finished && opt.finished(data);
             };
             
@@ -85,7 +84,7 @@
                 if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
                 else synced[opt.channel].set(data);
                 
-                //opt.finished && opt.finished(data);
+                opt.finished && opt.finished(data);
             };
             
             // Destroyed model
@@ -134,7 +133,7 @@
     
     // Callback testing
     var callback = function(data, opt) {
-        console.log('sync col callback?', data);
+        console.log('callback test:', data);
     };
     
     // Override `Backbone.sync` to use delegate to the model or collection's

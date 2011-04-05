@@ -2,6 +2,8 @@
 html(lang="en")
   head
     title nodechat
+    
+    // Dependancies
     script(src="jquery-1.5.1.js")
     script(src="underscore-min.js")
     script(src="backbone.js")
@@ -13,6 +15,8 @@ html(lang="en")
     script(src="/dnode.js")
     script(src="synchronize.js")
 
+    
+    // User full
     script#user-template(type='text/template')
       a.gravatar(href='#/user/{{ username }}')
         span
@@ -20,8 +24,77 @@ html(lang="en")
       span.username
         {{ username }}
     
-    script#list-template(type='text/template')
-
+    
+    // Main application
+    script#application-template(type='text/template')
+      .header
+        .logo
+        ul.navigation
+      .wrapper
+        .sidebar
+          .menu
+          .users
+          .games
+          .channels
+        .main
+          h2.title {{ title }}
+          .search-bar
+          .controls
+            .main-controls
+            .change-layouts
+              button .list
+              button .tiles
+      .footer
+        .copyright
+          p &copy; 2011
+        .author
+          p Beau Sorensen
+    
+    
+    // Game room
+    script#game-template(type='text/template')
+      .widget
+        .current-player-count {{ count }}
+        .current-players
+      .main-viewport
+      .workspace
+        .actions
+        .current-deck
+        button .help
+      
+      
+    // Deck of cards
+    script#deck-template(type='text/template')
+      .controls
+        .shuffle
+      .card-count
+      .card-list
+    
+    
+    // Card
+    script#card-template(type='text/template')
+        .card(title='{{ title }}')
+          .suit-tl {{ suit }}
+          .rank {{ rank }}
+          .suit-br {{ suit }}
+    
+    
+    // Game icon for list view
+    script#channel-icon-template(type='text/template')
+      .name {{ name }}
+      .users {{ usercount }}
+      .updates {{ newmessages }}
+    
+    
+    // Channel icon for list view
+    script#channel-icon-template(type='text/template')
+      .name {{ name }}
+      .users {{ usercount }}
+      .updates {{ newmessages }}
+    
+    
+    // Channel full view
+    script#channel-list-template(type='text/template')
     script#channel-template(type='text/template')
       .voting
       .feature
@@ -30,6 +103,8 @@ html(lang="en")
       .changeable
         .subscribers
 
+        
+    // World of chat rooms
     script#world-template(type='text/template')
       .feature.box
         .feature-content
@@ -46,8 +121,8 @@ html(lang="en")
       .chat-list
       .user-list
 
-    script#channel-list-template(type='text/template')
 
+    // Chat window
     script#chat-template(type='text/template')
       h3.name {{ name }}
       form(method="post", action="#", onsubmit="return false")
@@ -55,29 +130,28 @@ html(lang="en")
         input.chat-box(type='text', name='message', placeholder='Say something...')
       .message-list
     
+    
+    // Single message
+    script#message-list-template(type='text/template')
     script#message-template(type='text/template')
       span.icon
         span.avatar
+          {{ avatar }}
       a.username(href='#{{ username }}')
         {{ username }}
       span.data
         {{ text }}
     
-    script#message-list-template(type='text/template')
     
-   
+    // MVC
     script(src="models/models.js")
     script(src="controllers/controllers.js")
     script(src="views/views.js")
     script(src="client.js")
-    
     link(rel='stylesheet', href='css/style.css')
     style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
   body
     #wrapper
       div.offline
     #client(style='display:none;')
-      div.username= name
-    #webcam-test
-    #webcam-receive
-    #webcam-debug
+      = locals.name

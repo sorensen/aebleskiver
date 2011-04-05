@@ -224,9 +224,9 @@ $(function(){
     render: function() {
       var done = Todos.done().length;
       this.$('#todo-stats').html(this.statsTemplate({
-        total:      Todos.length,
-        done:       Todos.done().length,
-        remaining:  Todos.remaining().length
+        total     : Todos.length,
+        done      : Todos.done().length,
+        remaining : Todos.remaining().length
       }));
     },
 

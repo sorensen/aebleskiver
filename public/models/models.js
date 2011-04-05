@@ -6,20 +6,26 @@
     // one overall 'world' to hold everything
     var Models;
     if (typeof exports !== 'undefined') {
-        _           = require('underscore')._;
-        Backbone    = require('backbone');
-        Models      = exports;
+        // Server exports
+        _        = require('underscore')._;
+        Backbone = require('backbone');
+        Models   = exports;
     } else {
+        // Client include
         Models = this.Models = {};
     }
     
     // User
     Models.UserModel = Backbone.Model.extend({
         
+        urlRoot  : 'users',
+        name     : 'users',
         defaults : {
-            'username'   : 'anonymous',
-            'gravatar'   : 'images/undefined.png',
-            'status'     : 'offline',
+            'cards'    : [],
+            'messages' : [],
+            'username' : 'anonymous',
+            'gravatar' : 'images/undefined.png',
+            'status'   : 'offline',
             'statistics' : {
                 'games'  : 0,
                 'clicks' : 0,
@@ -28,6 +34,7 @@
                 'score'  : 0
             },
         },
+        
         initialize : function(options) {
             this.deck = new Models.CardCollection();
         },
@@ -37,7 +44,7 @@
     Models.CardModel = Backbone.Model.extend({
         defaults : {
             'suit' : 'clubs',
-            'value' : 1,
+            'rank' : 1,
         },
         initialize : function(options) {
         },
@@ -72,6 +79,22 @@
         // Remove this delete its view.
         leaveChannel : function() {
             this.view.leaveChannel();
+        }
+    });
+    
+    // World Model
+    Models.GameModel = Backbone.Model.extend({
+        name     : 'games',
+        urlRoot  : 'games',
+        defaults : {
+            'name'     : 'Game Name',
+            'counter'  : 0,
+            'users'    : [],
+            'messages' : []
+        },
+        initialize : function(options) {
+            this.users = new Models.UserCollection();
+            this.users.url = 'games:' + this.id + ':users';
         }
     });
     
@@ -128,10 +151,10 @@
         name     : 'worlds',
         urlRoot  : 'worlds',
         defaults : {
-            'name'  : 'World',
+            'name'    : 'World',
             'counter' : 0,
-            'users' : [],
-            'chats' : []
+            'users'   : [],
+            'chats'   : []
         },
         initialize : function(options) {
             this.users = new Models.UserCollection();
