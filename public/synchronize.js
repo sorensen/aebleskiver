@@ -11,7 +11,6 @@
     } else {
         Synchronize = this.Synchronize = {};
     }
-    
     var server = false;
     var synced = {};
     var seperator = ':';
@@ -25,25 +24,45 @@
     
     var connected = function(model, options) {
         var name = model.name || model.collection.name;
+        var url = (model.collection) ? getUrl(model.collection) : getUrl(model);
         
         // Ooh boy is that a new magazine!?
-        var magazine = _.extend({
+        var magazine = {
             store : {
-                name : model.name || model.collection.name
+                name : name
             },
-            url : getUrl(model)
-        }, model.toJSON());
+            url : url
+        };
+        if (model instanceof Backbone.Model) {
+            params = _.extend(magazine, model.toJSON());
+        }
         
-        options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
+        options.channel = url;
         synced[options.channel] = model;
         
-        // Two year membership? Sure!
-        // ...this is all free, right?
-        server.subscribe(magazine, options);
-        
-        // I'll take those now, thank you.
-        options.save && model.save();
-        options.fetch && model.fetch(options.fetch);
+        if (options.unsubscribe) {
+            var opt = _.extend({
+                channel : options.channel,
+            }, options.unsubscribe);
+            
+            // Alright, thats enough of those
+            server.unsubscribe(magazine, opt);
+            delete synced[options.channel];
+        } 
+        else {
+            var opt = _.extend({
+                channel : options.channel,
+            }, options.subscribe);
+            
+            // Two year membership? Sure!
+            // ...this is all free, right?
+            server.subscribe(magazine, opt);
+            
+            // I'll take those now, thank you.
+            options.save && model.save();
+            options.fetch && model.fetch(options.fetch);
+        }
+        // All done with the setup
         options.finished && options.finished(model);
     };
         
@@ -54,6 +73,19 @@
         
         // Remote protocol
         var Protocol = function() {
+        
+            // New subscription
+            this.subscribed = function(data, opt, cb) {
+                if (!data || !synced[opt.channel]) return;
+                opt.finished && opt.finished(data);
+            };
+        
+            // New subscription
+            this.unsubscribed = function(data, opt, cb) {
+                if (!data || !synced[opt.channel]) return;
+                opt.finished && opt.finished(data);
+            };
+            
             // Created model
             // NOTE: New models must be created through sets
             this.created = function(data, opt, cb) {
@@ -65,22 +97,18 @@
             
             // Fetched model
             this.read = function(data, opt, cb) {
-                console.log('Protocol read: ', data);
                 // Compare URL's to update the right collection
                 if (!data.id && !_.first(data) || !synced[opt.channel]) return;
-                
                 var chan = synced[opt.channel];
                 if (chan instanceof Backbone.Model) chan.set(data);
                 else if (!chan.get(data.id)) chan.add(data);
                 
-                console.log('Protocol read finished');
                 opt.finished && opt.finished(data);
             };
             
             // Updated model data
             this.updated = function(data, opt, cb) {
                 if (!data || !synced[opt.channel]) return;
-                
                 if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
                 else synced[opt.channel].set(data);
                 
@@ -108,7 +136,7 @@
         
         // Setup our dnode listeners for server callbacks
         // as well as model bindings on connection
-        var port = 8000;
+        var port = 3000;
         var block = function(remote) {
             server = remote;
             connected(model, options);
@@ -140,14 +168,19 @@
     // *localStorage* property, which should be an instance of `Store`.
     Backbone.sync = function(method, model, options) {
         // Set model url and store
-        var params = _.extend({
+        var params = {
             store : {
                 name : model.name || model.collection.name
             },
             url :  getUrl(model) || model.url
-        }, model.toJSON());
+        };
         
-        options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
+        if (model instanceof Backbone.Model) {
+            params = _.extend(params, model.toJSON());
+        }
+        
+        callback = options.remote || callback;
+        if (!options.channel) options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
         options.method  = method;
         
         if (!server) return;

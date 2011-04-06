@@ -54,7 +54,13 @@
     Models.MessageModel = Backbone.Model.extend({
         defaults : {
         },
+        
         initialize : function(options) {
+        },
+        
+        // Remove this delete its view.
+        clear : function() {
+            this.view.remove();
         },
     });
     
@@ -73,12 +79,11 @@
         },
         // Remove this delete its view.
         clear : function() {
-            this.destroy();
-            this.view.remove();
+            //this.view.remove();
         },
         // Remove this delete its view.
         leaveChannel : function() {
-            this.view.leaveChannel();
+            //this.view.leaveChannel();
         }
     });
     
@@ -146,22 +151,36 @@
         }
     });
     
+    // Chat Collection
+    Models.GameCollection = Backbone.Collection.extend({
+        
+        model : Models.GameModel,
+        url   : 'games',
+        name  : 'games',
+        
+        // Initialize
+        initialize : function(options) {
+        }
+    });
+    
     // World Model
-    Models.WorldModel = Backbone.Model.extend({
-        name     : 'worlds',
-        urlRoot  : 'worlds',
+    Models.ApplicationModel = Backbone.Model.extend({
+        name     : 'app',
+        urlRoot  : 'app',
         defaults : {
-            'name'    : 'World',
-            'counter' : 0,
-            'users'   : [],
-            'chats'   : []
+            'title'  : 'aebleskiver',
+            'visits' : 0,
+            'users'  : [],
+            'games'  : [],
+            'chats'  : []
         },
         initialize : function(options) {
             this.users = new Models.UserCollection();
-            this.users.url = 'worlds:' + this.id + ':users';
-            
+            this.users.url = 'app:' + this.id + ':users';
+            this.games = new Models.GameCollection();
+            this.games.url = 'app:' + this.id + ':games';
             this.chats = new Models.ChatCollection();
-            this.chats.url = 'worlds:' + this.id + ':chats';
+            this.chats.url = 'app:' + this.id + ':chats';
         }
     });
 })()

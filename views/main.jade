@@ -1,17 +1,17 @@
 !!! 5
 html(lang="en")
   head
-    title nodechat
+    title &AElig;bleskiver
     
     // Dependancies
-    script(src="jquery-1.5.1.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
     script(src="underscore-min.js")
     script(src="backbone.js")
-    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
-    script(src="jquery.livequery.js")
     script(src="mustache.js")
-    script(src="jquery.masonry.js")
-    script(src="json.js")
+    script(src="json2.js")
+    
+    // RPC
     script(src="/dnode.js")
     script(src="synchronize.js")
 
@@ -27,28 +27,51 @@ html(lang="en")
     
     // Main application
     script#application-template(type='text/template')
-      .header
-        .logo
-        ul.navigation
-      .wrapper
-        .sidebar
-          .menu
-          .users
-          .games
-          .channels
-        .main
-          h2.title {{ title }}
-          .search-bar
-          .controls
+      #header
+        #logo: h1 &aelig;bleskiver
+        ul#navigation
+          li: a(href='/logout') Logout
+          
+      .wrapper.container_16
+        #sidebar.grid_4
+          #sidebar-tabs
+            button#show-users Users
+            button#show-users Chats
+            button#show-users Games
+              
+          #sidebar-controls
+            form#chat-form(method="post", action="#", onsubmit="return false")
+              input#create-chat-button(type='submit', value='Create')
+              input#create-chat(type='text', name='chat', placeholder='Create a chat')
+            form#game-form(method="post", action="#", onsubmit="return false")
+              input#create-game-button(type='submit', value='Create')
+              input#create-game(type='text', name='game', placeholder='Create a game')
+          
+          #sidebar-up
+          #sidebar-content  
+            #users
+            #games
+            #chats
+          #sidebar-down
+        
+        #main.grid_12
+          #main-tabs
+            button#news News
+            button#help Help
+            
+          #main-controls
             .main-controls
-            .change-layouts
-              button .list
-              button .tiles
-      .footer
-        .copyright
-          p &copy; 2011
-        .author
-          p Beau Sorensen
+              button.new-chat Create Channel
+              button.new-game Create Game
+            
+            .layout-controls
+              button.list List
+          
+          #main-content
+                
+      #footer
+        #copyright
+          p &copy;
     
     
     // Game room
@@ -60,7 +83,13 @@ html(lang="en")
       .workspace
         .actions
         .current-deck
-        button .help
+        button.help
+    
+    // Chat window
+    script#game-list-template(type='text/template')
+      h3.name {{ name }}
+      p.description {{ description }}
+      span.total-users {{ totalUsers }}
       
       
     // Deck of cards
@@ -74,61 +103,33 @@ html(lang="en")
     // Card
     script#card-template(type='text/template')
         .card(title='{{ title }}')
-          .suit-tl {{ suit }}
-          .rank {{ rank }}
-          .suit-br {{ suit }}
+          .front
+            .suit-tl {{ suit }}
+            .rank {{ rank }}
+            .suit-br {{ suit }}
+          .back
+            .card-image {{ graphic }}
     
-    
-    // Game icon for list view
-    script#channel-icon-template(type='text/template')
-      .name {{ name }}
-      .users {{ usercount }}
-      .updates {{ newmessages }}
-    
-    
-    // Channel icon for list view
-    script#channel-icon-template(type='text/template')
-      .name {{ name }}
-      .users {{ usercount }}
-      .updates {{ newmessages }}
-    
-    
-    // Channel full view
-    script#channel-list-template(type='text/template')
-    script#channel-template(type='text/template')
-      .voting
-      .feature
-        .feature-content
-          h2 {{ name }}
-      .changeable
-        .subscribers
-
-        
-    // World of chat rooms
-    script#world-template(type='text/template')
-      .feature.box
-        .feature-content
-          h2 {{ name }}
-          form(method="post", action="#", onsubmit="return false")
-            input.join-room(type='text', name='chat', placeholder='Create chat...')
-          p.menu
-            a(href='/logout') Logout
-          p.users
-            | Username: 
-            span.username 
-              = locals.name
-      div(style='clear:both;')
-      .chat-list
-      .user-list
 
 
     // Chat window
     script#chat-template(type='text/template')
-      h3.name {{ name }}
-      form(method="post", action="#", onsubmit="return false")
+      h1.name {{ name }}
+      p.description {{ description }}
+      .users
+      .messages
+      form.message-form(method="post", action="#", onsubmit="return false")
         button Chat
-        input.chat-box(type='text', name='message', placeholder='Say something...')
-      .message-list
+        input.create-message(type='text', name='message', placeholder='Say something...')
+
+
+    // Chat window
+    script#chat-list-template(type='text/template')
+      .destroy
+      h3.name {{ name }}
+      p.description {{ description }}
+      span.new-messages {{ newMessages }}
+      span.total-users {{ totalUsers }}
     
     
     // Single message
@@ -137,7 +138,7 @@ html(lang="en")
       span.icon
         span.avatar
           {{ avatar }}
-      a.username(href='#{{ username }}')
+      a.username(href='#/users/{{ username }}')
         {{ username }}
       span.data
         {{ text }}
@@ -148,10 +149,12 @@ html(lang="en")
     script(src="controllers/controllers.js")
     script(src="views/views.js")
     script(src="client.js")
+    
+    // CSS
+    link(rel='stylesheet', href='css/grid.css')
     link(rel='stylesheet', href='css/style.css')
     style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
   body
     #wrapper
-      div.offline
     #client(style='display:none;')
       = locals.name

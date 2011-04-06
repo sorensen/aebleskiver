@@ -10,11 +10,7 @@
 		window.Application = new Views.ApplicationView({
         
 			// Use existing DOM element
-			el   : $("#wrapper"),
-            
-            // Username provided by the Node session
-            // on the initial page render
-            user : $('#client .username')
+			el   : $("#wrapper")
 		});
 	});
 })()

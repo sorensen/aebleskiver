@@ -12,15 +12,15 @@ html(lang="en")
   body
     #wrapper
       #login
-        h1 Login
+        h1 Velkommen!
         
         form(method="post", action="/login")
           p
             label Username:
-              input(type='text', name='username')
+            input(type='text', name='username')
           p
             label Password:
-              input(type='text', name='password')
+            input(type='password', name='password')
           P
-            input(type='submit', value='send')
+            input#submit-login(type='submit', value='login')
             a(href="/register") Register

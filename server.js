@@ -6,19 +6,27 @@
     // Dependancies
     var express  = require('express'),
         connect  = require('connect'),
+        crypto   = require("crypto"),
+        path     = require("path"),
+        fs       = require("fs"),
         fugue    = require('fugue'),
         Store    = require('connect-redis');
-        keys     = require('keys');
         Protocol = require('protocol'),
-        _        = require('underscore')._,
         dnode    = require('dnode'),
         Auth     = require('auth'),
-        REST     = require('rest'),
         server   = express.createServer();
+    
+    // SSL Compatibility
+    if (path.existsSync("keys/privatekey.pem")) {
+        var privateKey  = fs.readFileSync("keys/privatekey.pem", "utf8");
+        var certificate = fs.readFileSync("keys/certificate.pem", "utf8");
+        var credentials = crypto.createCredentials({key: privateKey, cert: certificate});
+    }
     
     // Server configuration
     server.configure(function() {
-        //server.use('/api', REST);
+        credentials && server.setSecure(credentials);
+    
         server.use(express.logger());
         server.use(express.bodyParser());
         server.use(express.cookieParser());
@@ -52,8 +60,7 @@
     server.get('/logout', function(req, res) {
         // destroy the user's session to log them out
         // will be re-created next request
-        req.session.destroy(function()
-        {
+        req.session.destroy(function() {
             res.redirect('home');
         });
     });
@@ -113,9 +120,9 @@
     });
 
     // Start serving
-    server.listen(8000);
+    server.listen(3000);
 
     // Initialize DNode
-    dnode(Protocol).listen(8080).listen(server);
+    dnode(Protocol).listen(server);
 })()
     
