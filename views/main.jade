@@ -3,37 +3,60 @@ html(lang="en")
   head
     title &AElig;bleskiver
     
+    // CSS
+    link(rel='stylesheet', href='css/style.css')
+    link(rel='stylesheet', href='css/grid.css')
+    style(type='text/css') @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.2.css');
+    link(rel='stylesheet', href='css/aebleskiver/jquery-ui-1.8.11.aebleskiver.css')
+    //style(type='text/css') @import url('//cdn.wijmo.com/themes/aristo/jquery-wijmo.css');
+    //style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
+    
     // Dependancies
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
+    script(src="//cdn.wijmo.com/jquery.wijmo-open.1.1.2.min.js")
+    
     script(src="underscore-min.js")
     script(src="backbone.js")
     script(src="mustache.js")
+    script(src="jquery.livequery.js")
     script(src="json2.js")
     
     // RPC
+    script(src="secure.js")
     script(src="/dnode.js")
     script(src="synchronize.js")
+    script(src="gravatar.js")
 
+    
+    // Core
+    script(src="controllers/controllers.js")
+    script(src="models/models.js")
+    script(src="client.js")
+    script(src="ui.js")
+    
     
     // User full
     script#user-template(type='text/template')
       a.gravatar(href='#/user/{{ username }}')
         span
-          img(src='{{ gravatar }}')
+          img(src='{{ avatar }}')
       span.username
         {{ username }}
     
     
     // Main application
     script#application-template(type='text/template')
-      #header
+      #header.container_16
         #logo: h1 &aelig;bleskiver
         ul#navigation
-          li: a(href='/logout') Logout
+          li: a(href='/') Home
+          li: a(href='/#/settings') Settings
+          li: a(href='/#/logout') Backbone Logout
+          li: a(href='/logout') Express Logout
           
       .wrapper.container_16
-        #sidebar.grid_4
+        #sidebar.grid_5
           #sidebar-tabs
             button#show-users Users
             button#show-users Chats
@@ -54,7 +77,7 @@ html(lang="en")
             #chats
           #sidebar-down
         
-        #main.grid_12
+        #main.grid_11
           #main-tabs
             button#news News
             button#help Help
@@ -69,7 +92,7 @@ html(lang="en")
           
           #main-content
                 
-      #footer
+      #footer.container_16
         #copyright
           p &copy;
     
@@ -114,19 +137,23 @@ html(lang="en")
 
     // Chat window
     script#chat-template(type='text/template')
-      h1.name {{ name }}
+      h1.name
+        span {{ name }}
+        span.destroy
+        
       p.description {{ description }}
       .users
       .messages
       form.message-form(method="post", action="#", onsubmit="return false")
         button Chat
-        input.create-message(type='text', name='message', placeholder='Say something...')
+        input.create-message(type='text', name='message', placeholder='Say something...', length="40")
 
 
     // Chat window
     script#chat-list-template(type='text/template')
       .destroy
-      h3.name {{ name }}
+      a(href='#/chats/{{ id }}')
+        h3.name {{ name }}
       p.description {{ description }}
       span.new-messages {{ newMessages }}
       span.total-users {{ totalUsers }}
@@ -135,25 +162,16 @@ html(lang="en")
     // Single message
     script#message-list-template(type='text/template')
     script#message-template(type='text/template')
-      span.icon
-        span.avatar
-          {{ avatar }}
+      span.created
+        {{ created }}
+      span.avatar
+        img(src='{{ avatar }}')
       a.username(href='#/users/{{ username }}')
         {{ username }}
       span.data
         {{ text }}
     
-    
-    // MVC
-    script(src="models/models.js")
-    script(src="controllers/controllers.js")
     script(src="views/views.js")
-    script(src="client.js")
-    
-    // CSS
-    link(rel='stylesheet', href='css/grid.css')
-    link(rel='stylesheet', href='css/style.css')
-    style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
   body
     #wrapper
     #client(style='display:none;')

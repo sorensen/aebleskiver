@@ -10,8 +10,8 @@
         Synchronize = module.exports;
     } else {
         Synchronize = this.Synchronize = {};
+        Server = this.Server = this.Synchronize.Server = false;
     }
-    var server = false;
     var synced = {};
     var seperator = ':';
     
@@ -46,7 +46,7 @@
             }, options.unsubscribe);
             
             // Alright, thats enough of those
-            server.unsubscribe(magazine, opt);
+            Server.unsubscribe(magazine, opt);
             delete synced[options.channel];
         } 
         else {
@@ -56,7 +56,7 @@
             
             // Two year membership? Sure!
             // ...this is all free, right?
-            server.subscribe(magazine, opt);
+            Server.subscribe(magazine, opt);
             
             // I'll take those now, thank you.
             options.save && model.save();
@@ -67,7 +67,7 @@
     };
         
     // Transport methods for model storage, sending data 
-    // through the socket instance to be saved on the server 
+    // through the socket instance to be saved on the Server 
     Synchronize = function(model, options) {
         options = options || {};
         
@@ -132,25 +132,32 @@
                     case 'delete' : this.destroyed(data, opt, cb); break;
                 };
             };
+            
+            // Fetched gravatar
+            this.gravatared = function(data, opt, cb) {
+                console.log('Sync Gravatared: ', data);
+                // Compare URL's to update the right collection
+                if (!data) return;
+                
+                opt.finished && opt.finished(data);
+            };
         };
         
-        // Setup our dnode listeners for server callbacks
+        // Setup our dnode listeners for Server callbacks
         // as well as model bindings on connection
-        var port = 3000;
-        var block = function(remote) {
-            server = remote;
+        if (!Server) DNode(Protocol).connect(function(remote) {
+            // Connect to DNode Server only once
+            Server = remote;
             connected(model, options);
-        };
-        
-        // Connect to DNode server only once
-        if (!server) DNode(Protocol).connect(port, block);
+        });
+        // We are already connected
         else connected(model, options);
     };
     if (typeof exports !== 'undefined') module.exports = Synchronize;
 
     urlError = function() { return ''; };
     
-    // Default URL for the model's representation on the server -- if you're
+    // Default URL for the model's representation on the Server -- if you're
     // using Backbone's restful methods, override this to change the endpoint
     // that will be called.
     Backbone.Model.prototype.url = function() {
@@ -161,7 +168,7 @@
     
     // Callback testing
     var callback = function(data, opt) {
-        console.log('callback test:', data);
+        //console.log('callback test:', data);
     };
     
     // Override `Backbone.sync` to use delegate to the model or collection's
@@ -183,12 +190,12 @@
         if (!options.channel) options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
         options.method  = method;
         
-        if (!server) return;
+        if (!Server) return;
         switch (method) {
-            case 'read'   :    server.read(params, options, callback); break;
-            case 'create' :  server.create(params, options, callback); break;
-            case 'update' :  server.update(params, options, callback); break;
-            case 'delete' : server.destroy(params, options, callback); break;
+            case 'read'   :    Server.read(params, options, callback); break;
+            case 'create' :  Server.create(params, options, callback); break;
+            case 'update' :  Server.update(params, options, callback); break;
+            case 'delete' : Server.destroy(params, options, callback); break;
         };
     };
 })()

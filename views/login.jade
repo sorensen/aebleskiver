@@ -1,17 +1,23 @@
 !!! 5
 html(lang="en")
   head
-    title nodechat
+    title &AElig;bleskiver
+    
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
+    script(src="//cdn.wijmo.com/jquery.wijmo-open.1.1.2.min.js")
+    script(src="jquery.livequery.js")
 
     link(rel='stylesheet', href='/css/style.css')
-    style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
+    style(type='text/css') @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.2.css');
+    link(rel='stylesheet', href='css/aebleskiver/jquery-ui-1.8.11.aebleskiver.css')
+    script(src="ui.js")
+    script(src="secure.js")
   head
     title Login
   body
     #wrapper
-      #login
+      #login.authenticate
         h1 Velkommen!
         
         form(method="post", action="/login")

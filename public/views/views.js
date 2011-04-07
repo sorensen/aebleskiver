@@ -12,6 +12,22 @@
         Views = this.Views = {};
     }
     
+    // Helpers
+    clockTime = function (data) {
+        if (data) {
+            var now    = new Date(data);
+        } else {
+            var now    = new Date();
+        }
+        var hour   = now.getHours();
+        var minute = now.getMinutes();
+        if (hour   == 0) { hour = "00";             }
+        if (hour   < 10) { hour   = "0" + hour;   }
+        if (minute < 10) { minute = "0" + minute; }
+        var formatted = '[' + hour + ':' + minute + ']';
+        return formatted;
+    };
+    
     // User ( Client )
     Views.UserView = Backbone.View.extend({
         tagName : 'div',
@@ -63,6 +79,11 @@
             // Set direct reference to the view
             this.model.view = this;
         },
+
+        // Toggle the item state
+        toggle: function() {
+            this.set({read: !this.get("read")});
+        },
         
         // Remove this view from the DOM.
         remove : function() {
@@ -72,8 +93,9 @@
         // Re-render contents
         render : function() {
             // Send model contents to Mustache
-            var content = this.model.toJSON();            
-            var view = Mustache.to_html(this.template(content), content);            
+            var content = this.model.toJSON();
+            content.created = clockTime(content.created);
+            var view = Mustache.to_html(this.template(content), content);
             $(this.el).html(view);
             return this;
         }
@@ -89,7 +111,7 @@
         
         // The DOM events specific to an item.
         events : {
-            "click .name" : "toggleActive"
+            "click" : "toggleActive"
         },
         
         initialize : function(options) {
@@ -114,6 +136,12 @@
         // Refresh
         render : function() {
             return this;
+            var done = Todos.done().length;
+            this.$('.statistics').html(this.statsTemplate({
+                total     : Todos.length,
+                done      : Todos.done().length,
+                remaining : Todos.remaining().length
+            }));
         },
         
         // Remove this view from the DOM.
@@ -149,7 +177,7 @@
                 .addClass('inactive')
                 .removeClass('current');
             
-            window.Application.activateChat(this.model);
+            //Application.activateChat(this.model.get('id'));
         },
         
         // Leave Channel
@@ -175,8 +203,9 @@
         
         // The DOM events specific to an item.
         events : {
-            "submit .message-form" : "sendMessage",
+            "submit .message-form"        : "sendMessage",
             "click .message-form button"  : "sendMessage",
+            "click .destroy"              : "deactivate"
         },
         
         initialize : function(options) {
@@ -234,6 +263,10 @@
             return this;
         },
         
+        deactivate : function() {
+            Application.deactivateChat(this.model);
+        },
+        
         // Remove this view from the DOM.
         remove : function() {
             var self = this;
@@ -260,29 +293,35 @@
         },
         
         addMessage : function(message) {
+            message.created = new Date().getTime();
+            
             var view = new Views.MessageView({
                 model : message
             }).render();
             
             this.messagelist
                 .append(view.el);
-             
-            $(".messages").scrollTop($(".messages")[0].scrollHeight);
+            
+            this.messagelist.scrollTop(
+                this.messagelist[0].scrollHeight
+            );
+            
+            delete message.created;
         },
         
         // Send a message to the server
         sendMessage : function() {
-            console.log('send message', this);
             if (!this.input.val()) return;
             
             var self = this;
             this.model.messages.create(this.newAttributes(), {
                 silent : true,
                 finished : function(data) {
-                     var keys = _.without(self.model.get('messages'), data.id);
-                     keys.push(data.id);
-                     self.model.set({messages : keys}).save({silent : true});
-                     delete keys;
+                    var keys = _.without(self.model.get('messages'), data.id);
+                    if (keys.length > 50) keys = _.rest(keys, (keys.length - 50));
+                    keys.push(data.id);
+                    self.model.set({messages : keys}).save({silent : true});
+                    delete keys;
                 }
             });
             this.input.val('');
@@ -293,7 +332,8 @@
             return {
                 chat     : this.model.escape('id'),
                 text     : this.input.val(),
-                username : $('#client').html()
+                username : window.user.get('username'),
+                avatar   : window.user.get('avatar')
             };
         },
     });
@@ -333,11 +373,8 @@
             var view = Mustache.to_html(this.template(content), content);            
             $(this.el).html(view);
             
-            // Backbone history and action router
-            this.router = new Controllers.Router();
-            
-            var username = options.username || $('#client').html();
-            var user = new Models.UserModel({id : username, username : username});
+            var key = $('#client').html();
+            window.user = new Models.UserModel({id : key});
             
             // Set shortcuts to collection DOM
             this.userInput = $(this.el).find('#create-user');
@@ -349,30 +386,32 @@
             this.gameList = $(this.el).find('#games');
             
             var self = this;
+            var userCallback = function(model) {
+                window.user.set(model);
+                window.user.set({
+                    visits : model.visits + 1,
+                    status : 'online',
+                });
+                Gravatar(model, {
+                    finished : function(data) {
+                        console.log('avatar', data);
+                        if (!data) return;
+                        window.user.set({ avatar : data.image }).save();
+                    },
+                    size : 40,
+                });
+            };
             // Callback for when server synchronization
             // has been completed
             var finished = function() {
                 // Find all users
-                Synchronize(user, {
+                Synchronize(window.user, {
                     fetch : {
                         finished : function(model) {
-                            user.set(model);
-                            user.set({
-                                visits : model.visits + 1,
-                                status : 'online',
-                            }).save();
-                            
-                            // Attatch to window for common use
-                            self.user = window.user = user;
+                            userCallback(model);
                         },
                         error : function(model) {
-                            user.set({
-                                visits : 1,
-                                status : 'online',
-                            }).save();
-                            
-                            // Attatch to window for common use
-                            self.user = window.user = user;
+                            userCallback(model);
                         },
                     }
                 });
@@ -468,38 +507,50 @@
                 .append(view.el);
         },
         
-        deactivateChat : function(chat) {
+        deactivateChat : function() {
             $(this.el)
                 .find('#main-content')
-                .hide('fastest')
-                .html('');
+                .fadeOut(300, function(){
+                    $(this).html('');
+                });
                 
             // Join Channel
             this.activeChat && this.activeChat.remove();
         },
         
-        activateChat : function(chat) {
-            this.deactivateChat(chat);
+        activateChat : function(params) {
+            this.deactivateChat();
             
+            console.log('activateChat: ', params);
+            console.log('activateChat: ', this.model.chats);
+            // Get model by name
+            /**
+            var model = this.model.chats.find(function(chat){ 
+                console.log('find: ', chat);
+                if (params === chat.get('name') || params === chat.get('id')) return chat; 
+            });
+            **/
+            
+            var model = this.model.chats.get(params);
+            console.log('model: ', model);
+            
+            if (!model) return;
+            console.log('model: ', model.url());
+        
             this.activeChat = new Views.ChatMainView({
-                model : chat
+                model : model
             }).render();
             
+            var self = this;
             $(this.el)
                 .find('#main-content')
-                .show('fast')
-                .html(this.activeChat.el);
-                
-            /**
-                $(this.el)
-                    .find('#main-content')
-                    .html('')
-                    .fadeOut(300)
-                    .delay(400)
-                    .show(300, function(){
-                        $('#main-content').html(active.el)
-                    });
-             **/
+                .fadeIn(300, function(){
+                    $(this).html(self.activeChat.el);
+                    self.activeChat.messagelist.scrollTop(
+                        self.activeChat.messagelist[0].scrollHeight
+                    );
+                    delete self;
+                });
         },
         
         // Generate the attributes for a new chat
@@ -519,6 +570,7 @@
                     var keys = self.model.get('chats');
                     if (keys) {
                         keys.push(data.id);
+                        if (keys.length > 50) keys = _.rest(keys, (keys.length - 50));
                         self.model.set({chats : _.uniq(keys)}).save();
                         delete keys;
                     }

@@ -154,9 +154,11 @@ body {
     line-height: 1.6;
 }
 #header {
-    margin: 0 20px;
+    position: relative;
+    top: 0;
     overflow: hidden;
     z-index: 3;
+    height: 40px;
 }
     #logo {
         display: none;
@@ -165,7 +167,6 @@ body {
         font-weight: bold;
         margin: 0;
         color: white;
-        font-weight: bold;
         text-transform: lowercase;
         text-shadow: 1px 1px 3px #222;
     }
@@ -173,28 +174,42 @@ body {
         float: right;
         margin: 0;
         list-style: none outside;
-        margin: 20px 30px 0 0;
+        position: absolute;
+        right: 40px;
+        top: 18px;
     }
-    #navigation a {
-        color: white;
-        font-weight: bold;
+    #navigation li {
+        float: left;
+        margin-left: 15px;
+    }
+    #navigation li:first-child {
+        margin-left: 0;
+    }
+    #navigation li a {
+        font-size: 14px;
+        color: #efefef;
         text-decoration: none;
+        text-shadow: 1px 1px 1px #222;
+    }
+    #navigation li a:hover {
+        color: #fff;
+        text-shadow: 1px 1px 1px #000;
+        border-bottom: 3px solid #333;
     }
 
 #wrapper {
     height: 100%;
-    width: 100%;
     overflow: hidden;
 }
 .wrapper {
     height: 100%;
-    width: 100%;
+    margin-top: 30px;
+    overflow: hidden;
 }
 #footer {
     display: none;
     overflow: hidden;
     clear: both;
-    margin: 0 20px;
 }
     #copyright {
         margin: 20px 0 0 5px;
@@ -214,14 +229,10 @@ body {
     Sidebar
 **/
 #sidebar {
-    margin: 55px 30px;
-    width: 300px;
-    position: absolute;
+    height: 62%;
+    margin-top: 50px;
+    position: relative;
     padding-bottom: 4px;
-    float: left;
-    top: 0;
-    bottom: 0;
-    left: 0;
            -moz-border-radius: 0 0 8px 8px; /* FF1+ */
         -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
                 border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
@@ -231,8 +242,12 @@ body {
         height: 40px;
     }
     #sidebar-controls {
-        padding: 8px;
-        height: 46px;
+        position: absolute;
+        top: -50px;
+        width: 100%;
+        z-index: 4;
+        padding: 0;
+        height: 50px;
         background: white;
            -moz-border-radius: 8px 8px 0 0; /* FF1+ */
         -webkit-border-radius: 8px 8px 0 0; /* Saf3-4, iOS 1+, Android 1.5+ */
@@ -242,20 +257,28 @@ body {
             display: none;
         }
     #sidebar-up {
-        display: none;
         background-color: white;
-        border-bottom: 1px solid #ccc;
+        border-bottom: 1px solid #CCC;
         height: 16px;
         overflow: hidden;
+        position: absolute;
+        width: 100%;
+        top: -50px;
+           -moz-border-radius: 8px 8px 0 0; /* FF1+ */
+        -webkit-border-radius: 8px 8px 0 0; /* Saf3-4, iOS 1+, Android 1.5+ */
+                border-radius: 8px 8px 0 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
     }
     #sidebar-content {
-        height: 90%;
-        overflow-y: scroll;
-        background: #eee;
+        height: 100%;
+        overflow: hidden;
+        background: #EEE;
         min-height: 300px;
+        padding: 0% 0;
+        clear: both;
     }
         #users, #games, #chats {
-            min-height: 300px;
+            overflow-y: scroll;
+            height: 100%;
         }
         #users {
             border-top: 1px solid #bbb;
@@ -270,44 +293,88 @@ body {
         }
             .chat {
                 position: relative;
-                padding: 10px 20px 10px 30px;
+                padding: 0;
                 cursor: pointer;
                 border-bottom: 1px solid #E0E0E0;
                 border-top: 1px solid white;
                 border-right: 2px solid #CCC;
-                background: #F4F3F1;
+                background-color: #F4F3F1;
+                background-image: -moz-linear-gradient(top, #F4F3F1, #efefef); /* FF3.6 */
+                background-image: -o-linear-gradient(top, #F4F3F1, #efefef); /* Opera 11.10+ */
+                background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #F4F3F1),color-stop(1, #efefef)); /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(#F4F3F1, #efefef); /* Chrome 10+, Saf5.1+ */
+                background-image: linear-gradient(top, #F4F3F1, #efefef);
+                        filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F4F3F1', EndColorStr='#efefef'); /* IE6–IE9 */
             }
             .chat:hover {
-                background: white;
+                background-color: white;
+                background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #F4F3F1)); /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(#ffffff, #F4F3F1); /* Chrome 10+, Saf5.1+ */
+            }
+            #chats .chat:first-child {
+            }
+            #chats .chat.current {
+                background-color: #c2e7fa;
+                background-image: -moz-linear-gradient(top, #c2e7fa, #82ccf3); /* FF3.6 */
+                background-image: -o-linear-gradient(top, #c2e7fa, #82ccf3); /* Opera 11.10+ */
+                background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #c2e7fa),color-stop(1, #82ccf3)); /* Saf4+, Chrome */
+                background-image: -webkit-linear-gradient(#c2e7fa, #82ccf3); /* Chrome 10+, Saf5.1+ */
+                background-image: linear-gradient(top, #c2e7fa, #82ccf3);
+                        filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#c2e7fa', EndColorStr='#82ccf3'); /* IE6–IE9 */
+                        
+            }
+            .chat a {
+                display: block;
+                overflow: hidden;
+                text-decoration: none;
+            }
+            .chat .name {
+                margin: 10px 20px;
             }
             
     #sidebar-down {
         position: absolute;
-        width: 300px;
-        bottom: 0;
+        width: 100%;
+        bottom: -46px;
+        height: 50px;
         left: 0;
         border-top: 1px solid #ccc;
         background-color: white;
-        height: 16px;
         overflow: hidden;
            -moz-border-radius: 0 0 8px 8px; /* FF1+ */
         -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
                 border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
     }
+    #chat-form {
+        font-size: 14px;
+    }
     #create-chat-button {
-        margin: 10px;
+        margin: 0 10px 0 10px;
+        padding: 5px 0;
+        float: left;
+        width: 23%;
     }
     #create-chat {
         margin: 10px;
+        display: block;
+        padding: 3px 5px;
+        width: 62%;
+    }
+    
+    body .ui-widget {
+        font-family: 'Droid Sans', Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1;
     }
 
 /**
     Main content screens
 **/
 #main {
-    margin: 0 0 0 320px;
+    height: 62%;
+    margin-top: 50px;
     position: relative;
-    height: 100%;
+    padding-bottom: 4px;
 }
     #main-tabs {
         display: none;
@@ -315,18 +382,12 @@ body {
     }
     #main-content {
         display: none;
-        position: relative;
-        width: 50%;
         background: white;
-        min-height: 300px;
+        height: 100%;
         overflow: hidden;
-           -moz-border-radius: 8px; /* FF1+ */
-        -webkit-border-radius: 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
-                border-radius: 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
-        height: 87%;
-        position: fixed;
-        top: 55px;
-        margin: 0 30px 30px 30px;
+        min-height: 300px;
+        padding: 0% 0;
+        clear: both;
     }
     #main-controls {
         display: none;
@@ -347,50 +408,120 @@ body {
     margin: 0;
     height: 100%;
 }
-.message-form {
-    display: block;
-    overflow: hidden;
+.main-chat .name {
+    line-height: 50px;
+    font-size: 26px;
+    margin: 0;
     position: absolute;
-    bottom: 0;
-    left: 0;
-    padding: 15px;
+    top: -50px;
+    width: 100%;
+    z-index: 4;
+    padding: 0;
+    height: 50px;
+    background: white;
+       -moz-border-radius: 8px 8px 0 0;
+    -webkit-border-radius: 8px 8px 0 0;
+            border-radius: 8px 8px 0 0;
 }
-.messages {
-    overflow-y: scroll;
-    margin: 20px;
-    height: 80%;
-}
-.message {
-    list-style: none outside;
-    padding: 3px 0;
-    border-top: 1px solid #eee;
-}
-    .message .data {
-        margin-left: 5px;
+    .main-chat .name span {
+        margin-left: 20px;
     }
 
-.main-chat .destroy {
+.destroy {
     position: absolute;
     top: 5px;
     right: 5px;
     height: 20px;
     width: 20px;
+    margin: 10px;
     display: none;
     cursor: pointer;
     background: url(../images/destroy.png) no-repeat 0 0;
 }
-    .main-chat .destroy {
+    .destroy {
         display: block;
     }
-    .main-chat .destroy:hover {
+    .destroy:hover {
         background-position: 0 -20px;
     }
-    .create-message {
-        margin-left: 10px;
+    .chat .destroy {
+        display: none;
     }
+    
+.messages {
+    margin: 0px 20px 0px 20px;
+    height: 100%;
+    overflow-y: scroll;
+}
+    .message {
+        list-style: none outside;
+        padding: 3px 0;
+        border-top: 1px solid #eee;
+        overflow: hidden;
+    }
+        .message .created,
+        .message .avatar,
+        .message .username,
+        .message .data {
+            float: left;
+            margin-top: 3px;
+        }
+        .message .avatar {
+            width: 20px;
+            height: 20px;
+            overflow: hidden;
+            display: block;
+            float: left;
+            margin: 0 5px 0 10px;
+        }
+            .avatar img {
+                height: 20px;
+                width: 20px;
+            }
+        .message .username {
+            margin-right: 5px;
+        }
+        .message .data {
+            margin-left: 5px;
+        }
+        
+    .message-form {
+        display: block;
+        overflow: hidden;
+        width: 100%;
+        position: absolute;
+        height: 50px;
+        bottom: -46px;
+        padding: 0;
+        font-size: 16px;
+        background: white;
+           -moz-border-radius: 0 0 8px 8px; /* FF1+ */
+        -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
+                border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
+    }
+        .main-chat .message-form button {
+            float: left;
+            height: 30px;
+            width: 15%;
+            margin-left: 1.5%;
+            padding: 0;
+            margin-top: 10px;
+            line-height: 1;
+        }
+            .main-chat .message-form button span {
+                padding: 0;
+            }
+        .main-chat .message-form .create-message {
+            width: 78%;
+            display: block;
+            float: left;
+            height: 28px;
+            margin: 10px 1% 0;
+            line-height: 1;
+            padding: 0 1%;
+        }
 
-#login,
-#register,
+.authenticate,
 .wrapper,
 #main,
 #main-content, 
@@ -402,8 +533,7 @@ body {
   -webkit-transition: all 0.3s ease-out;  /* Saf3.2+, Chrome */
           transition: all 0.3s ease-out;
 }
-#login,
-#register,
+.authenticate,
 #main-content, 
 #sidebar {
        -moz-box-shadow: 1px 1px 4px #222; /* FF3.5+ */
@@ -420,7 +550,7 @@ h1,h2,h3,h4,h5,h6 {
 }
 h1 { 
     font-size: 22px;
-    margin: 20px;
+    margin: 20px 20px 0;
     border-bottom: 2px solid #DEDEDE;
 }
 h2 { 
@@ -436,11 +566,11 @@ h4,h5,h6 {
 /**
     Login / Registration
 **/
-#login {
+.authenticate {
     overflow: hidden;
     padding: 30px;
     background: white;
-    width: 240px;
+    width: 320px;
     margin: 15% auto 20px;
        -moz-border-radius: 8px; /* FF1+ */
     -webkit-border-radius: 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
@@ -450,30 +580,32 @@ h4,h5,h6 {
     -webkit-box-shadow: 1px 1px 4px #222; /* Saf3.0+, Chrome */
             box-shadow: 1px 1px 4px #222; /* Opera 10.5, IE9, Chrome 10+ */
 }
-    #login h1 {
+    .authenticate h1 {
         clear: both;
         margin: 0 0 15px;
         font-size: 42px;
         line-height: 1;
+        text-align: center;
     }
-    #login p {
+    .authenticate p {
         clear: both;
     }
-    #login label {
+    .authenticate label {
         margin: 5px 0;
-        width: 70px;
         display: block;
         float: left;
         clear: left;
     }
-    #login input[type='text'],
-    #login input[type='password'] {
+    #register label {
+    }
+    .authenticate input[type='text'],
+    .authenticate input[type='password'] {
         margin: 5px 0 5px 10px;
-        float: left;
+        float: right;
         clear: right;
     }
-    #login #submit-registration,
-    #login #submit-login {
+    .authenticate #submit-registration,
+    .authenticate #submit-login {
         font-size: 24px;
         margin: 10px 0;
         padding: 20px 0;

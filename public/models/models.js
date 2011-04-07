@@ -21,6 +21,7 @@
         urlRoot  : 'users',
         name     : 'users',
         defaults : {
+            'created'  : new Date().getTime(),
             'cards'    : [],
             'messages' : [],
             'username' : 'anonymous',
@@ -53,6 +54,7 @@
     // Message
     Models.MessageModel = Backbone.Model.extend({
         defaults : {
+            //'created' : new Date().getTime(),
         },
         
         initialize : function(options) {
@@ -67,6 +69,7 @@
     // Chat room
     Models.ChatModel = Backbone.Model.extend({
         defaults : {
+            'created' : new Date().getTime(),
             'name' : 'Unknown',
             'tags' : [
                 'general'
@@ -136,7 +139,23 @@
         
         // Initialize
         initialize : function(options) {
-        }
+        },
+        /**
+        // Todos are sorted by their original insertion order.
+        comparator: function(message) {
+            return message.get('created');
+        },
+        
+        // Filter down the list of all todo items that are finished.
+        done: function() {
+            return this.filter(function(message){ return todo.get('read'); });
+        },
+
+        // Filter down the list to only todo items that are still not finished.
+        remaining: function() {
+            return this.without.apply(this, this.done());
+        },
+        **/
     });
     
     // Chat Collection
@@ -168,11 +187,12 @@
         name     : 'app',
         urlRoot  : 'app',
         defaults : {
-            'title'  : 'aebleskiver',
-            'visits' : 0,
-            'users'  : [],
-            'games'  : [],
-            'chats'  : []
+            'created' : new Date().getTime(),
+            'title'   : 'aebleskiver',
+            'visits'  : 0,
+            'users'   : [],
+            'games'   : [],
+            'chats'   : []
         },
         initialize : function(options) {
             this.users = new Models.UserCollection();
