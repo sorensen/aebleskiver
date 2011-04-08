@@ -8,3 +8,4 @@ connect-redis
 connect
 express
 keys@0.1.2
+node-uuid@1.1.0
