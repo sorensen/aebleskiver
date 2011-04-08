@@ -11,6 +11,10 @@
     } else {
         Gravatar = this.Gravatar = {};
         Server   = this.Server = this.Gravatar.Server = Synchronize.Server || false;
+        console.log('Grav Synchronize: ', Synchronize);
+        console.log('Grav Connected: ', Connected);
+        console.log('Grav Protocol: ', Protocol);
+        console.log('Grav server: ', Server);
     }
     
     var cb = function(){

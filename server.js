@@ -117,7 +117,7 @@
     });
     
     // Start application
-    server.listen(8080);
+    server.listen(80);
     
     dnode(Protocol)
         .use(GravatarProtocol)

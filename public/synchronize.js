@@ -22,7 +22,8 @@
         return _.isFunction(object.url) ? object.url() : object.url;
     };
     
-    var connected = function(model, options) {
+    // Called only when DNode is connected
+    Connected = function(model, options) {
         var name = model.name || model.collection.name;
         var url = (model.collection) ? getUrl(model.collection) : getUrl(model);
         
@@ -65,93 +66,96 @@
         // All done with the setup
         options.finished && options.finished(model);
     };
+    
+    // Remote protocol
+    Protocol = function(client, con) {
+    
+        console.log('Protocol client: ', client);
+        console.log('Protocol con: ', con);
+    
+        // New subscription
+        this.subscribed = function(data, opt, cb) {
+            if (!data || !synced[opt.channel]) return;
+            opt.finished && opt.finished(data);
+        };
+    
+        // New subscription
+        this.unsubscribed = function(data, opt, cb) {
+            if (!data || !synced[opt.channel]) return;
+            opt.finished && opt.finished(data);
+        };
+        
+        // Created model (NOTE) New models must be created through sets
+        this.created = function(data, opt, cb) {
+            if (!data || !synced[opt.channel]) return;
+            if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
+            
+            opt.finished && opt.finished(data);
+        };
+        
+        // Fetched model
+        this.read = function(data, opt, cb) {
+            // Compare URL's to update the right collection
+            if (!data.id && !_.first(data) || !synced[opt.channel]) return;
+            var chan = synced[opt.channel];
+            if (chan instanceof Backbone.Model) chan.set(data);
+            else if (!chan.get(data.id)) chan.add(data);
+            
+            opt.finished && opt.finished(data);
+        };
+        
+        // Updated model data
+        this.updated = function(data, opt, cb) {
+            if (!data || !synced[opt.channel]) return;
+            if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
+            else synced[opt.channel].set(data);
+            
+            opt.finished && opt.finished(data);
+        };
+        
+        // Destroyed model
+        this.destroyed = function(data, opt, cb) {
+            if (!data) return;
+            synced[opt.channel].remove(data) || delete synced[opt.channel];
+            
+            opt.finished && opt.finished(data);
+        };
+        
+        this.published = function(data, opt, cb) {
+            // Check CRUD
+            switch (opt.method) {
+                case 'read'   :      this.read(data, opt, cb); break;
+                case 'create' :   this.created(data, opt, cb); break;
+                case 'update' :   this.updated(data, opt, cb); break;
+                case 'delete' : this.destroyed(data, opt, cb); break;
+            };
+        };
+        
+        // Fetched gravatar
+        this.gravatared = function(data, opt, cb) {
+            console.log('Sync Gravatared: ', data);
+            // Compare URL's to update the right collection
+            if (!data) return;
+            
+            opt.finished && opt.finished(data);
+        };
+    };
         
     // Transport methods for model storage, sending data 
     // through the socket instance to be saved on the Server 
     Synchronize = function(model, options) {
         options = options || {};
         
-        // Remote protocol
-        var Protocol = function() {
-        
-            // New subscription
-            this.subscribed = function(data, opt, cb) {
-                if (!data || !synced[opt.channel]) return;
-                opt.finished && opt.finished(data);
-            };
-        
-            // New subscription
-            this.unsubscribed = function(data, opt, cb) {
-                if (!data || !synced[opt.channel]) return;
-                opt.finished && opt.finished(data);
-            };
-            
-            // Created model
-            // NOTE: New models must be created through sets
-            this.created = function(data, opt, cb) {
-                if (!data || !synced[opt.channel]) return;
-                if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
-                
-                opt.finished && opt.finished(data);
-            };
-            
-            // Fetched model
-            this.read = function(data, opt, cb) {
-                // Compare URL's to update the right collection
-                if (!data.id && !_.first(data) || !synced[opt.channel]) return;
-                var chan = synced[opt.channel];
-                if (chan instanceof Backbone.Model) chan.set(data);
-                else if (!chan.get(data.id)) chan.add(data);
-                
-                opt.finished && opt.finished(data);
-            };
-            
-            // Updated model data
-            this.updated = function(data, opt, cb) {
-                if (!data || !synced[opt.channel]) return;
-                if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
-                else synced[opt.channel].set(data);
-                
-                opt.finished && opt.finished(data);
-            };
-            
-            // Destroyed model
-            this.destroyed = function(data, opt, cb) {
-                if (!data) return;
-                synced[opt.channel].remove(data) || delete synced[opt.channel];
-                
-                opt.finished && opt.finished(data);
-            };
-            
-            this.published = function(data, opt, cb) {
-                // Check CRUD
-                switch (opt.method) {
-                    case 'read'   :      this.read(data, opt, cb); break;
-                    case 'create' :   this.created(data, opt, cb); break;
-                    case 'update' :   this.updated(data, opt, cb); break;
-                    case 'delete' : this.destroyed(data, opt, cb); break;
-                };
-            };
-            
-            // Fetched gravatar
-            this.gravatared = function(data, opt, cb) {
-                console.log('Sync Gravatared: ', data);
-                // Compare URL's to update the right collection
-                if (!data) return;
-                
-                opt.finished && opt.finished(data);
-            };
-        };
-        
         // Setup our dnode listeners for Server callbacks
         // as well as model bindings on connection
         if (!Server) DNode(Protocol).connect(function(remote) {
+        
             // Connect to DNode Server only once
             Server = remote;
-            connected(model, options);
+            Connected(model, options);
         });
         // We are already connected
-        else connected(model, options);
+        else Connected(model, options);
     };
     if (typeof exports !== 'undefined') module.exports = Synchronize;
 
