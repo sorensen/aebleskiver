@@ -5,28 +5,12 @@
     // The app contains users, worlds, chat rooms, messages
     var Views;
     if (typeof exports !== 'undefined')    {
-        _           = require('underscore')._;
-        Backbone    = require('backbone');
-        Views       = exports;
+        _        = require('underscore')._;
+        Backbone = require('backbone');
+        Views    = exports;
     } else {
         Views = this.Views = {};
     }
-    
-    // Helpers
-    clockTime = function (data) {
-        if (data) {
-            var now    = new Date(data);
-        } else {
-            var now    = new Date();
-        }
-        var hour   = now.getHours();
-        var minute = now.getMinutes();
-        if (hour   == 0) { hour = "00";             }
-        if (hour   < 10) { hour   = "0" + hour;   }
-        if (minute < 10) { minute = "0" + minute; }
-        var formatted = '[' + hour + ':' + minute + ']';
-        return formatted;
-    };
     
     // User ( Client )
     Views.UserView = Backbone.View.extend({
@@ -176,8 +160,6 @@
                 .siblings()
                 .addClass('inactive')
                 .removeClass('current');
-            
-            //Application.activateChat(this.model.get('id'));
         },
         
         // Leave Channel
@@ -347,7 +329,6 @@
         // The DOM events specific to an item.
         events : {
             "submit #chat-form" : "createChat",
-            "submit #game-form" : "createGame",
         },
         
         // Mustache Template
@@ -366,7 +347,6 @@
             // Bind chats collection
             this.model.users.bind('add', this.addUser);
             this.model.chats.bind('add', this.addChat);
-            this.model.games.bind('add', this.addGame);
             
             // Send model contents to Mustache
             var content = this.model.toJSON();
@@ -379,11 +359,9 @@
             // Set shortcuts to collection DOM
             this.userInput = $(this.el).find('#create-user');
             this.chatInput = $(this.el).find('#create-chat');
-            this.gameInput = $(this.el).find('#create-game');
             
             this.userList = $(this.el).find('#users');
             this.chatList = $(this.el).find('#chats');
-            this.gameList = $(this.el).find('#games');
             
             var self = this;
             var userCallback = function(model) {
@@ -430,27 +408,6 @@
                             chat.fetch({
                                 finished : function(data) {
                                     self.model.chats.add(data);
-                                    
-                                },
-                            });
-                        });
-                    },
-                });
-                
-                // Find all games
-                Synchronize(self.model.games, {
-                    // Fetch data from server
-                    finished : function(data) {
-                        // Set a model for each id found for lookups
-                        _.each(self.model.attributes.games, function(id) {
-                            self.model.games.add({id : id}, {silent : true});
-                        });
-                        
-                        // Use backbone to fetch from the server
-                        self.model.games.each(function(game) {
-                            game.fetch({
-                                finished : function(data) {
-                                    self.model.games.add(data);
                                     
                                 },
                             });
@@ -521,16 +478,8 @@
         activateChat : function(params) {
             this.deactivateChat();
             
-            console.log('activateChat: ', params);
-            console.log('activateChat: ', this.model.chats);
-            // Get model by name
-            /**
-            var model = this.model.chats.find(function(chat){ 
-                console.log('find: ', chat);
-                if (params === chat.get('name') || params === chat.get('id')) return chat; 
-            });
-            **/
             
+            // Get model by name
             var model = this.model.chats.get(params);
             console.log('model: ', model);
             
@@ -577,43 +526,6 @@
                 }
             });
             this.chatInput.val('');
-        },
-        
-        // Add a single game room to the current veiw
-        addGame : function(game) {
-            game.messages.url = game.collection.url + ":" + game.id + ":messages";
-            game.users.url    = game.collection.url + ":" + game.id + ":users";
-            
-            var view = new Views.GameView({
-                model : game
-            }).render();
-            
-            $(this.el)
-                .find('#games')
-                .append(view.el);
-        },
-        
-        // Generate the attributes for a new chat
-        newGameAttributes : function() {
-            return {
-                name : this.gameInput.val()
-            };
-        },
-        
-        // Create new chat room
-        createGame : function() {
-            if (!this.gameInput.val()) return;
-            
-            var self = this;
-            this.model.games.create(this.newGameAttributes(), {
-                finished : function(data) {
-                    var keys = self.model.get('games');
-                    keys.push(data.id);
-                    self.model.set({games : _.uniq(keys)}).save();
-                    delete keys;
-                }
-            });
-            this.gameInput.val('');
         },
     });
 })()

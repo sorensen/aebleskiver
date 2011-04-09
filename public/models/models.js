@@ -21,33 +21,25 @@
         urlRoot  : 'users',
         name     : 'users',
         defaults : {
-            'created'  : new Date().getTime(),
-            'cards'    : [],
+            'created' : true,
             'messages' : [],
             'username' : 'anonymous',
             'gravatar' : 'images/undefined.png',
             'status'   : 'offline',
             'statistics' : {
-                'games'  : 0,
-                'clicks' : 0,
-                'wins'   : 0,
-                'losses' : 0,
-                'score'  : 0
             },
         },
         
         initialize : function(options) {
-            this.deck = new Models.CardCollection();
+        
         },
     });
     
-    // Cards
-    Models.CardModel = Backbone.Model.extend({
-        defaults : {
-            'suit' : 'clubs',
-            'rank' : 1,
-        },
+    // User
+    Models.ModeratorModel = Models.UserModel.extend({
+        
         initialize : function(options) {
+        
         },
     });
     
@@ -69,7 +61,7 @@
     // Chat room
     Models.ChatModel = Backbone.Model.extend({
         defaults : {
-            'created' : new Date().getTime(),
+            'created' : true,
             'name' : 'Unknown',
             'tags' : [
                 'general'
@@ -84,26 +76,6 @@
         clear : function() {
             //this.view.remove();
         },
-        // Remove this delete its view.
-        leaveChannel : function() {
-            //this.view.leaveChannel();
-        }
-    });
-    
-    // World Model
-    Models.GameModel = Backbone.Model.extend({
-        name     : 'games',
-        urlRoot  : 'games',
-        defaults : {
-            'name'     : 'Game Name',
-            'counter'  : 0,
-            'users'    : [],
-            'messages' : []
-        },
-        initialize : function(options) {
-            this.users = new Models.UserCollection();
-            this.users.url = 'games:' + this.id + ':users';
-        }
     });
     
     // User Collection
@@ -112,18 +84,6 @@
         model : Models.UserModel,
         url   : 'users',
         name  : 'users',
-        
-        // Initialize
-        initialize : function(options) {
-        }
-    });
-    
-    // Card Collection
-    Models.CardCollection = Backbone.Collection.extend({
-        
-        model : Models.MessageModel,
-        url   : 'cards',
-        name  : 'cards',
         
         // Initialize
         initialize : function(options) {
@@ -140,22 +100,6 @@
         // Initialize
         initialize : function(options) {
         },
-        /**
-        // Todos are sorted by their original insertion order.
-        comparator: function(message) {
-            return message.get('created');
-        },
-        
-        // Filter down the list of all todo items that are finished.
-        done: function() {
-            return this.filter(function(message){ return todo.get('read'); });
-        },
-
-        // Filter down the list to only todo items that are still not finished.
-        remaining: function() {
-            return this.without.apply(this, this.done());
-        },
-        **/
     });
     
     // Chat Collection
@@ -170,35 +114,23 @@
         }
     });
     
-    // Chat Collection
-    Models.GameCollection = Backbone.Collection.extend({
-        
-        model : Models.GameModel,
-        url   : 'games',
-        name  : 'games',
-        
-        // Initialize
-        initialize : function(options) {
-        }
-    });
-    
     // World Model
     Models.ApplicationModel = Backbone.Model.extend({
+    
         name     : 'app',
         urlRoot  : 'app',
         defaults : {
-            'created' : new Date().getTime(),
-            'title'   : 'aebleskiver',
             'visits'  : 0,
+            // Collection lookups
             'users'   : [],
-            'games'   : [],
             'chats'   : []
         },
         initialize : function(options) {
+            // Current user collection
             this.users = new Models.UserCollection();
             this.users.url = 'app:' + this.id + ':users';
-            this.games = new Models.GameCollection();
-            this.games.url = 'app:' + this.id + ':games';
+            
+            // Active chat collection
             this.chats = new Models.ChatCollection();
             this.chats.url = 'app:' + this.id + ':chats';
         }

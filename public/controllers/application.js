@@ -1,32 +1,20 @@
-(function() {
-    // Controller
+(function(Controllers) {
+    // Application
     // ----------
     
-    // Configure backbone settings and define 
-    // the application routing.
-    var Controllers;
-    if (typeof exports !== 'undefined') {
-        _           = require('underscore')._;
-        Backbone    = require('backbone');
-        Controllers = exports;
-    } else {
-        Controllers = this.Controllers = {};
-    }    
-    
-    // Router
-    Controllers.Workspace = Backbone.Controller.extend({
+    // Main controller and router
+    Controllers.Application = Backbone.Controller.extend({
     
         // Definitions
         routes : {
             '/chats/:id' : 'joinChat',
-            "/*route"    : "action",
             "*route"    : "invalid",
         },
         
         // Default action
         invalid : function(route) {
             console.log('Router: invalid: ', route);
-            //TODO: something
+            this.saveLocation('/');
         },
         
         // Join a chat room
@@ -38,6 +26,7 @@
         
         initialize : function(options) {
         
+            console.log('controller', Models);
             // Attach the application
             Application = this.view = new Views.ApplicationView({
                 // Use existing DOM element
@@ -48,4 +37,4 @@
             this.view.controller = this;
         },
     });
-})()
+})(Controllers)

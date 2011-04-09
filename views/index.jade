@@ -4,36 +4,27 @@ html(lang="en")
     title &AElig;bleskiver
     
     // CSS
-    link(rel='stylesheet', href='css/style.css')
-    link(rel='stylesheet', href='css/grid.css')
-    style(type='text/css') @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.2.css');
+    link(rel='stylesheet', href='/css/style.css')
+    link(rel='stylesheet', href='/css/grid.css')
     link(rel='stylesheet', href='css/aebleskiver/jquery-ui-1.8.11.aebleskiver.css')
-    //style(type='text/css') @import url('//cdn.wijmo.com/themes/aristo/jquery-wijmo.css');
-    //style(type='text/css') @import url('//ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/black-tie/jquery-ui.css');
+    style(type='text/css') @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.2.css');
     
     // Dependancies
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
     script(src="//cdn.wijmo.com/jquery.wijmo-open.1.1.2.min.js")
     
-    script(src="underscore-min.js")
-    script(src="backbone.js")
-    script(src="mustache.js")
-    script(src="jquery.livequery.js")
-    script(src="json2.js")
+    script(src="/js/underscore-min.js")
+    script(src="/js/backbone.js")
+    script(src="/js/mustache.js")
+    script(src="/js/jquery.livequery.js")
+    script(src="/js/json2.js")
+    script(src="/js/ui.js")
     
     // RPC
-    script(src="secure.js")
     script(src="/dnode.js")
-    script(src="synchronize.js")
-    script(src="gravatar.js")
-
-    
-    // Core
-    script(src="controllers/controllers.js")
-    script(src="models/models.js")
-    script(src="client.js")
-    script(src="ui.js")
+    script(src="/rpc/synchronize.js")
+    script(src="/rpc/gravatar.js")
     
     
     // User full
@@ -52,8 +43,7 @@ html(lang="en")
         ul#navigation
           li: a(href='/') Home
           li: a(href='/#/settings') Settings
-          li: a(href='/#/logout') Backbone Logout
-          li: a(href='/logout') Express Logout
+          li: a(href='/logout') Logout
           
       .wrapper.container_16
         #sidebar.grid_5
@@ -171,8 +161,23 @@ html(lang="en")
       span.data
         {{ text }}
     
-    script(src="views/views.js")
+
+    // Core
+    script(src="/bootstrap.js")
+    
+    script(src="/models/message.js")
+    script(src="/models/chat.js")
+    script(src="/models/user.js")
+    script(src="/models/application.js")
+    
+    script(src="/views/user.js")
+    script(src="/views/message.js")
+    script(src="/views/chat.js")
+    script(src="/views/application.js")
+    
+    script(src="/controllers/application.js")
+    
+    script(src="/init.js")
   body
     #wrapper
-    #client(style='display:none;')
-      = locals.name
+    #client(style='display:none;')= locals.name

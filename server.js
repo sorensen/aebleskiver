@@ -5,6 +5,7 @@
     
     // Dependancies
     var express  = require('express'),
+        expose   = require('express-expose'),
         connect  = require('connect'),
         crypto   = require("crypto"),
         path     = require("path"),
@@ -17,39 +18,27 @@
         Secure   = require('secure')(),
         server   = module.exports = express.createServer();
     
-    // SSL Compatibility
-    if (path.existsSync("keys/privatekey.pem")) {
-        var privateKey  = fs.readFileSync("keys/privatekey.pem", "utf8");
-        var certificate = fs.readFileSync("keys/certificate.pem", "utf8");
-        var credentials = crypto.createCredentials({key: privateKey, cert: certificate});
-    }
-    
     // Server configuration
     server.configure(function() {
-        credentials && server.setSecure(credentials);
-        //Secure.http;
         server.use(express.logger());
         server.use(express.bodyParser());
         server.use(express.cookieParser());
         server.use(express.session({ secret : "AEbleskivers", store : new Store() }));
-        //server.use(express.session({
-        //    store : (new require("connect/middleware/session/memory"))({ 
-        //        reapInterval: 60000 * 10 
-        //    })
-        //}));
         server.use(express.methodOverride());
         server.use(express.static(__dirname + '/public'));
         server.set('view options', {layout: false});
+        server.set('title', 'AEbleskivers');
+        server.set('default language', 'en');
     });
+    
+    server.expose(server.settings);
     
     // Main application
     server.get('/', Auth.restricted, function(req, res) {
-        res.render('main.jade', {
-            locals: {
-                //name: 'anonymous',
-                name: req.session.user.username,
-                user: req.session.user
-            }
+    
+        if (req.session.user) server.expose(req.session.user, 'express.current.user');
+    
+        res.render('index.jade', {
         });
     });
     
@@ -64,11 +53,6 @@
 
     // Login
     server.get('/login', function(req, res) {
-        if (req.session.user) {
-            req.flash('success', 'Authenticated as ' + req.session.user.name
-              + ' click to <a href="/logout">logout</a>. '
-              + ' You may now access <a href="/restricted">/restricted</a>.');
-        }
         res.render('login.jade');
     });
 
@@ -83,8 +67,9 @@
                     req.session.user = user;
                     res.redirect('/');
                 });
+                
+                server.expose(user, 'express.current.user');
             } else {
-                req.flash('error', 'Authentication failed, please check your username and password.');
                 res.redirect('back');
             }
         });
@@ -109,15 +94,17 @@
                     req.session.user = user;
                     res.redirect('/');
                 });
+                server.expose(user, 'express.current.user');
             } else {
-                req.flash('error', 'Registration failed, please check your username and password.');
                 res.redirect('back');
             }
         });
     });
-    // Start application
-    server.listen(80);
     
+    // Start application
+    server.listen(3000);
+    
+    // Enable DNode RPC
     dnode(Protocol)
         .use(GravatarProtocol)
         .listen(server)

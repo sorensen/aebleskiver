@@ -1,17 +1,9 @@
-(function() {
+(function(Protocol, Server) {
     // Backbone dnode sync
     // -------------------
-    //var Synchronize;
-    if (typeof exports !== 'undefined') {
-		// Dependancies
-        _         = require('underscore')._;
-        Backbone  = require('backbone');
-        DNode     = require('dnode');
-        Synchronize = module.exports;
-    } else {
-        Synchronize = this.Synchronize = {};
-        Server = this.Server = this.Synchronize.Server = false;
-    }
+    
+    Synchronize = this.Synchronize = {};
+    
     var synced = {};
     var seperator = ':';
     
@@ -22,53 +14,8 @@
         return _.isFunction(object.url) ? object.url() : object.url;
     };
     
-    // Called only when DNode is connected
-    Connected = function(model, options) {
-        var name = model.name || model.collection.name;
-        var url = (model.collection) ? getUrl(model.collection) : getUrl(model);
-        
-        // Ooh boy is that a new magazine!?
-        var magazine = {
-            store : {
-                name : name
-            },
-            url : url
-        };
-        if (model instanceof Backbone.Model) {
-            params = _.extend(magazine, model.toJSON());
-        }
-        
-        options.channel = url;
-        synced[options.channel] = model;
-        
-        if (options.unsubscribe) {
-            var opt = _.extend({
-                channel : options.channel,
-            }, options.unsubscribe);
-            
-            // Alright, thats enough of those
-            Server.unsubscribe(magazine, opt);
-            delete synced[options.channel];
-        } 
-        else {
-            var opt = _.extend({
-                channel : options.channel,
-            }, options.subscribe);
-            
-            // Two year membership? Sure!
-            // ...this is all free, right?
-            Server.subscribe(magazine, opt);
-            
-            // I'll take those now, thank you.
-            options.save && model.save();
-            options.fetch && model.fetch(options.fetch);
-        }
-        // All done with the setup
-        options.finished && options.finished(model);
-    };
-    
     // Remote protocol
-    Protocol = function(client, con) {
+    Protocol.Backbone = function(client, con) {
     
         console.log('Protocol client: ', client);
         console.log('Protocol con: ', con);
@@ -140,6 +87,52 @@
             opt.finished && opt.finished(data);
         };
     };
+    
+    
+    // Called only when DNode is connected
+    Connected = function(model, options) {
+        var name = model.name || model.collection.name;
+        var url = (model.collection) ? getUrl(model.collection) : getUrl(model);
+        
+        // Ooh boy is that a new magazine!?
+        var magazine = {
+            store : {
+                name : name
+            },
+            url : url
+        };
+        if (model instanceof Backbone.Model) {
+            params = _.extend(magazine, model.toJSON());
+        }
+        
+        options.channel = url;
+        synced[options.channel] = model;
+        
+        if (options.unsubscribe) {
+            var opt = _.extend({
+                channel : options.channel,
+            }, options.unsubscribe);
+            
+            // Alright, thats enough of those
+            Server.unsubscribe(magazine, opt);
+            delete synced[options.channel];
+        } 
+        else {
+            var opt = _.extend({
+                channel : options.channel,
+            }, options.subscribe);
+            
+            // Two year membership? Sure!
+            // ...this is all free, right?
+            Server.subscribe(magazine, opt);
+            
+            // I'll take those now, thank you.
+            options.save && model.save();
+            options.fetch && model.fetch(options.fetch);
+        }
+        // All done with the setup
+        options.finished && options.finished(model);
+    };
         
     // Transport methods for model storage, sending data 
     // through the socket instance to be saved on the Server 
@@ -148,7 +141,7 @@
         
         // Setup our dnode listeners for Server callbacks
         // as well as model bindings on connection
-        if (!Server) DNode(Protocol).connect(function(remote) {
+        if (!Server) DNode(Protocol.Backbone).connect(function(remote) {
         
             // Connect to DNode Server only once
             Server = remote;
@@ -202,4 +195,4 @@
             case 'delete' : Server.destroy(params, options, callback); break;
         };
     };
-})()
+})(Protocol, Server)
