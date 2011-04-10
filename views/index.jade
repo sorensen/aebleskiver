@@ -13,7 +13,6 @@ html(lang="en")
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
     script(src="//cdn.wijmo.com/jquery.wijmo-open.1.1.2.min.js")
-    
     script(src="/js/underscore-min.js")
     script(src="/js/backbone.js")
     script(src="/js/mustache.js")
@@ -26,7 +25,6 @@ html(lang="en")
     script(src="/rpc/synchronize.js")
     script(src="/rpc/gravatar.js")
     
-    
     // User full
     script#user-template(type='text/template')
       a.gravatar(href='#/user/{{ username }}')
@@ -35,15 +33,16 @@ html(lang="en")
       span.username
         {{ username }}
     
-    
     // Main application
     script#application-template(type='text/template')
       #header.container_16
         #logo: h1 &aelig;bleskiver
         ul#navigation
           li: a(href='/') Home
+          li: a(href='/#/signin') Signin
+          li: a(href='/#/signup') Signin
           li: a(href='/#/settings') Settings
-          li: a(href='/logout') Logout
+          li: a(href='/#/logout') Logout
           
       .wrapper.container_16
         #sidebar.grid_5
@@ -86,32 +85,18 @@ html(lang="en")
         #copyright
           p &copy;
     
-    
-    // Game room
-    script#game-template(type='text/template')
-      .widget
-        .current-player-count {{ count }}
-        .current-players
-      .main-viewport
-      .workspace
-        .actions
-        .current-deck
-        button.help
-    
     // Chat window
     script#game-list-template(type='text/template')
       h3.name {{ name }}
       p.description {{ description }}
       span.total-users {{ totalUsers }}
-      
-      
+    
     // Deck of cards
     script#deck-template(type='text/template')
       .controls
         .shuffle
       .card-count
       .card-list
-    
     
     // Card
     script#card-template(type='text/template')
@@ -123,7 +108,16 @@ html(lang="en")
           .back
             .card-image {{ graphic }}
     
-
+    // Game room
+    script#game-template(type='text/template')
+      .widget
+        .current-player-count {{ count }}
+        .current-players
+      .main-viewport
+      .workspace
+        .actions
+        .current-deck
+        button.help
 
     // Chat window
     script#chat-template(type='text/template')
@@ -138,7 +132,6 @@ html(lang="en")
         button Chat
         input.create-message(type='text', name='message', placeholder='Say something...', length="40")
 
-
     // Chat window
     script#chat-list-template(type='text/template')
       .destroy
@@ -147,7 +140,6 @@ html(lang="en")
       p.description {{ description }}
       span.new-messages {{ newMessages }}
       span.total-users {{ totalUsers }}
-    
     
     // Single message
     script#message-list-template(type='text/template')

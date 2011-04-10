@@ -16,10 +16,6 @@
         initialize : function(options) {
             this.messages = new Models.MessageCollection();
         },
-        // Remove this delete its view.
-        clear : function() {
-            //this.view.remove();
-        },
     });
     
     // Chat Collection

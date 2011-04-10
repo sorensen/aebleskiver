@@ -39,80 +39,67 @@
             window.user = new Models.UserModel({id : key});
             
             // Set shortcuts to collection DOM
+            this.userList = $(this.el).find('#users');
             this.userInput = $(this.el).find('#create-user');
+            
+            this.chatList = $(this.el).find('#chats');
             this.chatInput = $(this.el).find('#create-chat');
             
-            this.userList = $(this.el).find('#users');
-            this.chatList = $(this.el).find('#chats');
-            
             var self = this;
-            var userCallback = function(model) {
-                window.user.set(model);
-                window.user.set({
-                    visits : model.visits + 1,
-                    status : 'online',
-                });
-                Gravatar(model, {
-                    finished : function(data) {
-                        console.log('avatar', data);
-                        if (!data) return;
-                        window.user.set({ avatar : data.image }).save();
+            
+            var params = {
+                error : function(resp) {
+                },
+            }
+            this.model.subscribe(params, function(resp, options) {
+                self.model.set({visits : data.visits + 1}).save();
+                
+                var params = {
+                    error : function(resp) {
                     },
-                    size : 40,
-                });
-            };
-            // Callback for when server synchronization
-            // has been completed
-            var finished = function() {
-                // Find all users
-                Synchronize(window.user, {
-                    fetch : {
-                        finished : function(model) {
-                            userCallback(model);
-                        },
-                        error : function(model) {
-                            userCallback(model);
+                }
+                window.user.subscribe(params, function(resp, options) {
+                
+                    window.user.set(resp);
+                    window.user.set({
+                        visits : resp.visits + 1,
+                        status : 'online',
+                    });
+                    
+                    var params = {
+                        size : 40,
+                        error : function(resp) {
                         },
                     }
+                    
+                    Server.gravatar(window.user, params, function(resp) {
+                        console.log('avatar', resp);
+                        window.user.set({ avatar : resp.image }).save();
+                    });
                 });
                 
+                var params = {
+                    error : function(resp) {
+                    },
+                }
                 // Sync up with the server through DNode
-                Synchronize(self.model.chats, {
-                    // Fetch data from server
-                    finished : function(data) {
-                        // Set a model for each id found for lookups
-                        _.each(self.model.attributes.chats, function(id) {
-                            self.model.chats.add({id : id}, {silent : true});
+                self.model.chats.subscribe(params, function(resp, options) {
+                
+                    // Set a model for each id found for lookups
+                    _.each(self.model.attributes.chats, function(key) {
+                        self.model.chats.add({id : key}, {silent : true});
+                    });
+                    
+                    // Use backbone to fetch from the server
+                    self.model.chats.each(function(chat) {
+                        chat.fetch({
+                            finished : function(data) {
+                                //self.model.chats.add(data);
+                                
+                            },
                         });
-                        
-                        // Use backbone to fetch from the server
-                        self.model.chats.each(function(chat) {
-                            chat.fetch({
-                                finished : function(data) {
-                                    self.model.chats.add(data);
-                                    
-                                },
-                            });
-                        });
-                    },
+                    });
                 });
-            };
-            
-            // Sync up with the server through DNode
-            Synchronize(this.model, {
-                // Fetch data from server
-                fetch : {
-                    finished : function(data) {
-                        // Increment some arbitrary number
-                        self.model.set({visits : data.visits + 1}).save();
-                        finished();
-                    },
-                    error : function(data) {
-                        // No existing data could be found
-                        self.model.save();
-                        finished();
-                    },
-                },
             });
         },
         

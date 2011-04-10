@@ -5,7 +5,7 @@
     // World Model
     Models.ApplicationModel = Backbone.Model.extend({
     
-        name     : 'app',
+        name     : 'application',
         urlRoot  : 'app',
         
         defaults : {
@@ -15,12 +15,6 @@
         },
         
         initialize : function(options) {
-            console.log('application', Models);
-            
-            var tests = Models;
-            console.log('application test', tests);
-            delete tests;
-            
             // Current user collection
             this.users = new Models.UserCollection();
             this.users.url = 'app:' + this.id + ':users';

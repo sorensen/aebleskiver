@@ -1,11 +1,7 @@
-(function(Protocol, Server) {
+(function(Protocols, Server) {
     // Backbone dnode sync
     // -------------------
-    
-    Synchronize = this.Synchronize = {};
-    
     var synced = {};
-    var seperator = ':';
     
     // Helper function to get a URL from a Model or Collection as a property
     // or as a function.
@@ -15,184 +11,131 @@
     };
     
     // Remote protocol
-    Protocol.Backbone = function(client, con) {
-    
-        console.log('Protocol client: ', client);
-        console.log('Protocol con: ', con);
-    
-        // New subscription
-        this.subscribed = function(data, opt, cb) {
-            if (!data || !synced[opt.channel]) return;
-            opt.finished && opt.finished(data);
-        };
-    
-        // New subscription
-        this.unsubscribed = function(data, opt, cb) {
-            if (!data || !synced[opt.channel]) return;
-            opt.finished && opt.finished(data);
-        };
+    Protocols.Backbone = function(client, con) {
         
-        // Created model (NOTE) New models must be created through sets
-        this.created = function(data, opt, cb) {
-            if (!data || !synced[opt.channel]) return;
-            if (!synced[opt.channel].get(data.id)) synced[opt.channel].add(data);
+        // Created model (NOTE) New models must be created through collections
+        this.created = function(resp, options) {
+            if (!synced[options.channel]) return;
+            if (!synced[options.channel].get(resp.id)) synced[options.channel].add(resp);
             
-            opt.finished && opt.finished(data);
+            options.finished && options.finished(resp);
         };
         
         // Fetched model
-        this.read = function(data, opt, cb) {
+        this.read = function(resp, options) {
             // Compare URL's to update the right collection
-            if (!data.id && !_.first(data) || !synced[opt.channel]) return;
-            var chan = synced[opt.channel];
-            if (chan instanceof Backbone.Model) chan.set(data);
-            else if (!chan.get(data.id)) chan.add(data);
+            if (!synced[options.channel]) return;
+            var model = synced[options.channel];
+            if (model instanceof Backbone.Model) model.set(resp);
+            else if (!model.get(resp.id)) model.add(resp);
             
-            opt.finished && opt.finished(data);
+            options.finished && options.finished(resp);
         };
         
         // Updated model data
-        this.updated = function(data, opt, cb) {
-            if (!data || !synced[opt.channel]) return;
-            if (synced[opt.channel].get(data.id)) synced[opt.channel].get(data.id).set(data);
-            else synced[opt.channel].set(data);
+        this.updated = function(resp, options) {
+            if (!synced[options.channel]) return;
+            if (synced[options.channel].get(resp.id)) synced[options.channel].get(resp.id).set(resp);
+            else synced[options.channel].set(resp);
             
-            opt.finished && opt.finished(data);
+            options.finished && options.finished(resp);
         };
         
         // Destroyed model
-        this.destroyed = function(data, opt, cb) {
-            if (!data) return;
-            synced[opt.channel].remove(data) || delete synced[opt.channel];
+        this.destroyed = function(resp, options) {
+            if (!synced[options.channel]) return;
+            synced[options.channel].remove(resp) || delete synced[options.channel];
             
-            opt.finished && opt.finished(data);
+            options.finished && options.finished(resp);
+        };
+    };
+    
+    // Remote protocol
+    Protocols.Pubsub = function(client, con) {
+    
+        // New subscription
+        this.subscribed = function(resp, options) {
+            if (!synced[options.channel]) return;
+            
+            options.finished && options.finished(resp);
+        };
+    
+        // New subscription
+        this.unsubscribed = function(resp, options) {
+            if (!synced[options.channel]) return;
+            
+            options.finished && options.finished(resp);
         };
         
-        this.published = function(data, opt, cb) {
-            // Check CRUD
-            switch (opt.method) {
-                case 'read'   :      this.read(data, opt, cb); break;
-                case 'create' :   this.created(data, opt, cb); break;
-                case 'update' :   this.updated(data, opt, cb); break;
-                case 'delete' : this.destroyed(data, opt, cb); break;
+        // Published from the server
+        this.published = function(resp, options) {
+            switch (options.method) {
+                case 'create' : this.created(resp, options); break;
+                case 'update' : this.updated(resp, options); break;
+                case 'delete' : this.destroyed(resp, options); break;
             };
         };
+    };
+    
+    _.extend(Backbone.Model.prototype, {
+    
+        url : function() {
+            var base = getUrl(this.collection) || this.urlRoot || '';
+            if (this.isNew()) return base;
+            return base + (base.charAt(base.length - 1) == ':' ? '' : ':') + encodeURIComponent(this.id);
+        },
         
-        // Fetched gravatar
-        this.gravatared = function(data, opt, cb) {
-            console.log('Sync Gravatared: ', data);
-            // Compare URL's to update the right collection
-            if (!data) return;
-            
-            opt.finished && opt.finished(data);
+    });
+    
+    Backbone.Model.prototype.subscribe = Backbone.Collection.prototype.subscribe = function(options, callback) {
+        options  || (options = {});
+        options.channel || (options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model));
+        if (!Server) {
+            options.error && options.error(this, options);
+            return;
         };
+        if (!options.silent) this.trigger('subscribe', this, options);
+        Server.subscribe.call(this.toJSON(), options callback);
+        return this;
     };
-    
-    
-    // Called only when DNode is connected
-    Connected = function(model, options) {
-        var name = model.name || model.collection.name;
-        var url = (model.collection) ? getUrl(model.collection) : getUrl(model);
         
-        // Ooh boy is that a new magazine!?
-        var magazine = {
-            store : {
-                name : name
-            },
-            url : url
+    Backbone.Model.prototype.unsubscribe = Backbone.Collection.prototype.unsubscribe = function(options, callback) {
+        options  || (options = {});
+        options.channel || (options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model));
+        
+        if (!Server) {
+            options.error && options.error(this, options);
+            return;
         };
-        if (model instanceof Backbone.Model) {
-            params = _.extend(magazine, model.toJSON());
-        }
-        
-        options.channel = url;
-        synced[options.channel] = model;
-        
-        if (options.unsubscribe) {
-            var opt = _.extend({
-                channel : options.channel,
-            }, options.unsubscribe);
-            
-            // Alright, thats enough of those
-            Server.unsubscribe(magazine, opt);
-            delete synced[options.channel];
-        } 
-        else {
-            var opt = _.extend({
-                channel : options.channel,
-            }, options.subscribe);
-            
-            // Two year membership? Sure!
-            // ...this is all free, right?
-            Server.subscribe(magazine, opt);
-            
-            // I'll take those now, thank you.
-            options.save && model.save();
-            options.fetch && model.fetch(options.fetch);
-        }
-        // All done with the setup
-        options.finished && options.finished(model);
-    };
-        
-    // Transport methods for model storage, sending data 
-    // through the socket instance to be saved on the Server 
-    Synchronize = function(model, options) {
-        options = options || {};
-        
-        // Setup our dnode listeners for Server callbacks
-        // as well as model bindings on connection
-        if (!Server) DNode(Protocol.Backbone).connect(function(remote) {
-        
-            // Connect to DNode Server only once
-            Server = remote;
-            Connected(model, options);
-        });
-        // We are already connected
-        else Connected(model, options);
-    };
-    if (typeof exports !== 'undefined') module.exports = Synchronize;
-
-    urlError = function() { return ''; };
-    
-    // Default URL for the model's representation on the Server -- if you're
-    // using Backbone's restful methods, override this to change the endpoint
-    // that will be called.
-    Backbone.Model.prototype.url = function() {
-      var base = getUrl(this.collection) || this.urlRoot || urlError();
-      if (this.isNew()) return base;
-      return base + (base.charAt(base.length - 1) == seperator ? '' : seperator) + encodeURIComponent(this.id);
+        if (!options.silent) this.trigger('unsubscribe', this, options);
+        Server.unsubscribe.call(this.toJSON(), options, callback);
+        delete synced[options.channel];
+        return this;
     };
     
-    // Callback testing
-    var callback = function(data, opt) {
-        //console.log('callback test:', data);
-    };
+    _.extend(Backbone {
     
-    // Override `Backbone.sync` to use delegate to the model or collection's
-    // *localStorage* property, which should be an instance of `Store`.
-    Backbone.sync = function(method, model, options) {
-        // Set model url and store
-        var params = {
-            store : {
-                name : model.name || model.collection.name
-            },
-            url :  getUrl(model) || model.url
-        };
+        sync : function(method, model, options) {
         
-        if (model instanceof Backbone.Model) {
-            params = _.extend(params, model.toJSON());
-        }
-        
-        callback = options.remote || callback;
-        if (!options.channel) options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model);
-        options.method  = method;
-        
-        if (!Server) return;
-        switch (method) {
-            case 'read'   :    Server.read(params, options, callback); break;
-            case 'create' :  Server.create(params, options, callback); break;
-            case 'update' :  Server.update(params, options, callback); break;
-            case 'delete' : Server.destroy(params, options, callback); break;
-        };
-    };
-})(Protocol, Server)
+            if (!Server) {
+                options.error && options.error(model, options);
+                return;
+            };
+            
+            options.url     || (getUrl(model) || model.url);
+            options.channel || (options.channel = (model.collection) ? getUrl(model.collection) : getUrl(model));
+            options.method  || (options.method = method);
+            
+            var callback = options.remote || false;
+            delete options.remote;
+            
+            switch (method) {
+                case 'read'   : Server.read(model.toJSON(), options, callback); break;
+                case 'create' : Server.create(model.toJSON(), options, callback); break;
+                case 'update' : Server.update(model.toJSON(), options, callback); break;
+                case 'delete' : Server.destroy(model.toJSON(), options, callback); break;
+            };
+        },
+    });
+    
+})(Protocols, Server)

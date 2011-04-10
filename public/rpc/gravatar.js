@@ -1,43 +1,17 @@
-(function(Protocol, Server) {
+(function(Protocols, Server) {
     // Gravatar dnode sync
     // -------------------
     
-    Gravatar = this.Gravatar = {};
-    Server   = this.Server = this.Gravatar.Server = Synchronize.Server || false;
-    
-    var cb = function(){
-        //TODO:
-    };
-    
-    var connected = function(model, options) {
-        Server.gravatar(model, options, cb);
-    };
-        
-    // Remote protocol
-    Protocol.Gravatar = function() {
+    Protocols.Gravatar = function() {
     
         // Fetched gravatar
-        this.gravatared = function(data, opt, cb) {
-            console.log('Gravatared: ', data);
+        this.gravatared = function(resp, options) {
+            console.log('Gravatared: ', resp);
             // Compare URL's to update the right collection
-            if (!data) return;
+            if (!resp) return;
             
-            opt.finished && opt.finished(data);
+            opt.finished && opt.finished(resp);
         };
     };
-        
-    // Transport methods for model storage, sending data 
-    // through the socket instance to be saved on the Server 
-    Gravatar = function(model, options) {
-        options = options || {};
-        
-        // Connect to DNode Server only once
-        if (!Server) DNode(GProtocol).connect(function(remote) {
-            Server = remote;
-            connected(model, options);
-        });
-        else connected(model, options);
-    };
-    //_.extend(Protocol, Gravatar);
-    if (typeof exports !== 'undefined') module.exports = Gravatar;
-})(Protocol, Server)
+    
+})(Protocols, Server)

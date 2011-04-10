@@ -1,6 +1,11 @@
 (function(Views) {
-    // Chat view
+    // Chat room views
     // -----------------
+    
+    // Both the simple 'Chat' view and the full 'MainChat'
+    // view share the same chat model, with the main difference
+    // being that the 'Chat' view does not hold a message
+    // collection, and provides different updates
     
     // Chat room
     Views.ChatView = Backbone.View.extend({
@@ -12,7 +17,7 @@
         
         // The DOM events specific to an item.
         events : {
-            "click" : "toggleActive"
+            "click" : "activate"
         },
         
         initialize : function(options) {
@@ -26,8 +31,7 @@
             // Send model contents to Mustache
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(content), content);            
-            $(this.el)
-                .html(view);
+            $(this.el).html(view);
                 
             // Bind to model
             this.model.bind('change', this.render);
@@ -50,42 +54,11 @@
             $(this.el).remove();
         },
         
-        // Remove this view from the DOM.
-        focusInput : function() {
-            this.input.focus();
-        },
-        
-        // Remove the item, destroy the model.
-        clear : function() {
-            this.model.clear();
-        },
-        
-        toggleActive : function() {
-            var check = $(this.el).attr('class').indexOf('current');
-            if (check === -1) {
-                this.activate();
-            } else {
-                this.deactivate();
-            }
-        },
-        
         // Join Channel
         activate : function() {            
             $(this.el)
                 .addClass('current')
                 .removeClass('inactive')
-                .siblings()
-                .addClass('inactive')
-                .removeClass('current');
-        },
-        
-        // Leave Channel
-        deactivate : function() {
-            $(this.el)
-                .addClass('inactive')
-                .removeClass('current');
-                
-            $(this.el)
                 .siblings()
                 .addClass('inactive')
                 .removeClass('current');
@@ -126,27 +99,41 @@
             $(this.el).html(view);
             
             // Set shortcut methods for DOM items
-            this.input       = $(this.el).find(".create-message");
+            this.input = $(this.el).find(".create-message");
             this.messagelist = $(this.el).find(".messages");
+            this.input.focus();
             
-            this.focusInput();
             var self = this;
-            var add = true;
-            if (this.model.messages.length === 0) add = false;
+            var add = (this.model.messages.length === 0) ? false : true;
             
-            // Sync up with the server through DNode
+            // Wrap remote procedure calls with a 'sync' object
+            // This will make sure that there is a connection between 
+            // the client and the server before executing
             Synchronize(this.model.messages, {
+            
                 // Fetch data from server
                 finished : function(data) {
                     self.model.attributes.messages = _.uniq(self.model.attributes.messages);
                     
+                    // Models that contain collections hold an array of 
+                    // id's, backbone will build the complete url/key
                     _.each(self.model.attributes.messages, function(id) {
+                    
+                        // Create a backbone object
                         var model = new Models.MessageModel();
                         
+                        // Set the lookup id
                         model.set({id : id});
+                        
+                        // Tell backbone that incomming model belongs 
+                        // to this model's message collection
                         model.collection = self.model.messages;
                         
+                        // Fetch the data from the server
                         model.fetch({
+                        
+                            // This will be called from the server through 
+                            // DNode once the async processing is done
                             finished : function(data) {
                                 //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
                                 if (add) self.model.messages.add(data);
@@ -159,67 +146,68 @@
         
         // Refresh
         render : function() {
+            //TODO: Update view with model 
+            // statistics and clear out all 
+            // existing message views to be re-rendered
             return this;
         },
         
+        // Tell the application to remove this chat room
         deactivate : function() {
+            //TODO: Move to the controller or 
+            // affect the display only
             Application.deactivateChat(this.model);
         },
         
-        // Remove this view from the DOM.
+        // Remove this view from the DOM, and unsubscribe from 
+        // all future updates to the message collection
         remove : function() {
             var self = this;
-            // Sync up with the server through DNode
             Synchronize(this.model.messages, {
-                // Fetch data from server
-                unsubscribe : true,
-                finished : function(data) {
-                    self.model.messages.each(function(message) {
-                        //message.clear();
-                    });
+            
+                // RPC command
+                unsubscribe  : {
+                
+                    // Callback function from the server
+                    finished : function(data) {
+                        self.model.messages.each(function(message) {
+                            //message.clear();
+                        });
+                    },
                 },
             });
         },
         
-        // Remove this view from the DOM.
-        focusInput : function() {
-            this.input.focus();
-        },
-        
-        // Remove the item, destroy the model.
-        clear : function() {
-            this.model.clear();
-        },
-        
         addMessage : function(message) {
-            message.created = new Date().getTime();
-            
             var view = new Views.MessageView({
                 model : message
             }).render();
             
             this.messagelist
-                .append(view.el);
-            
-            this.messagelist.scrollTop(
-                this.messagelist[0].scrollHeight
-            );
-            
+                .append(view.el)
+                .scrollTop(this.messagelist[0].scrollHeight);
+                
             delete message.created;
         },
         
         // Send a message to the server
         sendMessage : function() {
             if (!this.input.val()) return;
-            
             var self = this;
             this.model.messages.create(this.newAttributes(), {
-                silent : true,
+            
+                // Remote callback
                 finished : function(data) {
+                
+                    // Add the newly created ID to this model's
+                    // key collection for future lookups
                     var keys = _.without(self.model.get('messages'), data.id);
-                    if (keys.length > 50) keys = _.rest(keys, (keys.length - 50));
                     keys.push(data.id);
-                    self.model.set({messages : keys}).save({silent : true});
+                    
+                    // Only keep the last 200 messages that were sent, the rest will 
+                    // become archived by virtue of not being used any further
+                    if (keys.length > 200) keys = _.rest(keys, (keys.length - 200));
+                    self.model.set({messages : keys}).save();
                     delete keys;
                 }
             });
