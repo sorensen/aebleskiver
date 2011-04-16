@@ -9,7 +9,7 @@ html(lang="en")
     link(rel='stylesheet', href='css/aebleskiver/jquery-ui-1.8.11.aebleskiver.css')
     style(type='text/css') @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.2.css');
     
-    // Dependancies
+    // Dependencies
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
     script(src="//cdn.wijmo.com/jquery.wijmo-open.1.1.2.min.js")
@@ -19,11 +19,7 @@ html(lang="en")
     script(src="/js/jquery.livequery.js")
     script(src="/js/json2.js")
     script(src="/js/ui.js")
-    
-    // RPC
     script(src="/dnode.js")
-    script(src="/rpc/synchronize.js")
-    script(src="/rpc/gravatar.js")
     
     // User full
     script#user-template(type='text/template')
@@ -154,21 +150,31 @@ html(lang="en")
         {{ text }}
     
 
-    // Core
+    // Application core
     script(src="/bootstrap.js")
     
+    // Remote procedure calls
+    script(src="/rpc/auth.js")
+    //script(src="/rpc/pubsub.js")
+    script(src="/rpc/synchronize.js")
+    script(src="/rpc/gravatar.js")
+    
+    // Models
     script(src="/models/message.js")
     script(src="/models/chat.js")
     script(src="/models/user.js")
     script(src="/models/application.js")
     
+    // Views
     script(src="/views/user.js")
     script(src="/views/message.js")
     script(src="/views/chat.js")
     script(src="/views/application.js")
     
+    // Controllers
     script(src="/controllers/application.js")
     
+    // Start application
     script(src="/init.js")
   body
     #wrapper

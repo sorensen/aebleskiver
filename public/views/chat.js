@@ -106,11 +106,8 @@
             var self = this;
             var add = (this.model.messages.length === 0) ? false : true;
             
-            // Wrap remote procedure calls with a 'sync' object
-            // This will make sure that there is a connection between 
-            // the client and the server before executing
-            Synchronize(this.model.messages, {
             
+            var params = {
                 // Fetch data from server
                 finished : function(data) {
                     self.model.attributes.messages = _.uniq(self.model.attributes.messages);
@@ -129,19 +126,20 @@
                         // to this model's message collection
                         model.collection = self.model.messages;
                         
-                        // Fetch the data from the server
-                        model.fetch({
-                        
+                        var params = {
                             // This will be called from the server through 
                             // DNode once the async processing is done
                             finished : function(data) {
                                 //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
                                 if (add) self.model.messages.add(data);
                             },
-                        });
+                        };
+                        // Fetch the data from the server
+                        model.fetch(params);
                     });
                 },
-            });
+            };
+            this.model.messages.subscribe(params);
         },
         
         // Refresh
@@ -163,18 +161,16 @@
         // all future updates to the message collection
         remove : function() {
             var self = this;
-            Synchronize(this.model.messages, {
             
-                // RPC command
-                unsubscribe  : {
-                
-                    // Callback function from the server
-                    finished : function(data) {
-                        self.model.messages.each(function(message) {
-                            //message.clear();
-                        });
-                    },
-                },
+            var params = {
+                error    : function(data) {},
+                finished : function(data) {},
+            };
+            this.model.messages.unsubscribe(params, function(resp) {
+            
+                self.model.messages.each(function(message) {
+                    //message.clear();
+                });
             });
         },
         
@@ -193,9 +189,9 @@
         // Send a message to the server
         sendMessage : function() {
             if (!this.input.val()) return;
-            var self = this;
-            this.model.messages.create(this.newAttributes(), {
             
+            var self = this;
+            var params = {
                 // Remote callback
                 finished : function(data) {
                 
@@ -207,10 +203,11 @@
                     // Only keep the last 200 messages that were sent, the rest will 
                     // become archived by virtue of not being used any further
                     if (keys.length > 200) keys = _.rest(keys, (keys.length - 200));
-                    self.model.set({messages : keys}).save();
+                    self.model.save({messages : keys});
                     delete keys;
-                }
-            });
+                },
+            };
+            this.model.messages.create(this.newAttributes(), params);
             this.input.val('');
         },
         

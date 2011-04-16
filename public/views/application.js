@@ -4,107 +4,48 @@
     
     // Application
     Views.ApplicationView = Backbone.View.extend({
-        // DOM element
+    
         className : 'wrapper',
         tagName   : 'div',
-        
-        // The DOM events specific to an item.
-        events : {
+        template  : _.template($('#application-template').html()),
+        events    : {
             "submit #chat-form" : "createChat",
         },
         
-        // Mustache Template
-        template : _.template($('#application-template').html()),
-        
-        // Initialization
+        // Constructor
         initialize : function(options) {
-            _.bindAll(this, 'render', 'addChat', 'createChat', 'addUser', 'addGame', 'createGame');    
+            _.bindAll(this, 'render', 'addChat', 'createChat', 'addUser');    
             this.render = _.bind(this.render, this);
 
-            // Set the model directly
+            // Set the application model directly, since there is a 
+            // one to one relationship between the view and model
             this.model = new Models.ApplicationModel({
+            
+                // This can be used to represent different
+                // servers, or instances of the program, since
+                // it is the base ID of every model url path
                 id : 's1'
             });
             
             // Bind chats collection
             this.model.users.bind('add', this.addUser);
             this.model.chats.bind('add', this.addChat);
-            
-            // Send model contents to Mustache
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(content), content);            
-            $(this.el).html(view);
-            
-            var key = $('#client').html();
-            window.user = new Models.UserModel({id : key});
-            
-            // Set shortcuts to collection DOM
-            this.userList = $(this.el).find('#users');
-            this.userInput = $(this.el).find('#create-user');
-            
-            this.chatList = $(this.el).find('#chats');
-            this.chatInput = $(this.el).find('#create-chat');
-            
-            var self = this;
-            
-            var params = {
-                error : function(resp) {
-                },
-            }
-            this.model.subscribe(params, function(resp, options) {
-                self.model.set({visits : data.visits + 1}).save();
-                
-                var params = {
-                    error : function(resp) {
-                    },
-                }
-                window.user.subscribe(params, function(resp, options) {
-                
-                    window.user.set(resp);
-                    window.user.set({
-                        visits : resp.visits + 1,
-                        status : 'online',
-                    });
-                    
-                    var params = {
-                        size : 40,
-                        error : function(resp) {
-                        },
-                    }
-                    
-                    Server.gravatar(window.user, params, function(resp) {
-                        console.log('avatar', resp);
-                        window.user.set({ avatar : resp.image }).save();
-                    });
-                });
-                
-                var params = {
-                    error : function(resp) {
-                    },
-                }
-                // Sync up with the server through DNode
-                self.model.chats.subscribe(params, function(resp, options) {
-                
-                    // Set a model for each id found for lookups
-                    _.each(self.model.attributes.chats, function(key) {
-                        self.model.chats.add({id : key}, {silent : true});
-                    });
-                    
-                    // Use backbone to fetch from the server
-                    self.model.chats.each(function(chat) {
-                        chat.fetch({
-                            finished : function(data) {
-                                //self.model.chats.add(data);
-                                
-                            },
-                        });
-                    });
-                });
-            });
         },
         
         // Render contents
         render : function() {
+            // Send model contents to Mustache
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(content), content);            
+            this.el.html(view);
+            
+            // Set shortcuts to collection DOM
+            this.userList    = this.$('#users');
+            this.userInput   = this.$('#create-user');
+            this.chatList    = this.$('#chats');
+            this.chatInput   = this.$('#create-chat');
+            this.mainContent = this.$('#main-content');
+            
             return this;
         },
         
@@ -114,29 +55,26 @@
                 model : user
             }).render();
             
-            $(this.el)
-                .find('#users')
+            this.userList
                 .append(view.el);
         },
         
         // Add a single chat room to the current veiw
         addChat : function(chat) {
+            // Probably shouldn't have to set this here
             chat.messages.url = chat.collection.url + ":" + chat.id + ":messages";
             
             var view = new Views.ChatView({
                 model : chat
             }).render();
             
-            console.log('add chat', chat);
-            $(this.el)
-                .find('#chats')
+            this.chatList
                 .append(view.el);
         },
         
         deactivateChat : function() {
-            $(this.el)
-                .find('#main-content')
-                .fadeOut(300, function(){
+            this.mainContent
+                .fadeOut(50, function(){
                     $(this).html('');
                 });
                 
@@ -147,24 +85,21 @@
         activateChat : function(params) {
             this.deactivateChat();
             
-            
             // Get model by name
             var model = this.model.chats.get(params);
-            console.log('model: ', model);
-            
             if (!model) return;
-            console.log('model: ', model.url());
         
             this.activeChat = new Views.ChatMainView({
                 model : model
             }).render();
             
             var self = this;
-            $(this.el)
-                .find('#main-content')
-                .fadeIn(300, function(){
+            this.mainContent
+                .fadeIn(150, function(){
                     $(this).html(self.activeChat.el);
                     self.activeChat.messagelist.scrollTop(
+                    
+                        // Scroll to the bottom of the message window
                         self.activeChat.messagelist[0].scrollHeight
                     );
                     delete self;
@@ -181,19 +116,7 @@
         // Create new chat room
         createChat : function() {
             if (!this.chatInput.val()) return;
-            
-            var self = this;
-            this.model.chats.create(this.newChatAttributes(), {
-                finished : function(data) {
-                    var keys = self.model.get('chats');
-                    if (keys) {
-                        keys.push(data.id);
-                        if (keys.length > 50) keys = _.rest(keys, (keys.length - 50));
-                        self.model.set({chats : _.uniq(keys)}).save();
-                        delete keys;
-                    }
-                }
-            });
+            this.model.createChat(this.newChatAttributes());
             this.chatInput.val('');
         },
     });

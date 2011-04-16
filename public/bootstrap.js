@@ -7,3 +7,4 @@
     Models      = this.Models      = {};
     Views       = this.Views       = {};
     Controllers = this.Controllers = {};
+    

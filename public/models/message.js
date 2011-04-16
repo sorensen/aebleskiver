@@ -15,7 +15,7 @@
     // Message
     Models.MessageModel = Backbone.Model.extend({
         defaults : {
-            //'created' : new Date().getTime(),
+            created : true,
         },
         
         initialize : function(options) {

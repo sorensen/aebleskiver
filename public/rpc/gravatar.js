@@ -1,4 +1,6 @@
-(function(Protocols, Server) {
+console.log('Gravatar: ', Protocols);
+
+(function(Protocols) {
     // Gravatar dnode sync
     // -------------------
     
@@ -10,8 +12,8 @@
             // Compare URL's to update the right collection
             if (!resp) return;
             
-            opt.finished && opt.finished(resp);
+            options.finished && options.finished(resp);
         };
     };
     
-})(Protocols, Server)
+})(Protocols)

@@ -11,7 +11,7 @@
             'created' : true,
             'messages' : [],
             'username' : 'anonymous',
-            'gravatar' : 'images/undefined.png',
+            'avatar'   : '/images/undefined.png',
             'status'   : 'offline',
             'statistics' : {
             },
