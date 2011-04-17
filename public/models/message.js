@@ -1,27 +1,20 @@
-(function() {
+(function(Models) {
     // Message model
     // ------------------
-    var Models;
     
-    if (typeof exports !== 'undefined') {
-        _        = require('underscore')._;
-        Backbone = require('backbone');
-        Models   = exports;
-    } else {
-        if (!Models) var Models = this.Models = {};
-        else _.extend(Models, this.Models);
-    }
-    
-    // Message
+    // Single message model
     Models.MessageModel = Backbone.Model.extend({
+    
+        // Default model attributes
         defaults : {
             created : true,
         },
         
+        // Constructor
         initialize : function(options) {
         },
         
-        // Remove this delete its view.
+        // Remove model along with the view
         clear : function() {
             this.view.remove();
         },
@@ -34,9 +27,8 @@
         url   : 'messages',
         name  : 'messages',
         
-        // Initialize
+        // Constructor
         initialize : function(options) {
         },
     });
-    console.log('message', Models);
-})()
+})(Models)

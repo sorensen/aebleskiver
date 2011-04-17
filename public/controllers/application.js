@@ -25,13 +25,12 @@
         },
         
         initialize : function(options) {
+            this.saveLocation('/');
         
             // Create a new user for the current client, only the 
             // defaults will be used until the client authenticates
             // with valid credentials
             window.user = new Models.UserModel();
-            
-            console.log('controller', Models);
             
             // Attach the application
             Application = this.view = new Views.ApplicationView({

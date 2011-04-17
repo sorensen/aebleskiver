@@ -9,49 +9,38 @@
     
     // Chat room
     Views.ChatView = Backbone.View.extend({
+    
+        // DOM attributes
         tagName   : 'div',
         className : 'chat inactive',
+        template  : _.template($('#chat-list-template').html()),
         
-        // Mustache Template
-        template : _.template($('#chat-list-template').html()),
-        
-        // The DOM events specific to an item.
+        // Interaction events
         events : {
             "click" : "activate"
         },
         
+        // Constructor
         initialize : function(options) {
-            _.bindAll(this, 
-                'addMessage', 'sendMessage', 'render', 
-                'updateOnEnter', 'joinChannel', 'leaveChannel'
-            );
-            
-            this.render = _.bind(this.render, this);           
-            
-            // Send model contents to Mustache
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(content), content);            
-            $(this.el).html(view);
-                
             // Bind to model
+            _.bindAll(this, 'render');
+            this.render = _.bind(this.render, this);
             this.model.bind('change', this.render);
             this.model.view = this;
         },
         
         // Refresh
         render : function() {
+            // Send model contents to the template
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(content), content);            
+            $(this.el).html(view);
             return this;
-            var done = Todos.done().length;
-            this.$('.statistics').html(this.statsTemplate({
-                total     : Todos.length,
-                done      : Todos.done().length,
-                remaining : Todos.remaining().length
-            }));
         },
         
         // Remove this view from the DOM.
         remove : function() {
-            $(this.el).remove();
+            this.el.remove();
         },
         
         // Join Channel
@@ -67,86 +56,43 @@
     
     // Chat room
     Views.ChatMainView = Backbone.View.extend({
+    
+        // DOM attributes
         tagName   : 'div',
         className : 'main-chat',
+        template  : _.template($('#chat-template').html()),
         
-        // Mustache Template
-        template : _.template($('#chat-template').html()),
-        
-        // The DOM events specific to an item.
-        events : {
-            "submit .message-form"        : "sendMessage",
-            "click .message-form button"  : "sendMessage",
+        // Interaction events
+        events    : {
+            "submit .message-form"        : "createMessage",
+            "click .message-form button"  : "createMessage",
             "click .destroy"              : "deactivate"
         },
         
+        // Constructor
         initialize : function(options) {
             _.bindAll(this, 
-                'addMessage', 'sendMessage', 'render', 'leaveChannel'
+                'addMessage', 'createMessage', 'render'
             );
-            
             this.render = _.bind(this.render, this);           
             
             // Bind to model
             this.model.bind('change', this.render);
             this.model.view = this;
-            
             this.model.messages.bind('add', this.addMessage);
-            
-            // Send model contents to Mustache
+        },
+        
+        // Render contents
+        render : function() {
+            // Send model contents to the template
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(content), content);            
             $(this.el).html(view);
             
             // Set shortcut methods for DOM items
-            this.input = $(this.el).find(".create-message");
-            this.messagelist = $(this.el).find(".messages");
+            this.input       = this.$(".create-message");
+            this.messagelist = this.$(".messages");
             this.input.focus();
-            
-            var self = this;
-            var add = (this.model.messages.length === 0) ? false : true;
-            
-            
-            var params = {
-                // Fetch data from server
-                finished : function(data) {
-                    self.model.attributes.messages = _.uniq(self.model.attributes.messages);
-                    
-                    // Models that contain collections hold an array of 
-                    // id's, backbone will build the complete url/key
-                    _.each(self.model.attributes.messages, function(id) {
-                    
-                        // Create a backbone object
-                        var model = new Models.MessageModel();
-                        
-                        // Set the lookup id
-                        model.set({id : id});
-                        
-                        // Tell backbone that incomming model belongs 
-                        // to this model's message collection
-                        model.collection = self.model.messages;
-                        
-                        var params = {
-                            // This will be called from the server through 
-                            // DNode once the async processing is done
-                            finished : function(data) {
-                                //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
-                                if (add) self.model.messages.add(data);
-                            },
-                        };
-                        // Fetch the data from the server
-                        model.fetch(params);
-                    });
-                },
-            };
-            this.model.messages.subscribe(params);
-        },
-        
-        // Refresh
-        render : function() {
-            //TODO: Update view with model 
-            // statistics and clear out all 
-            // existing message views to be re-rendered
             return this;
         },
         
@@ -160,18 +106,7 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
-            var self = this;
-            
-            var params = {
-                error    : function(data) {},
-                finished : function(data) {},
-            };
-            this.model.messages.unsubscribe(params, function(resp) {
-            
-                self.model.messages.each(function(message) {
-                    //message.clear();
-                });
-            });
+            this.model.remove();
         },
         
         addMessage : function(message) {
@@ -187,27 +122,9 @@
         },
         
         // Send a message to the server
-        sendMessage : function() {
+        createMessage : function() {
             if (!this.input.val()) return;
-            
-            var self = this;
-            var params = {
-                // Remote callback
-                finished : function(data) {
-                
-                    // Add the newly created ID to this model's
-                    // key collection for future lookups
-                    var keys = _.without(self.model.get('messages'), data.id);
-                    keys.push(data.id);
-                    
-                    // Only keep the last 200 messages that were sent, the rest will 
-                    // become archived by virtue of not being used any further
-                    if (keys.length > 200) keys = _.rest(keys, (keys.length - 200));
-                    self.model.save({messages : keys});
-                    delete keys;
-                },
-            };
-            this.model.messages.create(this.newAttributes(), params);
+            this.model.createMessage(this.newAttributes());
             this.input.val('');
         },
         

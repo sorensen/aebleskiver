@@ -10,6 +10,8 @@
         Gravatar    = require('protocol-gravatar'),
         Auth        = require('protocol-auth'),
         dnode       = require('dnode'),
+        version     = '0.0.9',
+        port        = 3000
         server      = module.exports = express.createServer();
     
     // Server configuration
@@ -18,10 +20,7 @@
         server.use(express.methodOverride());
         server.use(express.static(__dirname + '/public'));
         server.set('view options', {layout : false});
-    });
-    
-    var version = '0.0.9',
-        port    = 3000;
+    });=
     
     // Main application
     server.get('/', function(req, res) {
@@ -29,19 +28,18 @@
         res.render('index.jade', {
             locals : {
                 port    : port,
-                version : version  
+                version : (version || '0.0.0'),
+                token   : (token   || ''),
             }
         });
     });
     
     // Start application
     server.listen(port);
-    
-    // Enable DNode RPC
     dnode()
         .use(Auth)          // Authentication support
         .use(PubSub)        // Pub/sub channel support
         .use(Synchronize)   // Backbone integration
         .use(Gravatar)      // Gravatar integration
-        .listen(server)
+        .listen(server)     // Start your engines
 })()

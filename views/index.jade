@@ -34,9 +34,9 @@ html(lang="en")
       #header.container_16
         #logo: h1 &aelig;bleskiver
         ul#navigation
-          li: a(href='/') Home
-          li: a(href='/#/signin') Signin
-          li: a(href='/#/signup') Signin
+          li: a(href='/#/') Home
+          li: a(href='/#/login') Login
+          li: a(href='/#/signup') Sign up
           li: a(href='/#/settings') Settings
           li: a(href='/#/logout') Logout
           
@@ -80,40 +80,6 @@ html(lang="en")
       #footer.container_16
         #copyright
           p &copy;
-    
-    // Chat window
-    script#game-list-template(type='text/template')
-      h3.name {{ name }}
-      p.description {{ description }}
-      span.total-users {{ totalUsers }}
-    
-    // Deck of cards
-    script#deck-template(type='text/template')
-      .controls
-        .shuffle
-      .card-count
-      .card-list
-    
-    // Card
-    script#card-template(type='text/template')
-        .card(title='{{ title }}')
-          .front
-            .suit-tl {{ suit }}
-            .rank {{ rank }}
-            .suit-br {{ suit }}
-          .back
-            .card-image {{ graphic }}
-    
-    // Game room
-    script#game-template(type='text/template')
-      .widget
-        .current-player-count {{ count }}
-        .current-players
-      .main-viewport
-      .workspace
-        .actions
-        .current-deck
-        button.help
 
     // Chat window
     script#chat-template(type='text/template')
@@ -155,8 +121,7 @@ html(lang="en")
     
     // Remote procedure calls
     script(src="/rpc/auth.js")
-    //script(src="/rpc/pubsub.js")
-    script(src="/rpc/synchronize.js")
+    script(src="/rpc/pubsub.js")
     script(src="/rpc/gravatar.js")
     
     // Models

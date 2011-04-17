@@ -2,19 +2,18 @@
     // Message view
     // -----------------
     
-    // Message
+    // Single room message
     Views.MessageView = Backbone.View.extend({
+        
+        // DOM attributes
         tagName   : 'li',
         className : 'message',
-        
-        // Mustache Template
-        template : _.template($('#message-template').html()),
+        template  : _.template($('#message-template').html()),
     
+        // Constructor
         initialize : function(options) {
             _.bindAll(this, 'render');
             this.model.bind('all', this.render);
-            
-            // Set direct reference to the view
             this.model.view = this;
         },
 
@@ -28,12 +27,11 @@
             //$(this.el).remove();
         },
     
-        // Re-render contents
+        // Render contents
         render : function() {
-            // Send model contents to Mustache
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(content), content);
-            $(this.el).html(view);
+            this.el.html(view);
             return this;
         }
     });
