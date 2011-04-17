@@ -12,45 +12,48 @@
             ],
             'messages' : [],
         },
-        // Initialize
-        initialize : function(options) {
+        
+        // Populate room with messages
+        populate : function() {
+                    console.log('chat populate: ', this);
             this.messages = new Models.MessageCollection();
+            this.messages.url = this.url() + ':messages';
+            
             var self = this;
             var add = (this.messages.length === 0) ? false : true;
             var params = {
-            
-                // Fetch data from server
-                finished : function(data) {
-                    self.attributes.messages = _.uniq(self.attributes.messages);
-                    
-                    // Models that contain collections hold an array of 
-                    // id's, backbone will build the complete url/key
-                    _.each(self.attributes.messages, function(id) {
-                    
-                        // Create a backbone object
-                        var model = new Models.MessageModel();
-                        
-                        // Set the lookup id
-                        model.set({id : id});
-                        
-                        // Tell backbone that incomming model belongs 
-                        // to this model's message collection
-                        model.collection = self.messages;
-                        
-                        var params = {
-                            // This will be called from the server through 
-                            // DNode once the async processing is done
-                            finished : function(data) {
-                                //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
-                                if (add) self.messages.add(data);
-                            },
-                        };
-                        // Fetch the data from the server
-                        model.fetch(params);
-                    });
-                },
             };
-            this.messages.subscribe(params);
+            this.messages.subscribe(params, function() {
+                self.attributes.messages = _.uniq(self.attributes.messages);
+                
+                // Models that contain collections hold an array of 
+                // id's, backbone will build the complete url/key
+                _.each(self.attributes.messages, function(id) {
+                    console.log('chat message each: ', id);
+                
+                    // Create a backbone object
+                    var model = new Models.MessageModel();
+                    
+                    // Set the lookup id
+                    model.set({id : id});
+                    
+                    // Tell backbone that incomming model belongs 
+                    // to this model's message collection
+                    model.collection = self.messages;
+                    
+                    var params = {
+                        // This will be called from the server through 
+                        // DNode once the async processing is done
+                        finished : function(data) {
+                            console.log('chat message fetch finished: ', data);
+                            //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
+                            if (add) self.messages.add(data);
+                        },
+                    };
+                    // Fetch the data from the server
+                    model.fetch(params);
+                });
+            });
         },
         
         // Remove this view from the DOM, and unsubscribe from 
@@ -73,7 +76,9 @@
             var self = this;
             var params = {
                 finished : function(resp) {
-                
+                    
+                    console.log('createMessage: ', resp);
+                    
                     // Add the newly created ID to this model's
                     // key collection for future lookups
                     var keys = _.without(self.get('messages'), resp.id);

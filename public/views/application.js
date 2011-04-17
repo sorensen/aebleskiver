@@ -62,7 +62,7 @@
         // Add a single chat room to the current veiw
         addChat : function(chat) {
             // Probably shouldn't have to set this here
-            chat.messages.url = chat.collection.url + ":" + chat.id + ":messages";
+            //chat.messages.url = chat.collection.url + ":" + chat.id + ":messages";
             
             var view = new Views.ChatView({
                 model : chat
@@ -77,7 +77,7 @@
                 .fadeOut(50, function(){
                     $(this).html('');
                 });
-                
+            
             // Join Channel
             this.activeChat && this.activeChat.remove();
         },
@@ -89,9 +89,13 @@
             var model = this.model.chats.get(params);
             if (!model) return;
         
+            console.log('activateChat: ', this);
+            console.log('activateChat: ', model);
+        
             this.activeChat = new Views.ChatMainView({
                 model : model
             }).render();
+            
             
             var self = this;
             this.mainContent

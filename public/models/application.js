@@ -38,18 +38,21 @@
         },
         
         initialize : function(options) {
+            
+            console.log('app init: ', this);
             // Current user collection
             this.users = new Models.UserCollection();
-            this.users.url = 'app:' + this.id + ':users';
+            this.users.url = this.url() + ':users';
             
             // Active chat collection
             this.chats = new Models.ChatCollection();
-            this.chats.url = 'app:' + this.id + ':chats';
+            this.chats.url = this.url() + ':chats';
             
             var self = this;
             var params = {
                 error : function(msg, resp, opt){},
             };
+            
             // Subscribing to a model can be continued by just 
             // passing a callback, though, it will still execute a
             // 'finished' function if you pass one in the options

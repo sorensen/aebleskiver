@@ -11,7 +11,8 @@
         Auth        = require('protocol-auth'),
         dnode       = require('dnode'),
         version     = '0.0.9',
-        port        = 3000
+        port        = 3000,
+        token       = '',
         server      = module.exports = express.createServer();
     
     // Server configuration
@@ -20,16 +21,15 @@
         server.use(express.methodOverride());
         server.use(express.static(__dirname + '/public'));
         server.set('view options', {layout : false});
-    });=
+    });
     
     // Main application
     server.get('/', function(req, res) {
-    
         res.render('index.jade', {
             locals : {
                 port    : port,
-                version : (version || '0.0.0'),
-                token   : (token   || ''),
+                version : version,
+                token   : token,
             }
         });
     });

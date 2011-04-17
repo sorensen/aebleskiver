@@ -74,16 +74,14 @@
             _.bindAll(this, 
                 'addMessage', 'createMessage', 'render'
             );
-            this.render = _.bind(this.render, this);           
+            this.render = _.bind(this.render, this);
+            this.model.populate();
             
             // Bind to model
             this.model.bind('change', this.render);
             this.model.view = this;
             this.model.messages.bind('add', this.addMessage);
-        },
-        
-        // Render contents
-        render : function() {
+            
             // Send model contents to the template
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(content), content);            
@@ -93,6 +91,11 @@
             this.input       = this.$(".create-message");
             this.messagelist = this.$(".messages");
             this.input.focus();
+        },
+        
+        // Render contents
+        render : function() {
+            //TODO: Update statistics
             return this;
         },
         
@@ -114,11 +117,11 @@
                 model : message
             }).render();
             
+            console.log('addMessage: ', view);
+            
             this.messagelist
                 .append(view.el)
                 .scrollTop(this.messagelist[0].scrollHeight);
-                
-            delete message.created;
         },
         
         // Send a message to the server
