@@ -6,7 +6,7 @@
     // Dependancies
     var express     = require('express'),
         PubSub      = require('protocol-pubsub'),
-        Synchronize = require('protocol-backbone'),
+        CRUD        = require('protocol-crud'),
         Gravatar    = require('protocol-gravatar'),
         Auth        = require('protocol-auth'),
         dnode       = require('dnode'),
@@ -39,7 +39,7 @@
     dnode()
         .use(Auth)          // Authentication support
         .use(PubSub)        // Pub/sub channel support
-        .use(Synchronize)   // Backbone integration
+        .use(CRUD)   // Backbone integration
         .use(Gravatar)      // Gravatar integration
         .listen(server)     // Start your engines
 })()

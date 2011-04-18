@@ -156,20 +156,28 @@ body {
 #header {
     position: relative;
     top: 0;
-    overflow: hidden;
-    z-index: 3;
     height: 40px;
 }
     #logo {
-        display: none;
-        float: left;
-        font-size: 26px;
-        font-weight: bold;
+        writing-mode: tb-rl;
+        -webkit-transform: rotate(90deg);
+        -moz-transform: rotate(90deg);
         margin: 0;
         color: white;
-        text-transform: lowercase;
-        text-shadow: 1px 1px 3px #222;
+        position: absolute;
+        left: 50%;
+        top: -100%;
+        display: block;
+        text-decoration: none;
     }
+        #logo h1 {
+            font-size: 500px;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px #222;
+            opacity: 0.2;
+            border: 0;
+            margin: 0;
+        }
     #navigation {
         float: right;
         margin: 0;
@@ -197,14 +205,13 @@ body {
         border-bottom: 3px solid #333;
     }
 
-#wrapper {
+#application {
     height: 100%;
     overflow: hidden;
 }
 .wrapper {
     height: 100%;
     margin-top: 30px;
-    overflow: hidden;
 }
 #footer {
     display: none;
@@ -225,6 +232,69 @@ body {
         text-shadow: 1px 1px 3px #444;
     }
 
+    
+/**
+    Top Rounded corners
+**/
+#sidebar-controls,
+#sidebar-up,
+#main-controls,
+.main-room .name,
+.authenticate .title
+{
+       -moz-border-radius: 8px 8px 0 0; /* FF1+ */
+    -webkit-border-radius: 8px 8px 0 0; /* Saf3-4, iOS 1+, Android 1.5+ */
+            border-radius: 8px 8px 0 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
+}
+/**
+    Bottom Rounded corners
+**/
+#sidebar-down,
+.authenticate .controls,
+.message-form
+{
+       -moz-border-radius: 0 0 8px 8px; /* FF1+ */
+    -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
+            border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
+}
+/**
+    Full Rounded corners
+**/
+.authenticate
+{
+       -moz-border-radius: 8px; /* FF1+ */
+    -webkit-border-radius: 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
+            border-radius: 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
+}
+/**
+    Transitions
+**/
+body .ui-dialog,
+.wrapper,
+#main,
+#main-content, 
+#sidebar,
+#sidebar-controls,
+#sidebar-content
+{
+     -moz-transition: all 0.3s ease-out;  /* FF4+ */
+       -o-transition: all 0.3s ease-out;  /* Opera 10.5+ */
+  -webkit-transition: all 0.3s ease-out;  /* Saf3.2+, Chrome */
+          transition: all 0.3s ease-out;
+}
+/**
+    Shadows
+**/
+body .ui-dialog,
+#main-content, 
+#sidebar,
+.authenticate
+{
+       -moz-box-shadow: 1px 1px 4px #222; /* FF3.5+ */
+    -webkit-box-shadow: 1px 1px 4px #222; /* Saf3.0+, Chrome */
+            box-shadow: 1px 1px 4px #222; /* Opera 10.5, IE9, Chrome 10+ */
+}
+
 /**
     Sidebar
 **/
@@ -233,14 +303,7 @@ body {
     margin-top: 50px;
     position: relative;
     padding-bottom: 4px;
-           -moz-border-radius: 0 0 8px 8px; /* FF1+ */
-        -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
-                border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
 }
-    #sidebar-tabs {
-        display: none;
-        height: 40px;
-    }
     #sidebar-controls {
         position: absolute;
         top: -50px;
@@ -249,12 +312,9 @@ body {
         padding: 0;
         height: 50px;
         background: white;
-           -moz-border-radius: 8px 8px 0 0; /* FF1+ */
-        -webkit-border-radius: 8px 8px 0 0; /* Saf3-4, iOS 1+, Android 1.5+ */
-                border-radius: 8px 8px 0 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
     }
-        #game-form {
-            display: none;
+        #sidebar-controls button {
+            margin: 9px 0 9px 9px;
         }
     #sidebar-up {
         background-color: white;
@@ -264,9 +324,6 @@ body {
         position: absolute;
         width: 100%;
         top: -50px;
-           -moz-border-radius: 8px 8px 0 0; /* FF1+ */
-        -webkit-border-radius: 8px 8px 0 0; /* Saf3-4, iOS 1+, Android 1.5+ */
-                border-radius: 8px 8px 0 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
     }
     #sidebar-content {
         height: 100%;
@@ -276,7 +333,7 @@ body {
         padding: 0% 0;
         clear: both;
     }
-        #users, #games, #chats {
+        #users, #rooms {
             overflow-y: scroll;
             height: 100%;
         }
@@ -284,14 +341,10 @@ body {
             border-top: 1px solid #bbb;
             display: none;
         }
-        #games {
-            border-top: 1px solid #bbb;
-            display: none;
-        }
-        #chats {
+        #rooms {
             border-top: 1px solid #bbb;
         }
-            .chat {
+            .room {
                 position: relative;
                 padding: 0;
                 cursor: pointer;
@@ -306,14 +359,14 @@ body {
                 background-image: linear-gradient(top, #F4F3F1, #efefef);
                         filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F4F3F1', EndColorStr='#efefef'); /* IE6–IE9 */
             }
-            .chat:hover {
+            .room:hover {
                 background-color: white;
                 background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #F4F3F1)); /* Saf4+, Chrome */
                 background-image: -webkit-linear-gradient(#ffffff, #F4F3F1); /* Chrome 10+, Saf5.1+ */
             }
-            #chats .chat:first-child {
+            #rooms .room:first-child {
             }
-            #chats .chat.current {
+            #rooms .room.current {
                 background-color: #c2e7fa;
                 background-image: -moz-linear-gradient(top, #c2e7fa, #82ccf3); /* FF3.6 */
                 background-image: -o-linear-gradient(top, #c2e7fa, #82ccf3); /* Opera 11.10+ */
@@ -323,12 +376,12 @@ body {
                         filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#c2e7fa', EndColorStr='#82ccf3'); /* IE6–IE9 */
                         
             }
-            .chat a {
+            .room a {
                 display: block;
                 overflow: hidden;
                 text-decoration: none;
             }
-            .chat .name {
+            .room .name {
                 margin: 10px 20px;
             }
             
@@ -341,20 +394,17 @@ body {
         border-top: 1px solid #ccc;
         background-color: white;
         overflow: hidden;
-           -moz-border-radius: 0 0 8px 8px; /* FF1+ */
-        -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
-                border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
     }
-    #chat-form {
+    #room-form {
         font-size: 14px;
     }
-    #create-chat-button {
+    #create-room-button {
         margin: 0 10px 0 10px;
         padding: 5px 0;
         float: left;
         width: 23%;
     }
-    #create-chat {
+    #create-room-input {
         margin: 10px;
         display: block;
         padding: 3px 5px;
@@ -394,9 +444,6 @@ body {
         padding: 8px;
         height: 40px;
         background: white;
-         -moz-border-radius: 8px 8px 0 0; /* FF1+ */
-      -webkit-border-radius: 8px 8px 0 0; /* Saf3-4, iOS 1+, Android 1.5+ */
-              border-radius: 8px 8px 0 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
         overflow: hidden;
     }
         #main-controls * { display: none; }
@@ -404,26 +451,22 @@ body {
         float: right;
     }
 
-.main-chat {
+.main-room {
     margin: 0;
     height: 100%;
 }
-.main-chat .name {
+.main-room .name {
     line-height: 50px;
     font-size: 26px;
     margin: 0;
     position: absolute;
     top: -50px;
     width: 100%;
-    z-index: 4;
     padding: 0;
     height: 50px;
     background: white;
-       -moz-border-radius: 8px 8px 0 0;
-    -webkit-border-radius: 8px 8px 0 0;
-            border-radius: 8px 8px 0 0;
 }
-    .main-chat .name span {
+    .main-room .name span {
         margin-left: 20px;
     }
 
@@ -444,7 +487,7 @@ body {
     .destroy:hover {
         background-position: 0 -20px;
     }
-    .chat .destroy {
+    .room .destroy {
         display: none;
     }
     
@@ -495,11 +538,8 @@ body {
         padding: 0;
         font-size: 16px;
         background: white;
-           -moz-border-radius: 0 0 8px 8px; /* FF1+ */
-        -webkit-border-radius: 0 0 8px 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
-                border-radius: 0 0 8px 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
     }
-        .main-chat .message-form button {
+        .main-room .message-form button {
             float: left;
             height: 30px;
             width: 15%;
@@ -508,10 +548,10 @@ body {
             margin-top: 10px;
             line-height: 1;
         }
-            .main-chat .message-form button span {
+            .main-room .message-form button span {
                 padding: 0;
             }
-        .main-chat .message-form .create-message {
+        .main-room .message-form .create-message {
             width: 78%;
             display: block;
             float: left;
@@ -521,32 +561,65 @@ body {
             padding: 0 1%;
         }
 
-.authenticate,
-.wrapper,
-#main,
-#main-content, 
-#sidebar,
-#sidebar-controls,
-#sidebar-content {
-     -moz-transition: all 0.3s ease-out;  /* FF4+ */
-       -o-transition: all 0.3s ease-out;  /* Opera 10.5+ */
-  -webkit-transition: all 0.3s ease-out;  /* Saf3.2+, Chrome */
-          transition: all 0.3s ease-out;
+.statistics {
+    overflow: hidden;
+    position: absolute;
+    right: 8px;
+    top: 8px;
 }
-.authenticate,
-#main-content, 
-#sidebar {
-       -moz-box-shadow: 1px 1px 4px #222; /* FF3.5+ */
-    -webkit-box-shadow: 1px 1px 4px #222; /* Saf3.0+, Chrome */
-            box-shadow: 1px 1px 4px #222; /* Opera 10.5, IE9, Chrome 10+ */
+.main-room .statistics {
+    position: absolute;
+    right: 50px;
+    top: -40px;
 }
-
+    .statistics .stat {
+        float: right;
+        display: block;
+    }
+        .stat .title {
+            font-weight: bold;
+            float: left;
+            display: block;
+        }
+        .stat .value {
+            float: right;
+            display: block;
+            font-weight: bold;
+            text-align: center;
+            width: 16px;
+            height: 16px;
+            
+            background: #eee;
+            padding: 8px;
+            line-height: 16px;
+            color: #444;
+            
+               -moz-border-radius: 16px; /* FF1+ */
+            -webkit-border-radius: 16px; /* Saf3-4, iOS 1+, Android 1.5+ */
+                    border-radius: 16px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
+                    
+               -moz-box-shadow: inset 1px 1px 3px #5d5d5d; /* FF3.5+ */
+            -webkit-box-shadow: inset 1px 1px 3px #5d5d5d; /* Saf3.0+, Chrome */
+                    box-shadow: inset 1px 1px 3px #5d5d5d; /* Opera 10.5, IE9, Chrome 10+ */
+        }
+        .main-room .stat .title,
+        #rooms .stat .title,
+        #app-stats .total-users,
+        #app-stats .total-messages,
+        #app-stats .total-rooms .title
+        {
+            display: none;
+        }
+        .main-room .stat .value,
+        #rooms .stat .value 
+        {
+        }
 /**
     Typography styles
 **/
 h1,h2,h3,h4,h5,h6 {
-	margin: 10px 0;
-	font-weight: normal;
+    margin: 10px 0;
+    font-weight: normal;
 }
 h1 { 
     font-size: 22px;
@@ -567,25 +640,39 @@ h4,h5,h6 {
     Login / Registration
 **/
 .authenticate {
-    overflow: hidden;
-    padding: 30px;
+    outline: 0px;
+    height: auto;
+    width: auto;
+    top: 0px;
+    left: 517px;
+    display: block;
+    z-index: 1002;
+    position: absolute;
     background: white;
-    width: 320px;
     margin: 15% auto 20px;
-       -moz-border-radius: 8px; /* FF1+ */
-    -webkit-border-radius: 8px; /* Saf3-4, iOS 1+, Android 1.5+ */
-            border-radius: 8px; /* Opera 10.5, IE9, Saf5, Chrome, FF4 */
-            
-       -moz-box-shadow: 1px 1px 4px #222; /* FF3.5+ */
-    -webkit-box-shadow: 1px 1px 4px #222; /* Saf3.0+, Chrome */
-            box-shadow: 1px 1px 4px #222; /* Opera 10.5, IE9, Chrome 10+ */
 }
-    .authenticate h1 {
+    .authenticate .content {
+        padding: 20px;
+        overflow: hidden;
+    }
+    .authenticate .title {
+        border: 0;
+        border-bottom: 1px solid #9E9E9E;
+        padding: 10px;
+        background-color: #ffffff;
+        background-image: -moz-linear-gradient(top, #ffffff, #eeeeee); /* FF3.6 */
+        background-image: -o-linear-gradient(top, #ffffff, #eeeeee); /* Opera 11.10+ */
+        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #eeeeee)); /* Saf4+, Chrome */
+        background-image: -webkit-linear-gradient(#ffffff, #eeeeee); /* Chrome 10+, Saf5.1+ */
+        background-image: linear-gradient(top, #ffffff, #eeeeee);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#eeeeee'); /* IE6–IE9 */
+    }
+    .authenticate .title h3 {
         clear: both;
-        margin: 0 0 15px;
-        font-size: 42px;
-        line-height: 1;
-        text-align: center;
+        margin: 0;
+        font-size: 28px;
+        font-weight: 300;
+        line-height: 1.2;
     }
     .authenticate p {
         clear: both;
@@ -612,6 +699,21 @@ h4,h5,h6 {
         font-weight: bold;
         width: 100%;
     }
+    .authenticate .controls {
+        padding: 10px;
+        text-align: right;
+        border-top: 1px solid #9E9E9E;
+        background-color: #eeeeee;
+        background-image: -moz-linear-gradient(top, #eeeeee, #ffffff); /* FF3.6 */
+        background-image: -o-linear-gradient(top, #eeeeee, #ffffff); /* Opera 11.10+ */
+        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #ffffff)); /* Saf4+, Chrome */
+        background-image: -webkit-linear-gradient(#eeeeee, #ffffff); /* Chrome 10+, Saf5.1+ */
+        background-image: linear-gradient(top, #eeeeee, #ffffff);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eeeeee', EndColorStr='#ffffff'); /* IE6–IE9 */
+    }
+        .authenticate .controls button {
+            margin-left: 5px;
+        }
 
 /**
     Custom helpers

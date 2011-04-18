@@ -7,8 +7,12 @@
     
         // Definitions
         routes : {
-            '/chats/:id' : 'joinChat',
-            "*route"    : "invalid",
+            '/signup'    : 'signup',
+            '/login'     : 'login',
+            '/logout'    : 'logout',
+            '/rooms/:id' : 'joinRoom',
+            '/'          : 'home',
+            '*route'     : 'invalid',
         },
         
         // Default action
@@ -17,11 +21,14 @@
             this.saveLocation('/');
         },
         
-        // Join a chat room
-        joinChat : function(id) {
-            console.log('Router: join chat', id);
+        // Join a room room
+        joinRoom : function(id) {
             if (!id) return;
-            this.view.activateChat(id);
+            this.view.activateRoom(id);
+        },
+        
+        home : function() {
+            this.view.render();
         },
         
         initialize : function(options) {
@@ -35,12 +42,22 @@
             // Attach the application
             Application = this.view = new Views.ApplicationView({
                 // Use existing DOM element
-                el : $("#wrapper")
+                el : $("#application")
             });
             
             // Circular reference
             this.view.controller = this;
             this.view.render();
+        },
+        
+        // Show the login form
+        login : function() {
+            this.view.showLogin();
+        },
+        
+        // Show the login form
+        signup : function() {
+            this.view.showSignup();
         },
         
         // Authenticate the current user, check the credentials

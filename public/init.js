@@ -6,7 +6,7 @@
     // as well as model bindings on connection
     DNode()
         .use(Protocols.Auth)
-        .use(Protocols.Backbone)
+        .use(Protocols.CRUD)
         .use(Protocols.Pubsub)
         .use(Protocols.Gravatar)
         .connect(function(remote) {

@@ -1,9 +1,9 @@
 (function(Models) {
-    // Chat model
+    // Room model
     // ------------------
     
-    // Chat room
-    Models.ChatModel = Backbone.Model.extend({
+    // Room room
+    Models.RoomModel = Backbone.Model.extend({
         defaults : {
             'created' : true,
             'name' : 'Unknown',
@@ -15,7 +15,6 @@
         
         // Populate room with messages
         populate : function() {
-                    console.log('chat populate: ', this);
             this.messages = new Models.MessageCollection();
             this.messages.url = this.url() + ':messages';
             
@@ -29,8 +28,6 @@
                 // Models that contain collections hold an array of 
                 // id's, backbone will build the complete url/key
                 _.each(self.attributes.messages, function(id) {
-                    console.log('chat message each: ', id);
-                
                     // Create a backbone object
                     var model = new Models.MessageModel();
                     
@@ -45,7 +42,6 @@
                         // This will be called from the server through 
                         // DNode once the async processing is done
                         finished : function(data) {
-                            console.log('chat message fetch finished: ', data);
                             //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
                             if (add) self.messages.add(data);
                         },
@@ -95,12 +91,12 @@
         },
     });
     
-    // Chat Collection
-    Models.ChatCollection = Backbone.Collection.extend({
+    // Room Collection
+    Models.RoomCollection = Backbone.Collection.extend({
         
-        model : Models.ChatModel,
-        url   : 'chats',
-        name  : 'chats',
+        model : Models.RoomModel,
+        url   : 'rooms',
+        name  : 'rooms',
         
         // Initialize
         initialize : function(options) {

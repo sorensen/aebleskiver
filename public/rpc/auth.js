@@ -1,5 +1,3 @@
-console.log('Auth: ', Protocols);
-
 (function(Protocols) {
     // Backbone dnode sync
     // -------------------
@@ -23,5 +21,4 @@ console.log('Auth: ', Protocols);
             options.finished && options.finished(resp);
         };
     };
-    
 })(Protocols)

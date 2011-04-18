@@ -18,21 +18,71 @@ html(lang="en")
     script(src="/js/mustache.js")
     script(src="/js/jquery.livequery.js")
     script(src="/js/json2.js")
-    script(src="/js/ui.js")
     script(src="/dnode.js")
     
+    // Registration template
+    script#signup-template(type='text/template')
+      #signup.authenticate
+        form#signup-form(method="get", action="/#/register", onsubmit="return false")
+          .title
+            h3 Signup
+          .content
+            p
+              label Username: 
+              input(type='text', name='username')
+            p
+              label Display Name: (optional)
+              input(type='text', name='displayname')
+            p
+              label Email: 
+              input(type='text', name='email')
+            p
+              label Password: 
+              input(type='password', name='password')
+          .controls
+            button.submit Login
+            button.cancel Cancel
+            
+    // Login template
+    script#login-template(type='text/template')
+      #login.authenticate
+        form#login-form(method="get", action="/#/authenticate", onsubmit="return false")
+          .title
+            h3 Login
+          .content
+            p
+              label Username: 
+              input(type='text', name='username')
+            p
+              label Password: 
+              input(type='password', name='password')
+          .controls
+            button.submit Login
+            button.cancel Cancel
+    
+    // Create new room
+    script#create-room-template(type='text/template')
+      .authenticate
+        form#create-room-form(method="get", action="/#/", onsubmit="return false")
+          .title
+            h3 Create a new room
+          .content
+            p
+              label Name: 
+              input(type='text', name='room', placeholder='Room name')
+          .controls
+            button.submit Create
+            button.cancel Cancel
+            
     // User full
     script#user-template(type='text/template')
-      a.gravatar(href='#/user/{{ username }}')
-        span
-          img(src='{{ avatar }}')
-      span.username
-        {{ username }}
-    
+      a.gravatar(href='#/user/{{ username }}'): span: img(src='{{ avatar }}')
+      span.username {{ username }}
+              
     // Main application
     script#application-template(type='text/template')
       #header.container_16
-        #logo: h1 &aelig;bleskiver
+        a#logo(href='/'): h1 ;)
         ul#navigation
           li: a(href='/#/') Home
           li: a(href='/#/login') Login
@@ -42,25 +92,19 @@ html(lang="en")
           
       .wrapper.container_16
         #sidebar.grid_5
-          #sidebar-tabs
-            button#show-users Users
-            button#show-users Chats
-            button#show-users Games
-              
+        
           #sidebar-controls
-            form#chat-form(method="post", action="#", onsubmit="return false")
-              input#create-chat-button(type='submit', value='Create')
-              input#create-chat(type='text', name='chat', placeholder='Create a chat')
-            form#game-form(method="post", action="#", onsubmit="return false")
-              input#create-game-button(type='submit', value='Create')
-              input#create-game(type='text', name='game', placeholder='Create a game')
+            button#show-users Users
+            button#show-rooms Rooms
+            button#create-room Create Room
           
           #sidebar-up
           #sidebar-content  
             #users
             #games
-            #chats
+            #rooms
           #sidebar-down
+            .statistics#app-stats
         
         #main.grid_11
           #main-tabs
@@ -69,71 +113,97 @@ html(lang="en")
             
           #main-controls
             .main-controls
-              button.new-chat Create Channel
+              button.new-room Create Channel
               button.new-game Create Game
             
             .layout-controls
               button.list List
           
           #main-content
-                
+          
+      #create-room-dialog
+      #login-dialog
+      #signup-dialog
+      #settings-dialog
       #footer.container_16
         #copyright
           p &copy;
+        #authors
+          p.author Beau Sorensen
 
-    // Chat window
-    script#chat-template(type='text/template')
+    // Application statistics
+    script#application-stats-template(type='text/template')
+      .stat.total-messages
+        span.title Total Messages:
+        span.value {{ totalMessages }}
+      .stat.total-users
+        span.title Total Users:
+        span.value {{ totalUsers }}
+      .stat.total-rooms
+        span.title Total Rooms:
+        span.value {{ totalRooms }}
+    
+    // Room room
+    script#room-template(type='text/template')
       h1.name
         span {{ name }}
         span.destroy
-        
+      .statistics.room-stats
+      
       p.description {{ description }}
       .users
       .messages
       form.message-form(method="post", action="#", onsubmit="return false")
-        button Chat
+        button Room
         input.create-message(type='text', name='message', placeholder='Say something...', length="40")
 
-    // Chat window
-    script#chat-list-template(type='text/template')
-      .destroy
-      a(href='#/chats/{{ id }}')
-        h3.name {{ name }}
+    // Room listing
+    script#room-list-template(type='text/template')
+      a(href='#/rooms/{{ id }}')
+        h3.name
+          span {{ name }}
+          span.destroy
       p.description {{ description }}
-      span.new-messages {{ newMessages }}
-      span.total-users {{ totalUsers }}
-    
+      .statistics.room-stats
+      
+    // Room statistics
+    script#room-stats-template(type='text/template')
+      .stat.total-messages
+        span.title Total Messages:
+        span.value {{ totalMessages }}
+        
     // Single message
     script#message-list-template(type='text/template')
     script#message-template(type='text/template')
-      span.created
-        {{ created }}
-      span.avatar
-        img(src='{{ avatar }}')
-      a.username(href='#/users/{{ username }}')
-        {{ username }}
-      span.data
-        {{ text }}
+      span.created {{ created }}
+      span.avatar: img(src='{{ avatar }}')
+      a.username(href='#/users/{{ username }}') {{ username }}
+      span.data {{ text }}
     
 
     // Application core
     script(src="/bootstrap.js")
     
+    // Helpers
+    script(src="/js/ui.js")
+    script(src="/js/helpers.js")
+    
     // Remote procedure calls
     script(src="/rpc/auth.js")
     script(src="/rpc/pubsub.js")
+    script(src="/rpc/crud.js")
     script(src="/rpc/gravatar.js")
     
     // Models
     script(src="/models/message.js")
-    script(src="/models/chat.js")
+    script(src="/models/room.js")
     script(src="/models/user.js")
     script(src="/models/application.js")
     
     // Views
     script(src="/views/user.js")
     script(src="/views/message.js")
-    script(src="/views/chat.js")
+    script(src="/views/room.js")
     script(src="/views/application.js")
     
     // Controllers
@@ -142,5 +212,8 @@ html(lang="en")
     // Start application
     script(src="/init.js")
   body
-    #wrapper
-    #client(style='display:none;')= locals.name
+    #application
+    #port(style='display:none;')= locals.port
+    #token(style='display:none;')= locals.token
+    #dialog(style='display:none;')
+    #version= locals.version

@@ -1,19 +1,20 @@
 (function(Views) {
-    // Chat room views
+    // Room room views
     // -----------------
     
-    // Both the simple 'Chat' view and the full 'MainChat'
-    // view share the same chat model, with the main difference
-    // being that the 'Chat' view does not hold a message
+    // Both the simple 'Room' view and the full 'MainRoom'
+    // view share the same room model, with the main difference
+    // being that the 'Room' view does not hold a message
     // collection, and provides different updates
     
-    // Chat room
-    Views.ChatView = Backbone.View.extend({
+    // Room room
+    Views.RoomView = Backbone.View.extend({
     
         // DOM attributes
-        tagName   : 'div',
-        className : 'chat inactive',
-        template  : _.template($('#chat-list-template').html()),
+        tagName        : 'div',
+        className      : 'room inactive',
+        template       : _.template($('#room-list-template').html()),
+        statsTemplate  : _.template($('#room-stats-template').html()),
         
         // Interaction events
         events : {
@@ -27,14 +28,19 @@
             this.render = _.bind(this.render, this);
             this.model.bind('change', this.render);
             this.model.view = this;
-        },
-        
-        // Refresh
-        render : function() {
+            
             // Send model contents to the template
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(content), content);            
             $(this.el).html(view);
+        },
+        
+        // Refresh statistics
+        render : function() {
+            var totalMessages = this.model.get('messages').length;
+            this.$('.room-stats').html(Mustache.to_html(this.statsTemplate(), {
+                totalMessages : totalMessages
+            }));
             return this;
         },
         
@@ -54,13 +60,14 @@
         },
     });
     
-    // Chat room
-    Views.ChatMainView = Backbone.View.extend({
+    // Room room
+    Views.RoomMainView = Backbone.View.extend({
     
         // DOM attributes
-        tagName   : 'div',
-        className : 'main-chat',
-        template  : _.template($('#chat-template').html()),
+        tagName        : 'div',
+        className      : 'main-room',
+        template       : _.template($('#room-template').html()),
+        statsTemplate  : _.template($('#room-stats-template').html()),
         
         // Interaction events
         events    : {
@@ -91,19 +98,23 @@
             this.input       = this.$(".create-message");
             this.messagelist = this.$(".messages");
             this.input.focus();
+            this.render();
         },
         
-        // Render contents
+        // Refresh statistics
         render : function() {
-            //TODO: Update statistics
+            var totalMessages = this.model.messages.length;
+            this.$('.room-stats').html(Mustache.to_html(this.statsTemplate(), {
+                totalMessages : totalMessages
+            }));
             return this;
         },
         
-        // Tell the application to remove this chat room
+        // Tell the application to remove this room
         deactivate : function() {
             //TODO: Move to the controller or 
             // affect the display only
-            Application.deactivateChat(this.model);
+            Application.deactivateRoom(this.model);
         },
         
         // Remove this view from the DOM, and unsubscribe from 
@@ -134,7 +145,7 @@
         // Generate the attributes
         newAttributes : function() {
             return {
-                chat     : this.model.escape('id'),
+                room     : this.model.escape('id'),
                 text     : this.input.val(),
                 username : window.user.get('username'),
                 avatar   : window.user.get('avatar')

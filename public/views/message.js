@@ -25,12 +25,13 @@
         // Remove this view from the DOM.
         remove : function() {
             //$(this.el).remove();
-            console.log('remove?');
+            console.log('msg remove?');
         },
     
         // Render contents
         render : function() {
             var content = this.model.toJSON();
+            content.created && (content.created = Helpers.timeFormat(content.created));
             var view = Mustache.to_html(this.template(content), content);
             $(this.el).html(view);
             return this;
