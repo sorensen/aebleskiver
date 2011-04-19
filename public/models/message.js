@@ -25,7 +25,6 @@
         
         model : Models.MessageModel,
         url   : 'messages',
-        name  : 'messages',
         
         // Constructor
         initialize : function(options) {

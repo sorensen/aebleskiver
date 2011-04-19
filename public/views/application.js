@@ -15,8 +15,10 @@
         // Interaction events
         events    : {
             "click #create-room"       : "showCreateRoom",
-            "submit #login-form"       : "showCreateRoom",
-            "submit #signup-form"      : "showCreateRoom",
+            "click #login"             : "showLogin",
+            "click #signup"            : "showSignup",
+            "submit #login-form"       : "authenticate",
+            "submit #signup-form"      : "register",
             "submit #create-room-form" : "createRoom",
             "click .cancel"            : "hideDialogs",
         },
@@ -128,6 +130,8 @@
                     );
                     delete self;
                 });
+                
+            this.$('input[name="message"]').focus();
         },
         
         // Create new room room
@@ -141,10 +145,90 @@
             name.val('');
         },
         
+        // Authenticate the current user, check the credentials
+        // sent on the server side, which will return the client 
+        // data to update the default model with
+        authenticate : function() {
+            var params = {
+                username : this.$('input[name="username"]'),
+                password : this.$('input[name="password"]'),
+            };
+            console.log('view auth', params);
+            console.log('view auth', this);
+            
+            Server.authenticate(window.user, params, function(resp) {
+            
+                console.log('window.user.authenticated: ', resp);
+                
+                // Update the current model with the returned data, 
+                // increase total visits, and chage the status to 'online'
+                window.user.set(resp);
+                window.user.set({
+                    visits : window.user.get('visits') + 1,
+                    status : 'online',
+                });
+                
+                // Request a gravatar image for the current 
+                // user based on email address
+                var params = {
+                    email : window.user.get('email'),
+                    size  : 40
+                };
+                
+                Server.gravatar(params, function(resp) {
+                    console.log('avatar', resp);
+                    window.user.set({ avatar : resp });
+                });
+            });
+            console.log('window user', window.user);
+            this.loginDialog.hide();
+        },
+        
+        // Authenticate the current user, check the credentials
+        // sent on the server side, which will return the client 
+        // data to update the default model with
+        register : function() {
+            var params = {
+                username    : this.$('input[name="username"]'),
+                displayName : this.$('input[name="displayname"]'),
+                email       : this.$('input[name="email"]'),
+                password    : this.$('input[name="password"]'),
+            };
+            console.log('view reg', params);
+            
+            Server.register(window.user, options, function(resp) {
+            
+                console.log('window.user.registered: ', resp);
+                
+                // Update the current model with the returned data, 
+                // increase total visits, and chage the status to 'online'
+                window.user.set(resp);
+                window.user.set({
+                    visits : window.user.get('visits') + 1,
+                    status : 'online',
+                });
+                
+                // Request a gravatar image for the current 
+                // user based on email address
+                var params = {
+                    email : window.user.get('email'),
+                    size  : 40
+                };
+                
+                Server.gravatar(params, function(resp) {
+                    console.log('avatar', resp);
+                    window.user.set({ avatar : resp });
+                });
+            });
+            console.log('window user', window.user);
+            this.signupDialog.hide();
+        },
+        
         hideDialogs : function() {
-            this.loginDialog.fadeOut(150);
-            this.signupDialog.fadeOut(150);
-            this.createRoomDialog.fadeOut(150);
+            this.loginDialog.hide();
+            this.signupDialog.hide();
+            this.createRoomDialog.hide();
+            return false;
         },
         
         // Show the login form

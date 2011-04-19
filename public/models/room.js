@@ -72,9 +72,6 @@
             var self = this;
             var params = {
                 finished : function(resp) {
-                    
-                    console.log('createMessage: ', resp);
-                    
                     // Add the newly created ID to this model's
                     // key collection for future lookups
                     var keys = _.without(self.get('messages'), resp.id);
@@ -82,7 +79,7 @@
                     
                     // Only keep the last 200 messages that were sent, the rest will 
                     // become archived by virtue of not being used any further
-                    if (keys.length > 200) keys = _.rest(keys, (keys.length - 200));
+                    //if (keys.length > 200) keys = _.rest(keys, (keys.length - 200));
                     self.save({messages : keys});
                     delete keys;
                 },

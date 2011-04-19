@@ -6,14 +6,14 @@
     Models.UserModel = Backbone.Model.extend({
         
         urlRoot  : 'users',
-        name     : 'users',
         defaults : {
-            'created' : true,
-            'messages' : [],
-            'username' : 'anonymous',
-            'avatar'   : '/images/undefined.png',
-            'status'   : 'offline',
-            'statistics' : {
+            'displayName' : false,
+            'username'    : 'anonymous',
+            'avatar'      : '/images/undefined.png',
+            'status'      : 'offline',
+            'created'     : true,
+            'messages'    : [],
+            'statistics'  : {
             },
         },
         
@@ -27,12 +27,9 @@
         
         model : Models.UserModel,
         url   : 'users',
-        name  : 'users',
         
         // Initialize
         initialize : function(options) {
         }
     });
-    console.log('user', Models);
-    
 })(Models)

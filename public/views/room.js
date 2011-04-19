@@ -81,13 +81,14 @@
             _.bindAll(this, 
                 'addMessage', 'createMessage', 'render'
             );
-            this.render = _.bind(this.render, this);
-            this.model.populate();
             
             // Bind to model
-            this.model.bind('change', this.render);
+            this.render = _.bind(this.render, this);
             this.model.view = this;
+            this.model.bind('change', this.render);
+            this.model.populate();
             this.model.messages.bind('add', this.addMessage);
+            this.model.messages.bind('add', this.render);
             
             // Send model contents to the template
             var content = this.model.toJSON();
@@ -98,6 +99,8 @@
             this.input       = this.$(".create-message");
             this.messagelist = this.$(".messages");
             this.input.focus();
+            
+            // Update statistics
             this.render();
         },
         
