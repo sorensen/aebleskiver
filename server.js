@@ -10,8 +10,8 @@
         Gravatar    = require('protocol-gravatar'),
         Auth        = require('protocol-auth'),
         dnode       = require('dnode'),
-        version     = '0.0.9',
-        port        = 3000,
+        version     = '0.1.0',
+        port        = 80,
         token       = '',
         server      = module.exports = express.createServer();
     
