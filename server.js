@@ -11,7 +11,7 @@
         Auth        = require('protocol-auth'),
         dnode       = require('dnode'),
         version     = '0.0.9',
-        port        = 80,
+        port        = 3000,
         token       = '',
         server      = module.exports = express.createServer();
     
@@ -37,9 +37,9 @@
     // Start application
     server.listen(port);
     dnode()
-        .use(Auth)          // Authentication support
-        .use(PubSub)        // Pub/sub channel support
-        .use(CRUD)   // Backbone integration
-        .use(Gravatar)      // Gravatar integration
-        .listen(server)     // Start your engines
+        .use(Auth)      // Authentication support
+        .use(PubSub)    // Pub/sub channel support
+        .use(CRUD)      // Backbone integration
+        .use(Gravatar)  // Gravatar integration
+        .listen(server) // Start your engines
 })()
