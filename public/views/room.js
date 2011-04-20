@@ -131,8 +131,6 @@
                 model : message
             }).render();
             
-            console.log('addMessage: ', view);
-            
             this.messagelist
                 .append(view.el)
                 .scrollTop(this.messagelist[0].scrollHeight);

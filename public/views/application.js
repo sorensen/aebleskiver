@@ -71,7 +71,6 @@
             var totalMessages = 0;
             
             this.model.rooms.each(function(room){
-                console.log('forEach', room);
                 totalMessages += room.get('messages').length;
             });
             
@@ -166,15 +165,7 @@
                 password    : this.$('input[name="password"]').val(),
             });
             
-            console.log('view auth', params);
-            console.log('view auth', model);
-            console.log('view auth', Server);
-            console.log('view auth', this);
-            
             Server.authenticate(model, params, function(resp) {
-            
-                console.log('window.user.authenticated: ', resp);
-                
                 // Update the current model with the returned data, 
                 // increase total visits, and chage the status to 'online'
                 window.user.set(resp);
@@ -191,11 +182,9 @@
                 };
                 
                 Server.gravatar(params, function(resp) {
-                    console.log('avatar', resp);
                     window.user.set({ avatar : resp });
                 });
             });
-            console.log('window user', window.user);
             this.loginDialog.hide();
         },
         
@@ -217,12 +206,7 @@
                 password    : this.$('input[name="password"]').val(),
             });
             
-            console.log('view reg', params);
-            
             Server.register(model, params, function(resp) {
-            
-                console.log('window.user.registered: ', resp);
-                
                 // Update the current model with the returned data, 
                 // increase total visits, and chage the status to 'online'
                 window.user.set(resp);
@@ -239,11 +223,9 @@
                 };
                 
                 Server.gravatar(params, function(resp) {
-                    console.log('avatar', resp);
                     window.user.set({ avatar : resp });
                 });
             });
-            console.log('window user', window.user);
             this.signupDialog.hide();
         },
         

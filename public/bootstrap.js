@@ -1,12 +1,15 @@
-
+(function() {
     // Bootstrap
     // ------------------
     
-    Server      = this.Server      = {};
-    Store       = this.Store       = {};
-    Helpers     = this.Helpers     = {};
-    Protocols   = this.Protocols   = {};
-    Models      = this.Models      = {};
-    Views       = this.Views       = {};
-    Controllers = this.Controllers = {};
-    
+    // Predefine all commonly shared objects and storage
+    // containers, so that they may be extended and shared
+    // throughout the application
+    Server      = this.Server      = {}; // DNode remote connection
+    Store       = this.Store       = {}; // Subscribed model storage
+    Helpers     = this.Helpers     = {}; // Format / UI helpers
+    Protocols   = this.Protocols   = {}; // DNode function protocols
+    Models      = this.Models      = {}; // Backbone models
+    Views       = this.Views       = {}; // Backbone views
+    Controllers = this.Controllers = {}; // Backbone controllers
+})()
