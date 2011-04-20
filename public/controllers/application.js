@@ -57,6 +57,8 @@
         
         // Destroy the current user object
         logout : function() {
+            delete window.user;
+            window.user = new Models.UserModel();
         },
         
         // Show the login form

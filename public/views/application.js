@@ -17,15 +17,20 @@
             "click #create-room"       : "showCreateRoom",
             "click #login"             : "showLogin",
             "click #signup"            : "showSignup",
-            "submit #login-form"       : "authenticate",
-            "submit #signup-form"      : "register",
-            "submit #create-room-form" : "createRoom",
             "click .cancel"            : "hideDialogs",
+            
+            // Form interactions
+            "click #login-form .submit"       : "authenticate",
+            "click #signup-form .submit"      : "register",
+            "click #create-room-form .submit" : "createRoom",
         },
         
         // Constructor
         initialize : function(options) {
-            _.bindAll(this, 'render', 'addRoom', 'createRoom', 'addUser');    
+            _.bindAll(this, 
+                'render', 'addRoom', 'createRoom', 'addUser',
+                'authenticate', 'register'
+            );    
             this.render = _.bind(this.render, this);
 
             // Set the application model directly, since there is a 
@@ -149,14 +154,24 @@
         // sent on the server side, which will return the client 
         // data to update the default model with
         authenticate : function() {
-            var params = {
-                username : this.$('input[name="username"]'),
-                password : this.$('input[name="password"]'),
+            var options = {
+                username    : this.$('input[name="username"]').val(),
             };
+            var model = window.user.toJSON();
+            
+            // Add user info to the model before sending
+            _.extend(model, options);
+            
+            var params = _.extend(options, {
+                password    : this.$('input[name="password"]').val(),
+            });
+            
             console.log('view auth', params);
+            console.log('view auth', model);
+            console.log('view auth', Server);
             console.log('view auth', this);
             
-            Server.authenticate(window.user, params, function(resp) {
+            Server.authenticate(model, params, function(resp) {
             
                 console.log('window.user.authenticated: ', resp);
                 
@@ -188,15 +203,23 @@
         // sent on the server side, which will return the client 
         // data to update the default model with
         register : function() {
-            var params = {
-                username    : this.$('input[name="username"]'),
-                displayName : this.$('input[name="displayname"]'),
-                email       : this.$('input[name="email"]'),
-                password    : this.$('input[name="password"]'),
+            var options = {
+                username    : this.$('input[name="username"]').val(),
+                displayName : this.$('input[name="displayname"]').val(),
+                email       : this.$('input[name="email"]').val(),
             };
+            var model = window.user.toJSON();
+            
+            // Add user info to the model before sending
+            _.extend(model, options);
+            
+            var params = _.extend(options, {
+                password    : this.$('input[name="password"]').val(),
+            });
+            
             console.log('view reg', params);
             
-            Server.register(window.user, options, function(resp) {
+            Server.register(model, params, function(resp) {
             
                 console.log('window.user.registered: ', resp);
                 

@@ -22,57 +22,54 @@ html(lang="en")
     
     // Registration template
     script#signup-template(type='text/template')
-      #signup.authenticate
-        form#signup-form(method="get", action="/#/register", onsubmit="return false")
-          .title
-            h3 Signup
-          .content
-            p
-              label Username: 
-              input(type='text', name='username')
-            p
-              label Display Name: (optional)
-              input(type='text', name='displayname')
-            p
-              label Email: 
-              input(type='text', name='email')
-            p
-              label Password: 
-              input(type='password', name='password')
-          .controls
-            button.submit Login
-            button.cancel Cancel
+      #signup-form.authenticate
+        .title
+          h3 Signup
+        .content
+          p
+            label Username: 
+            input(type='text', name='username')
+          p
+            label Display Name: (optional)
+            input(type='text', name='displayname')
+          p
+            label Email: 
+            input(type='text', name='email')
+          p
+            label Password: 
+            input(type='password', name='password')
+        .controls
+          button.submit Login
+          button.cancel Cancel
             
     // Login template
     script#login-template(type='text/template')
-      #login.authenticate
-        form#login-form(method="get", action="/#/authenticate", onsubmit="return false")
-          .title
-            h3 Login
-          .content
-            p
-              label Username: 
-              input(type='text', name='username')
-            p
-              label Password: 
-              input(type='password', name='password')
-          .controls
-            button.submit Login
-            button.cancel Cancel
+      #login-form.authenticate
+        .title
+          h3 Login
+        .content
+          p
+            label Username: 
+            input(type='text', name='username')
+          p
+            label Password: 
+            input(type='password', name='password')
+        .controls
+          button.submit Login
+          button.cancel Cancel
     
     // Create new room
     script#create-room-template(type='text/template')
-      .authenticate
-        form#create-room-form(method="get", action="/#/", onsubmit="return false")
-          .title
-            h3 Create a new room
-          .content
-            p
-              label Name: 
-              input(type='text', name='room', placeholder='Room name')
-          .controls
-            button.submit Create
-            button.cancel Cancel
+      #create-room-form.authenticate
+        .title
+          h3 Create a new room
+        .content
+          p
+            label Name: 
+            input(type='text', name='room', placeholder='Room name')
+        .controls
+          button.submit Create
+          button.cancel Cancel
             
     // User full
     script#user-template(type='text/template')
@@ -213,7 +210,6 @@ html(lang="en")
     script(src="/init.js")
   body
     #application
-    #port(style='display:none;')= locals.port
-    #token(style='display:none;')= locals.token
-    #dialog(style='display:none;')
+    #port= locals.port
+    #token= locals.token
     #version= locals.version
