@@ -148,6 +148,7 @@ a:hover { color: #036; }
 html {
     height: 100%;
     background: #4d4d4d;
+    overflow: hidden;
 }
 body {
     height: 100%;
@@ -173,7 +174,7 @@ body {
     text-align: left;
     color: #444;
     z-index: 9;
-    height: 30px;
+    height: 29px;
     background-color: #eeeeee;
     background-image: -moz-linear-gradient(top, #eeeeee, #cccccc); /* FF3.6 */
     background-image: -o-linear-gradient(top, #eeeeee, #cccccc); /* Opera 11.10+ */
@@ -261,7 +262,10 @@ body {
 #token, 
 #application #navigation #settings, 
 #application #navigation #logout, 
-#application #navigation #create-room 
+#application #navigation #create-room,
+#rooms .stat .title,
+#app-stats .total-users,
+#app-stats .total-messages
 { 
     display: none; 
 }
@@ -313,21 +317,55 @@ body .ui-dialog,
 /**
     Shadows
 **/
-body .ui-dialog,
-#main-content, 
-#sidebar,
 .dialog
 {
        -moz-box-shadow: 1px 1px 4px #222; /* FF3.5+ */
     -webkit-box-shadow: 1px 1px 4px #222; /* Saf3.0+, Chrome */
             box-shadow: 1px 1px 4px #222; /* Opera 10.5, IE9, Chrome 10+ */
 }
+.main-room .name,
+#sidebar-controls 
+{
+    background-color: #eeeeee;
+    background-image: -moz-linear-gradient(top, #eeeeee, #ffffff); /* FF3.6 */
+    background-image: -o-linear-gradient(top, #eeeeee, #ffffff); /* Opera 11.10+ */
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #ffffff)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(#eeeeee, #ffffff); /* Chrome 10+, Saf5.1+ */
+    background-image: linear-gradient(top, #eeeeee, #ffffff);
+    
+    background-color: #efefef;
+    background-image: -moz-linear-gradient(top, #efefef, #dddddd); /* FF3.6 */
+    background-image: -o-linear-gradient(top, #efefef, #dddddd); /* Opera 11.10+ */
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #efefef),color-stop(1, #dddddd)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(#efefef, #dddddd); /* Chrome 10+, Saf5.1+ */
+    background-image: linear-gradient(top, #efefef, #dddddd);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#efefef', EndColorStr='#dddddd'); /* IE6–IE9 */
+}
+.message-form,
+#sidebar-down
+{
+    background-color: #ffffff;
+    background-image: -moz-linear-gradient(top, #ffffff, #eeeeee); /* FF3.6 */
+    background-image: -o-linear-gradient(top, #ffffff, #eeeeee); /* Opera 11.10+ */
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #eeeeee)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(#ffffff, #eeeeee); /* Chrome 10+, Saf5.1+ */
+    background-image: linear-gradient(top, #ffffff, #eeeeee);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#eeeeee'); /* IE6–IE9 */
+            
+    background-color: #efefef;
+    background-image: -moz-linear-gradient(top, #efefef, #dddddd); /* FF3.6 */
+    background-image: -o-linear-gradient(top, #efefef, #dddddd); /* Opera 11.10+ */
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #efefef),color-stop(1, #dddddd)); /* Saf4+, Chrome */
+    background-image: -webkit-linear-gradient(#efefef, #dddddd); /* Chrome 10+, Saf5.1+ */
+    background-image: linear-gradient(top, #efefef, #dddddd);
+            filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#efefef', EndColorStr='#dddddd'); /* IE6–IE9 */
+}
 
 /**
     Sidebar
 **/
 #sidebar {
-    width: 300px;
+    width: 262px;
     top: 30px;
     bottom: 0;
     margin: 0;
@@ -335,6 +373,7 @@ body .ui-dialog,
     z-index: 2;
     position: absolute;
     padding: 50px 0;
+    border-right: 1px solid #aaa;
 }
     #sidebar-controls {
         position: absolute;
@@ -343,18 +382,11 @@ body .ui-dialog,
         z-index: 4;
         padding: 0;
         height: 50px;
-        background-color: #eeeeee;
-        background-image: -moz-linear-gradient(top, #eeeeee, #ffffff); /* FF3.6 */
-        background-image: -o-linear-gradient(top, #eeeeee, #ffffff); /* Opera 11.10+ */
-        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eeeeee),color-stop(1, #ffffff)); /* Saf4+, Chrome */
-        background-image: -webkit-linear-gradient(#eeeeee, #ffffff); /* Chrome 10+, Saf5.1+ */
-        background-image: linear-gradient(top, #eeeeee, #ffffff);
     }
         #sidebar-controls button {
             margin: 9px 0 9px 9px;
         }
     #sidebar-up {
-        background-color: white;
         border-bottom: 1px solid #CCC;
         height: 16px;
         overflow: hidden;
@@ -369,15 +401,7 @@ body .ui-dialog,
         height: 50px;
         left: 0;
         border-top: 1px solid #ccc;
-        background-color: white;
-        overflow: hidden;
-        background-color: #ffffff;
-        background-image: -moz-linear-gradient(top, #ffffff, #eeeeee); /* FF3.6 */
-        background-image: -o-linear-gradient(top, #ffffff, #eeeeee); /* Opera 11.10+ */
-        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #ffffff),color-stop(1, #eeeeee)); /* Saf4+, Chrome */
-        background-image: -webkit-linear-gradient(#ffffff, #eeeeee); /* Chrome 10+, Saf5.1+ */
-        background-image: linear-gradient(top, #ffffff, #eeeeee);
-                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#eeeeee'); /* IE6–IE9 */
+        overflow: hidden; */
     }
     #sidebar-content {
         height: 100%;
@@ -479,11 +503,11 @@ body .ui-dialog,
     }
     #main-content {
         display: none;
-        background: white;
+        background: #fafafa;
         height: 100%;
         min-height: 300px;
         clear: both;
-        margin-left: 300px;
+        margin-left: 262px;
     }
     #main-controls {
         display: none;
@@ -510,7 +534,7 @@ body .ui-dialog,
     top: 0;
     padding: 0;
     height: 50px;
-    background: white;
+    border-bottom: 1px solid #aaa;
 }
     .main-room .name span {
         margin-left: 20px;
@@ -540,17 +564,28 @@ body .ui-dialog,
 .messages {
     overflow-y: scroll;
     position: absolute;
-    top: 50px;
+    top: 51px;
     bottom: 50px;
-    right: 20px;
-    left: 20px;
+    right: 0;
+    left: 0;
 }
     .message {
         list-style: none outside;
-        padding: 3px 0;
-        border-top: 1px solid #eee;
+        padding: 10px 15px;
+        border-top: 1px solid #fff;
+        border-bottom: 1px solid #aaa;
         overflow: hidden;
+        background-color: #F4F3F1;
+        background-image: -moz-linear-gradient(top, #F4F3F1, #f1f1f1); /* FF3.6 */
+        background-image: -o-linear-gradient(top, #F4F3F1, #f1f1f1); /* Opera 11.10+ */
+        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #F4F3F1),color-stop(1, #f1f1f1)); /* Saf4+, Chrome */
+        background-image: -webkit-linear-gradient(#F4F3F1, #f1f1f1); /* Chrome 10+, Saf5.1+ */
+        background-image: linear-gradient(top, #F4F3F1, #f1f1f1);
+                filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#F4F3F1', EndColorStr='#f1f1f1'); /* IE6–IE9 */
     }
+        .message:first-child {
+            border-top: 0;
+        }
         .message .created,
         .message .avatar,
         .message .username,
@@ -581,14 +616,13 @@ body .ui-dialog,
         display: block;
         overflow: hidden;
         position: absolute;
-        height: 50px;
+        height: 49px;
         bottom: 0;
         left: 0;
         right: 0;
         padding: 0;
         font-size: 16px;
-        border-top: 2px solid #ccc;
-        background: white;
+        border-top: 1px solid #aaa;
     }
         .main-room .message-form button {
             float: left;
@@ -627,9 +661,14 @@ body .ui-dialog,
         display: block;
     }
         .stat .title {
-            font-weight: bold;
-            float: left;
             display: block;
+            line-height: 32px;
+            text-shadow: 1px 1px 1px white;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6D6D6D;
+            float: left;
+            margin-right: 10px;
         }
         .stat .value {
             float: right;
@@ -652,14 +691,6 @@ body .ui-dialog,
             -webkit-box-shadow: inset 1px 1px 3px #5d5d5d; /* Saf3.0+, Chrome */
                     box-shadow: inset 1px 1px 3px #5d5d5d; /* Opera 10.5, IE9, Chrome 10+ */
         }
-        .main-room .stat .title,
-        #rooms .stat .title,
-        #app-stats .total-users,
-        #app-stats .total-messages,
-        #app-stats .total-rooms .title
-        {
-            display: none;
-        }
         .main-room .stat .value,
         #rooms .stat .value 
         {
@@ -674,7 +705,6 @@ h1,h2,h3,h4,h5,h6 {
 h1 { 
     font-size: 22px;
     margin: 20px 20px 0;
-    border-bottom: 2px solid #DEDEDE;
 }
 h2 { 
     font-size: 22px;
