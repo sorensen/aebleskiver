@@ -3,15 +3,15 @@
     // ------------------
     require.paths.unshift(__dirname + '/lib');
     
-    // Dependancies
+    // Dependencies
     var express     = require('express'),
         PubSub      = require('protocol-pubsub'),
         CRUD        = require('protocol-crud'),
         Gravatar    = require('protocol-gravatar'),
         Auth        = require('protocol-auth'),
-        dnode       = require('dnode'),
+        DNode       = require('dnode'),
         version     = '0.1.0',
-        port        = 80,
+        port        = 3000,
         token       = '',
         server      = module.exports = express.createServer();
     
@@ -36,10 +36,10 @@
     
     // Start application
     server.listen(port);
-    dnode()
+    DNode()
         .use(Auth)      // Authentication support
         .use(PubSub)    // Pub/sub channel support
         .use(CRUD)      // Backbone integration
         .use(Gravatar)  // Gravatar integration
-        .listen(server) // Start your engines
+        .listen(server) // Start your engines!
 })()
