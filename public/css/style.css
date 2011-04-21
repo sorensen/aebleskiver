@@ -442,6 +442,7 @@ body .ui-dialog,
                 background-image: -webkit-linear-gradient(#ffffff, #F4F3F1); /* Chrome 10+, Saf5.1+ */
             }
             #rooms .room:first-child {
+                border-top: 0;
             }
             #rooms .room.current {
                 background-color: #c2e7fa;
@@ -457,9 +458,13 @@ body .ui-dialog,
                 display: block;
                 overflow: hidden;
                 text-decoration: none;
+                padding: 13px 0 13px 20px;
             }
             .room .name {
-                margin: 10px 20px;
+                font-size: 15px;
+                line-height: 1.1;
+                overflow: hidden;
+                margin: 0 50px 0 0;
             }
             
     #room-form {
@@ -650,6 +655,9 @@ body .ui-dialog,
     position: absolute;
     right: 8px;
     top: 8px;
+}
+.room .statistics {
+    top: 5px;
 }
 .main-room .statistics {
     position: absolute;
