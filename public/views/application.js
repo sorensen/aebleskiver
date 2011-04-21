@@ -59,6 +59,7 @@
             this.loginDialog      = this.$('#login-dialog');
             this.signupDialog     = this.$('#signup-dialog');
             this.createRoomDialog = this.$('#create-room-dialog');
+            this.overlay          = this.$('#overlay');
             
             this.render();
         },
@@ -104,7 +105,7 @@
         
         deactivateRoom : function() {
             this.mainContent
-                .fadeOut(50, function(){
+                .fadeOut(0, function(){
                     $(this).html('');
                 });
             
@@ -125,7 +126,7 @@
             
             var self = this;
             this.mainContent
-                .fadeIn(150, function(){
+                .fadeIn(0, function(){
                     $(this).html(self.activeRoom.el);
                     self.activeRoom.messagelist.scrollTop(
                     
@@ -146,6 +147,7 @@
                 name : name.val(),
             });
             this.createRoomDialog.fadeOut(150);
+            this.overlay.hide();
             name.val('');
         },
         
@@ -163,8 +165,14 @@
             
             var params = _.extend(options, {
                 password    : this.$('input[name="password"]').val(),
+                error       : function(code, data, options) {
+                    console.log('Auth error: code: ', code);
+                    console.log('Auth error: data: ', data);
+                    console.log('Auth error: options: ', options);
+                },
             });
             
+            var self = this;
             Server.authenticate(model, params, function(resp) {
                 // Update the current model with the returned data, 
                 // increase total visits, and chage the status to 'online'
@@ -184,8 +192,22 @@
                 Server.gravatar(params, function(resp) {
                     window.user.set({ avatar : resp });
                 });
+                
+                self.toggleNav();
+                delete self;
+                
             });
             this.loginDialog.hide();
+            this.overlay.hide();
+        },
+        
+        toggleNav : function() {
+            this.$('#signup').fadeOut(150);
+            this.$('#login').fadeOut(150);
+            
+            this.$('#settings').fadeIn(150);
+            this.$('#logout').fadeIn(150);
+            this.$('#create-room').fadeIn(150);
         },
         
         // Authenticate the current user, check the credentials
@@ -204,8 +226,13 @@
             
             var params = _.extend(options, {
                 password    : this.$('input[name="password"]').val(),
+                error       : function(code, data, options) {
+                    console.log('Auth error: code: ', code);
+                    console.log('Auth error: data: ', data);
+                    console.log('Auth error: options: ', options);
+                },
             });
-            
+            var self = this;
             Server.register(model, params, function(resp) {
                 // Update the current model with the returned data, 
                 // increase total visits, and chage the status to 'online'
@@ -225,20 +252,24 @@
                 Server.gravatar(params, function(resp) {
                     window.user.set({ avatar : resp });
                 });
+                
+                self.toggleNav();
             });
             this.signupDialog.hide();
+            this.overlay.hide();
         },
         
         hideDialogs : function() {
             this.loginDialog.hide();
             this.signupDialog.hide();
             this.createRoomDialog.hide();
-            return false;
+            this.overlay.hide();
         },
         
         // Show the login form
         showCreateRoom : function() {
             this.hideDialogs();
+            this.overlay.fadeIn(150);
             this.createRoomDialog
                 .html(Mustache.to_html(this.createRoomTemplate()))
                 .fadeIn(150, function(){
@@ -250,6 +281,7 @@
         // Show the login form
         showLogin : function() {
             this.hideDialogs();
+            this.overlay.fadeIn(150);
             this.loginDialog
                 .html(Mustache.to_html(this.loginTemplate()))
                 .fadeIn(150, function(){
@@ -261,6 +293,7 @@
         // Show the login form
         showSignup : function() {
             this.hideDialogs();
+            this.overlay.fadeIn(150);
             this.signupDialog
                 .html(Mustache.to_html(this.signupTemplate()))
                 .fadeIn(150, function(){

@@ -22,7 +22,7 @@ html(lang="en")
     
     // Registration template
     script#signup-template(type='text/template')
-      #signup-form.authenticate
+      #signup-form.dialog
         .title
           h3 Signup
         .content
@@ -39,12 +39,12 @@ html(lang="en")
             label Password: 
             input(type='password', name='password')
         .controls
-          button.submit Login
+          button.submit Signup
           button.cancel Cancel
             
     // Login template
     script#login-template(type='text/template')
-      #login-form.authenticate
+      #login-form.dialog
         .title
           h3 Login
         .content
@@ -60,7 +60,7 @@ html(lang="en")
     
     // Create new room
     script#create-room-template(type='text/template')
-      #create-room-form.authenticate
+      #create-room-form.dialog
         .title
           h3 Create a new room
         .content
@@ -70,7 +70,16 @@ html(lang="en")
         .controls
           button.submit Create
           button.cancel Cancel
-            
+    
+    // User listing
+    script#user-list-template(type='text/template')
+      a(href='#/user/{{ username }}')
+        h3.name
+          span: img(src='{{ avatar }}')
+          span {{ username }}
+          span.destroy
+      .statistics.user-stats
+    
     // User full
     script#user-template(type='text/template')
       a.gravatar(href='#/user/{{ username }}'): span: img(src='{{ avatar }}')
@@ -78,32 +87,32 @@ html(lang="en")
               
     // Main application
     script#application-template(type='text/template')
-      #header.container_16
-        a#logo(href='/'): h1 ;)
-        ul#navigation
-          li: a(href='/#/') Home
-          li: a#login(href='/#/login') Login
-          li: a#signup(href='/#/signup') Sign up
-          li: a#settings(href='/#/settings') Settings
-          li: a#logout(href='/#/logout') Logout
+      span.massive.top-text beau
+      span.massive.bottom-text sorensen
           
-      .wrapper.container_16
-        #sidebar.grid_5
-        
+      .wrapper
+        #header
+          ul#navigation
+            li: a(href='/#/') Home
+            li: a#login(href='/#/login') Login
+            li: a#signup(href='/#/signup') Sign up
+            li: a#settings(href='/#/settings') Settings
+            li: a#logout(href='/#/logout') Logout
+            li: a#show-users Users
+            li: a#show-rooms Rooms
+            li: a#create-room Create Room
+            
+        #sidebar
           #sidebar-controls
-            button#show-users Users
-            button#show-rooms Rooms
-            button#create-room Create Room
           
           #sidebar-up
           #sidebar-content  
             #users
-            #games
             #rooms
           #sidebar-down
             .statistics#app-stats
         
-        #main.grid_11
+        #main
           #main-tabs
             button#news News
             button#help Help
@@ -127,6 +136,7 @@ html(lang="en")
           p &copy;
         #authors
           p.author Beau Sorensen
+      #overlay
 
     // Application statistics
     script#application-stats-template(type='text/template')
