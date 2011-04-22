@@ -193,6 +193,7 @@
                     window.user.set({ avatar : resp });
                 });
                 
+                
                 self.toggleNav();
                 delete self;
                 
