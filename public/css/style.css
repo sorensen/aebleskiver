@@ -529,6 +529,14 @@ body .ui-dialog,
     height: 100%;
     position: relative;
 }
+.main-room .headline {
+    font-weight: 600;
+    text-shadow: 1px 1px 1px white;
+    position: absolute;
+    left: 20px;
+    right: 200px;
+    overflow: hidden;
+}
 .main-room .name {
     line-height: 50px;
     font-size: 26px;
@@ -540,7 +548,6 @@ body .ui-dialog,
     border-bottom: 1px solid #aaa;
 }
     .main-room .name span {
-        margin-left: 20px;
     }
 
 .destroy {
