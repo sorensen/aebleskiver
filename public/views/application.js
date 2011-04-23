@@ -19,10 +19,17 @@
             "click #signup"            : "showSignup",
             "click .cancel"            : "hideDialogs",
             
-            // Form interactions
+            // Login form
             "click #login-form .submit"       : "authenticate",
+            "keypress #login-form input"      : "authenticateOnEnter",
+      
+            // Registration form
             "click #signup-form .submit"      : "register",
+            "keypress #signup-form input"     : "registerOnEnter",
+            
+            // Create new room form
             "click #create-room-form .submit" : "createRoom",
+            "keypress #create-room-form input": "createRoomOnEnter",
         },
         
         // Constructor
@@ -81,6 +88,20 @@
                 totalMessages : 0
             }));
             return this;
+        },
+        
+        // Destroy the current user object and restore original
+        // navigation display
+        logout : function() {
+            delete window.user;
+            window.user = new Models.UserModel();
+            
+            this.$('#signup').fadeIn(150);
+            this.$('#login').fadeIn(150);
+            
+            this.$('#settings').fadeOut(150);
+            this.$('#logout').fadeOut(150);
+            this.$('#create-room').fadeOut(150);
         },
         
         // Add a single room room to the current veiw
@@ -151,6 +172,21 @@
             name.val('');
         },
         
+        // Create room keystroke listener
+        createRoomOnEnter: function(e) {
+            if (e.keyCode == 13) this.createRoom();
+        },
+        
+        // Alternate navigation based on user authentication
+        toggleNav : function() {
+            this.$('#signup').fadeOut(150);
+            this.$('#login').fadeOut(150);
+            
+            this.$('#settings').fadeIn(150);
+            this.$('#logout').fadeIn(150);
+            this.$('#create-room').fadeIn(150);
+        },
+        
         // Authenticate the current user, check the credentials
         // sent on the server side, which will return the client 
         // data to update the default model with
@@ -169,6 +205,13 @@
                     console.log('Auth error: code: ', code);
                     console.log('Auth error: data: ', data);
                     console.log('Auth error: options: ', options);
+                    
+                    console.log('before switch');
+                    switch(code) {
+                        case 400 : alert('Bad parameters'); break;
+                        case 401 : alert('Wrong password'); break;
+                        case 404 : alert('User not found'); break;
+                    }
                 },
             });
             
@@ -193,7 +236,7 @@
                     window.user.set({ avatar : resp });
                 });
                 
-                
+                alert('Sign in successfull');
                 self.toggleNav();
                 delete self;
                 
@@ -202,13 +245,9 @@
             this.overlay.hide();
         },
         
-        toggleNav : function() {
-            this.$('#signup').fadeOut(150);
-            this.$('#login').fadeOut(150);
-            
-            this.$('#settings').fadeIn(150);
-            this.$('#logout').fadeIn(150);
-            this.$('#create-room').fadeIn(150);
+        // Authentication keystroke listener
+        authenticateOnEnter: function(e) {
+            if (e.keyCode == 13) this.authenticate();
         },
         
         // Authenticate the current user, check the credentials
@@ -231,6 +270,12 @@
                     console.log('Auth error: code: ', code);
                     console.log('Auth error: data: ', data);
                     console.log('Auth error: options: ', options);
+                    
+                    console.log('before switch');
+                    switch(code) {
+                        case 400 : alert('Bad parameters'); break;
+                        case 401 : alert('Username taken'); break;
+                    }
                 },
             });
             var self = this;
@@ -254,12 +299,19 @@
                     window.user.set({ avatar : resp });
                 });
                 
+                alert('Registration complete');
                 self.toggleNav();
             });
             this.signupDialog.hide();
             this.overlay.hide();
         },
         
+        // Registration keystroke listener
+        registerOnEnter: function(e) {
+            if (e.keyCode == 13) this.register();
+        },
+        
+        // Remove all defined dialoges from the view
         hideDialogs : function() {
             this.loginDialog.hide();
             this.signupDialog.hide();

@@ -7,16 +7,13 @@ html(lang="en")
     link(rel='stylesheet', href='/css/style.css')
     link(rel='stylesheet', href='/css/grid.css')
     link(rel='stylesheet', href='css/aebleskiver/jquery-ui-1.8.11.aebleskiver.css')
-    style(type='text/css') @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.2.css');
     
     // Dependencies
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
-    script(src="//cdn.wijmo.com/jquery.wijmo-open.1.1.2.min.js")
     script(src="/js/underscore-min.js")
     script(src="/js/backbone.js")
     script(src="/js/mustache.js")
-    script(src="/js/jquery.livequery.js")
     script(src="/js/json2.js")
     script(src="/dnode.js")
     
@@ -128,15 +125,15 @@ html(lang="en")
       .wrapper
         #header
           h1#logo Sorensen
-          ul#navigation
-            li: a(href='/#/') Home
-            li: a#login(href='/#/login') Login
-            li: a#signup(href='/#/signup') Sign up
-            li: a#settings(href='/#/settings') Settings
-            li: a#logout(href='/#/logout') Logout
-            li: a#show-users Users
-            li: a#show-rooms Rooms
-            li: a#create-room Create Room
+          nav#navigation
+            a(href='/#/') Home
+            a#login(href='/#/login') Login
+            a#signup(href='/#/signup') Sign up
+            a#settings(href='/#/settings') Settings
+            a#logout(href='/#/logout') Logout
+            a#show-users Users
+            a#show-rooms Rooms
+            a#create-room Create Room
             
         #sidebar
           #sidebar-controls

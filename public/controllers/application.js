@@ -9,7 +9,6 @@
         routes : {
             '/signup'    : 'signup',
             '/login'     : 'login',
-            '/logout'    : 'logout',
             '/rooms/:id' : 'joinRoom',
             '/'          : 'home',
             '*route'     : 'invalid',
@@ -53,12 +52,6 @@
         // Show the login form
         login : function() {
             this.view.showLogin();
-        },
-        
-        // Destroy the current user object
-        logout : function() {
-            delete window.user;
-            window.user = new Models.UserModel();
         },
         
         // Show the login form
