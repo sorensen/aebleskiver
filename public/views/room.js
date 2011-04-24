@@ -148,7 +148,7 @@
             return {
                 room     : this.model.escape('id'),
                 text     : this.input.val(),
-                username : window.user.get('username'),
+                username : window.user.get('displayName') || window.user.get('username'),
                 avatar   : window.user.get('avatar')
             };
         },

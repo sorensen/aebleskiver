@@ -11,6 +11,7 @@ html(lang="en")
     // Dependencies
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
     script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
+    script(src="/js/modernizr-1.7.min.js")
     script(src="/js/underscore-min.js")
     script(src="/js/backbone.js")
     script(src="/js/mustache.js")
@@ -126,11 +127,11 @@ html(lang="en")
         #header
           h1#logo Sorensen
           nav#navigation
-            a(href='/#/') Home
-            a#login(href='/#/login') Login
-            a#signup(href='/#/signup') Sign up
-            a#settings(href='/#/settings') Settings
-            a#logout(href='/#/logout') Logout
+            // a(href='/#/') Home
+            a#login Login
+            a#signup Sign up
+            a#settings Settings
+            a#logout Logout
             a#show-users Users
             a#show-rooms Rooms
             a#create-room Create Room
@@ -182,6 +183,9 @@ html(lang="en")
       .stat.total-rooms
         span.title Rooms
         span.value {{ totalRooms }}
+      .stat.version
+        span.title Version
+        span.value {{ version }}
     
     // Room room
     script#room-template(type='text/template')

@@ -18,7 +18,6 @@
             
             $(function() {
                 new Controllers.Application();
-                Backbone.history.start();
             });
         });
 })()

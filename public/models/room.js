@@ -4,6 +4,9 @@
     
     // Room room
     Models.RoomModel = Backbone.Model.extend({
+    
+        type  : 'room',
+        
         defaults : {
             'created' : true,
             'name' : 'Unknown',

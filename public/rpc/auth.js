@@ -20,5 +20,13 @@
             
             options.finished && options.finished(resp);
         };
+    
+        // New subscription
+        this.receiveUser = function(session, options) {
+            console.log('receivedUser: ', session);
+            console.log('receivedUser: ', options);
+            
+            options.finished && options.finished(resp);
+        };
     };
 })(Protocols)

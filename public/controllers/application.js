@@ -7,36 +7,17 @@
     
         // Definitions
         routes : {
+            '/rooms/:id' : 'joinRoom',
             '/signup'    : 'signup',
             '/login'     : 'login',
-            '/rooms/:id' : 'joinRoom',
             '/'          : 'home',
-            '*route'     : 'invalid',
-        },
-        
-        // Default action
-        invalid : function(route) {
-            console.log('Router: invalid: ', route);
-            this.saveLocation('/');
-        },
-        
-        // Join a room room
-        joinRoom : function(id) {
-            if (!id) return;
-            this.view.activateRoom(id);
-        },
-        
-        home : function() {
-            this.view.render();
+            '*uri'       : 'invalid',
         },
         
         initialize : function(options) {
-            this.saveLocation('/');
-        
-            // Create a new user for the current client, only the 
-            // defaults will be used until the client authenticates
-            // with valid credentials
-            window.user = new Models.UserModel();
+            
+            // Force window location
+            //this.saveLocation('/');
             
             // Attach the application
             Application = this.view = new Views.ApplicationView({
@@ -47,6 +28,23 @@
             // Circular reference
             this.view.controller = this;
             this.view.render();
+        },
+        
+        home : function() {
+            this.view.render();
+            this.view.deactivateRoom();
+        },
+        
+        // Default action
+        invalid : function(uri) {
+            console.log('Router: invalid: ', uri);
+            this.saveLocation('/');
+        },
+        
+        // Join a room room
+        joinRoom : function(id) {
+            if (!id) return;
+            this.view.activateRoom(id);
         },
         
         // Show the login form

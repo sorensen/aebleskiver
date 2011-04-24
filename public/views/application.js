@@ -14,10 +14,13 @@
         
         // Interaction events
         events    : {
-            "click #create-room"       : "showCreateRoom",
-            "click #login"             : "showLogin",
-            "click #signup"            : "showSignup",
-            "click .cancel"            : "hideDialogs",
+            "click #show-rooms"  : "showRooms",
+            "click #show-users"  : "showUsers",
+            "click #create-room" : "showCreateRoom",
+            "click #login"       : "showLogin",
+            "click #logout"      : "logout",
+            "click #signup"      : "showSignup",
+            "click .cancel"      : "hideDialogs",
             
             // Login form
             "click #login-form .submit"       : "authenticate",
@@ -36,7 +39,7 @@
         initialize : function(options) {
             _.bindAll(this, 
                 'render', 'addRoom', 'createRoom', 'addUser',
-                'authenticate', 'register'
+                'authenticate', 'register', 'finishedEvent'
             );    
             this.render = _.bind(this.render, this);
 
@@ -51,8 +54,14 @@
             });
             
             this.model.bind('change', this.render);
+            
             this.model.users.bind('add', this.addUser);
+            this.model.users.bind('change', this.render);
+            
             this.model.rooms.bind('add', this.addRoom);
+            this.model.rooms.bind('change', this.render);
+            this.model.rooms.bind('subscribe', this.subscribeEvent);
+            this.model.rooms.bind('refresh', this.finishedEvent);
             
             // Render template contents
             var content = this.model.toJSON();
@@ -71,13 +80,25 @@
             this.render();
         },
         
+        finishedEvent : function() {
+            console.log('rooms finished event: ')
+            
+            // Start history once we have model data
+            Backbone.history.start();
+            this.render();
+        },
+        
+        subscribeEvent : function() {
+            console.log('room subscribed event: ')
+        },
+        
         // Refresh statistics
         render : function() {
             console.log('app render', this);
             var totalUsers = this.model.users.length;
             var totalRooms = this.model.get('rooms').length;
-            var totalMessages = 0;
             
+            var totalMessages = 0;
             this.model.rooms.each(function(room){
                 totalMessages += room.get('messages').length;
             });
@@ -85,9 +106,22 @@
             this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
                 totalUsers    : totalUsers,
                 totalRooms    : totalRooms,
-                totalMessages : 0
+                totalMessages : totalMessages,
+                version       : $('#version').html()
             }));
             return this;
+        },
+        
+        // Show the sidebar user list
+        showUsers : function() {
+            this.roomList.fadeOut(150);
+            this.userList.fadeIn(150);
+        },
+        
+        // Show the sidebar user list
+        showRooms : function() {
+            this.userList.fadeOut(150);
+            this.roomList.fadeIn(150);
         },
         
         // Destroy the current user object and restore original
@@ -200,6 +234,7 @@
             _.extend(model, options);
             
             var params = _.extend(options, {
+                token       : $('#token').html(),
                 password    : this.$('input[name="password"]').val(),
                 error       : function(code, data, options) {
                     console.log('Auth error: code: ', code);
@@ -233,7 +268,7 @@
                 };
                 
                 Server.gravatar(params, function(resp) {
-                    window.user.set({ avatar : resp });
+                    window.user.save({ avatar : resp });
                 });
                 
                 alert('Sign in successfull');
@@ -265,6 +300,7 @@
             _.extend(model, options);
             
             var params = _.extend(options, {
+                token       : $('#token').html(),
                 password    : this.$('input[name="password"]').val(),
                 error       : function(code, data, options) {
                     console.log('Auth error: code: ', code);
@@ -329,6 +365,37 @@
                 });
                 
             this.$('input[name="room"]').focus();
+        },
+        
+        // Save updated user settings
+        saveSettings : function() {
+        
+            var options = {
+                displayName : this.$('input[name="displayname"]').val(),
+                email       : this.$('input[name="email"]').val(),
+            };
+            var model = window.user.toJSON();
+            
+            
+            this.saveSettingsDialog.fadeOut(150);
+            this.overlay.hide();
+        },
+        
+        // Create room keystroke listener
+        createRoomOnEnter: function(e) {
+            if (e.keyCode == 13) this.saveSettings();
+        },
+        
+        // Show the login form
+        showSettings : function() {
+            this.hideDialogs();
+            this.overlay.fadeIn(150);
+            this.createRoomDialog
+                .html(Mustache.to_html(this.settingsTemplate()))
+                .fadeIn(150, function(){
+                });
+                
+            this.$('input[name="displayname"]').focus();
         },
         
         // Show the login form

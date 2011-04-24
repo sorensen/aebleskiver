@@ -5,7 +5,7 @@
     // User
     Models.UserModel = Backbone.Model.extend({
         
-        urlRoot  : 'users',
+        type     : 'user',
         defaults : {
             'displayName' : false,
             'username'    : 'anonymous',

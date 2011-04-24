@@ -5,6 +5,8 @@
     // Single message model
     Models.MessageModel = Backbone.Model.extend({
     
+        type  : 'message',
+        
         // Default model attributes
         defaults : {
             created : true,
