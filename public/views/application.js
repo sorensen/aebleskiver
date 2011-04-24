@@ -369,7 +369,7 @@
         
         // Save updated user settings
         saveSettings : function() {
-        
+            /**
             var options = {
                 displayName : this.$('input[name="displayname"]').val(),
                 email       : this.$('input[name="email"]').val(),
@@ -379,6 +379,7 @@
             
             this.saveSettingsDialog.fadeOut(150);
             this.overlay.hide();
+            **/
         },
         
         // Create room keystroke listener
