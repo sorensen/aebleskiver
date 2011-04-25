@@ -54,10 +54,8 @@
             });
             
             this.model.bind('change', this.render);
-            
             this.model.users.bind('add', this.addUser);
             this.model.users.bind('change', this.render);
-            
             this.model.rooms.bind('add', this.addRoom);
             this.model.rooms.bind('change', this.render);
             this.model.rooms.bind('subscribe', this.subscribeEvent);
@@ -369,7 +367,6 @@
         
         // Save updated user settings
         saveSettings : function() {
-            /**
             var options = {
                 displayName : this.$('input[name="displayname"]').val(),
                 email       : this.$('input[name="email"]').val(),
@@ -379,7 +376,6 @@
             
             this.saveSettingsDialog.fadeOut(150);
             this.overlay.hide();
-            **/
         },
         
         // Create room keystroke listener

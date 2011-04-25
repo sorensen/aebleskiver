@@ -48,6 +48,28 @@ html(lang="en")
         s.parentNode.insertBefore(wf, s);
       })();
     
+    // Settings template
+    script#settings-template(type='text/template')
+      #settings-form.dialog
+        .title
+          h3 Settings
+        .content
+          p
+            label Username: 
+            input(type='text', name='username', disabled='disabled')
+          p
+            label Display Name: (optional)
+            input(type='text', name='displayname')
+          p
+            label Email: 
+            input(type='text', name='email')
+          p
+            label Password: 
+            input(type='password', name='password')
+        .controls
+          button.submit Save
+          button.cancel Cancel
+          
     // Registration template
     script#signup-template(type='text/template')
       #signup-form.dialog
