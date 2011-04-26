@@ -18,10 +18,10 @@
         },
         
         // Labels for sensitive information
-        sensitive : {
+        sensitive : [
             'password',
-            'email',
-        },
+            'email'
+        ],
         
         initialize : function(options) {
         
