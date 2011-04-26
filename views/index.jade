@@ -246,7 +246,6 @@ html(lang="en")
       a.username(href='#/users/{{ username }}') {{ username }}
       span.data {{ text }}
     
-
     // Application core
     script(src="/bootstrap.js")
     
@@ -255,25 +254,25 @@ html(lang="en")
     script(src="/js/helpers.js")
     
     // Remote procedure calls
-    script(src="/rpc/auth.js")
-    script(src="/rpc/pubsub.js")
-    script(src="/rpc/crud.js")
-    script(src="/rpc/gravatar.js")
+    script(src="/rpc/authRPC.js")
+    script(src="/rpc/pubsubRPC.js")
+    script(src="/rpc/crudRPC.js")
+    script(src="/rpc/gravatarRPC.js")
     
     // Models
-    script(src="/models/message.js")
-    script(src="/models/room.js")
-    script(src="/models/user.js")
-    script(src="/models/application.js")
+    script(src="/models/messageModel.js")
+    script(src="/models/roomModel.js")
+    script(src="/models/userModel.js")
+    script(src="/models/appModel.js")
     
     // Views
-    script(src="/views/user.js")
-    script(src="/views/message.js")
-    script(src="/views/room.js")
-    script(src="/views/application.js")
+    script(src="/views/userView.js")
+    script(src="/views/messageView.js")
+    script(src="/views/roomView.js")
+    script(src="/views/appView.js")
     
     // Controllers
-    script(src="/controllers/application.js")
+    script(src="/controllers/appController.js")
     
     // Start application
     script(src="/init.js")

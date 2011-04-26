@@ -14,7 +14,8 @@
     "socket.io" : "0.6.17",
     "underscore" : "1.1.5",
     "mongodb" : "0.9.1",
-    "dnode" : "0.0.7"
+    "dnode" : "0.6.9",
+    "mongoose" : "1.3.0"
     }, 
     "repository" : {
         "type" : "git", 
