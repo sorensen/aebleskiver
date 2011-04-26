@@ -56,7 +56,7 @@
                 // This can be used to represent different
                 // servers, or instances of the program, since
                 // it is the base ID of every model url path
-                id : 's1'
+                server : 's1'
             });
             
             this.model.bind('change', this.render);

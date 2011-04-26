@@ -7,21 +7,14 @@
         
         type     : 'user',
         defaults : {
-            'displayName' : false,
-            'username'    : 'anonymous',
-            'avatar'      : '/images/undefined.png',
-            'status'      : 'offline',
-            'created'     : true,
-            'messages'    : [],
-            'statistics'  : {
-            },
+            created     : 'now',
+            displayName : 'now',
+            username    : 'anonymous',
+            avatar      : '/images/undefined.png',
+            status      : 'offline',
+            messages    : [],
+            statistics  : {},
         },
-        
-        // Labels for sensitive information
-        sensitive : [
-            'password',
-            'email'
-        ],
         
         initialize : function(options) {
         

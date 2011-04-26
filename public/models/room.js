@@ -8,12 +8,12 @@
         type  : 'room',
         
         defaults : {
-            'created' : true,
-            'name' : 'Unknown',
-            'tags' : [
+            //created  : 'now',
+            name     : 'Unknown',
+            messages : [],
+            tags     : [
                 'general'
             ],
-            'messages' : [],
         },
         
         // Populate room with messages

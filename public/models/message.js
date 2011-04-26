@@ -9,7 +9,7 @@
         
         // Default model attributes
         defaults : {
-            created : true,
+            //created : 'now',
         },
         
         // Constructor

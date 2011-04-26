@@ -41,9 +41,11 @@
         sync : function(method, model, options) {
             if (!Server) return (options.error && options.error(503, model, options));
             
-            options.url     || (options.url = Helpers.getUrl(model));
-            options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
-            options.method  || (options.method = method);
+            options.type      || (options.type = model.type || model.collection.type);
+            options.url       || (options.url = Helpers.getUrl(model));
+            options.channel   || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
+            options.method    || (options.method = method);
+            options.temporary || (options.temporary = false);
             
             // Direct server callback
             var callback = options.remote || false;

@@ -53,6 +53,7 @@
             return this;
         }
     };
+    
     _.extend(Backbone.Model.prototype, {
         url : function() {
             var base = Helpers.getUrl(this.collection) || this.urlRoot || '';

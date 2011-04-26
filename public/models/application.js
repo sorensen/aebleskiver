@@ -7,10 +7,12 @@
     
         type     : 'application',
         urlRoot  : 'app',
+        
         defaults : {
-            'visits'  : 0,
-            'users'   : [],
-            'rooms'   : []
+            server  : 's1',
+            visits  : 0,
+            users   : [],
+            rooms   : []
         },
         
         createRoom : function(attr) {
@@ -60,6 +62,17 @@
                     // supply the channel url if one is not supplied
                     self.rooms.subscribe({}, function(resp) {
                     
+                        self.rooms.fetch({
+                            query : {},
+                            error : function(code) { 
+                                console.log('fetch error', code); 
+                            },
+                            success : function(resp) {
+                                console.log('rooms fetched', resp);
+                            },
+                        });
+                        
+                        /**
                         // Total number of objects for lookup
                         var total = self.attributes.rooms.length;
                         console.log('total: ', total);
@@ -85,6 +98,7 @@
                                 },
                             });
                         });
+                        **/
                     });
                     
                     var params = {
@@ -106,16 +120,18 @@
                         var params = {
                             token : sid,
                             error : function(code, data, options) {
+                            
                                 console.log('get user error: code: ', code);
                                 console.log('get user error: data: ', data);
                                 console.log('get user error: options: ', options);
                                 
                                 switch(code) {
-                                    case 400 : alert('Bad parameters'); break;
+                                    case 400 : console.log('Bad parameters'); break;
+                                    case 500 : console.log('Internal server error'); break;
                                 }
                             },
                         };
-                        Server.getUser(window.user.toJSON(), params, function(session, options) {
+                        Server.getSession(window.user.toJSON(), params, function(session, options) {
                             if (!session) return;
                             
                             keys = self.attributes.users;
@@ -126,15 +142,25 @@
                                 
                                 console.log('session.user: ', window.user);
                                 // Add user to the app lookup keys
-                                keys = _.without(keys, session.user.id);
-                                keys.push(session.user.id);
+                                //keys = _.without(keys, session.user.id);
+                                //keys.push(session.user.id);
                                 
-                                console.log('keys: ', keys);
-                                self.set({users: keys});
+                                //console.log('keys: ', keys);
+                                //self.set({users: keys});
                             }
                             
+                            self.users.fetch({
+                                query : {status : 'online'},
+                                error : function(code) { 
+                                    console.log('users fetch error', code); 
+                                },
+                                success : function(resp) {
+                                    console.log('users fetched', resp);
+                                },
+                            });
                             console.log('self: ', self);
-                                
+                            
+                            /**
                             // Set a model for each id found for lookups
                             _.each(keys, function(key) {
                                 self.users.add({id : key}, {silent : true});
@@ -154,10 +180,12 @@
                                     },
                                 });
                             });
+                            **/
                         });
                     });
                 };
                 self.fetch({
+                    query    : {server : 's1'},
                     finished : function(resp) {
                         next();
                         // Increase the internal visit counter and 'update' the 

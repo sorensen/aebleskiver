@@ -22,4 +22,5 @@ this project, as it has for me.  This project is only for fun, so enjoy!
     node-uuid@1.1.0
     socket.io@0.6.17
     underscore@1.1.5
+    mongoose@1.3.0
     
