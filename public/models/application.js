@@ -16,23 +16,20 @@
         createRoom : function(attr) {
             if (!attr) return;
             var self = this;
-            var params = {
+            this.rooms.create(attr, {
                 error    : function(msg, resp, options) {},
                 finished : function(resp) {
-                    var params = {
-                        error : function(msg, resp, options) {},
-                    };
-                
                     var keys = self.get('rooms');
                     if (keys) {
                         keys.push(resp.id);
                         if (keys.length > 50) keys = _.rest(keys, (keys.length - 50));
-                        self.save({rooms : _.uniq(keys)}, params);
+                        self.save({rooms : _.uniq(keys)}, {
+                            error : function(msg, resp, options) {},
+                        });
                         delete keys;
                     }
                 }
-            };
-            this.rooms.create(attr, params);
+            });
         },
         
         initialize : function(options) {
@@ -59,16 +56,15 @@
             this.subscribe(params, function(resp) {
             
                 var next = function() {
-                    var params = {
-                        
-                    };
                     // Sync up with the server through DNode, Backbone will
                     // supply the channel url if one is not supplied
-                    self.rooms.subscribe(params, function(resp) {
+                    self.rooms.subscribe({}, function(resp) {
                     
                         // Total number of objects for lookup
                         var total = self.attributes.rooms.length;
                         console.log('total: ', total);
+                        
+                        if (total === 0) Backbone.history.start();
                         
                         // Set a model for each id found for lookups
                         _.each(self.attributes.rooms, function(key) {
@@ -78,7 +74,7 @@
                         // Use backbone to fetch from the server
                         var x = 0;
                         self.rooms.each(function(room) {
-                            var params = {
+                            room.fetch({
                                 error    : function(msg, resp, opt){},
                                 finished : function(data) {
                                     self.rooms.add(data);
@@ -87,8 +83,7 @@
                                     x++;
                                     if (x === total) self.rooms.trigger('refresh');
                                 },
-                            };
-                            room.fetch(params);
+                            });
                         });
                     });
                     
@@ -120,7 +115,6 @@
                                 }
                             },
                         };
-                        
                         Server.getUser(window.user.toJSON(), params, function(session, options) {
                             if (!session) return;
                             
@@ -149,7 +143,7 @@
                             // Use backbone to fetch from the server
                             self.users.each(function(room) {
                             
-                                var params = {
+                                user.fetch({
                                     error    : function(code, resp, opt){
                                         console.log('fetch error', code);
                                         console.log('fetch error', resp);
@@ -158,16 +152,13 @@
                                         self.users.add(data);
                                         console.log('user fetched: ', data);
                                     },
-                                };
-                                user.fetch(params);
+                                });
                             });
                         });
                     });
                 };
-            
-                var params = {
+                self.fetch({
                     finished : function(resp) {
-                    
                         next();
                         // Increase the internal visit counter and 'update' the 
                         // model, this can be done through other analytic tools, 
@@ -175,15 +166,13 @@
                         self.save({visits : resp.visits + 1});
                     },
                     error : function() {
-                    
                         next();
                         // This should only be triggered the first time the 
                         // application is run, since a model must be created
                         // before it can be 'read' or 'updated'
                         self.save({visits : 1}, {force : true});
                     },
-                };
-                self.fetch(params);
+                });
             });
         }
     });

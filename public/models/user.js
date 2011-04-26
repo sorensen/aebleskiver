@@ -17,6 +17,12 @@
             },
         },
         
+        // Labels for sensitive information
+        sensitive : {
+            'password',
+            'email',
+        },
+        
         initialize : function(options) {
         
         }

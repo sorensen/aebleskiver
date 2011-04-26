@@ -1,6 +1,7 @@
 # aebleskiver
 
 ![Mmmm...](http://upload.wikimedia.org/wikipedia/commons/0/04/Aebleskiver.jpg)
+
 [Mmmm...](http://en.wikipedia.org/wiki/%C3%86bleskiver)
 
 This project is currently under development, it may undergo radical changes in the near future.

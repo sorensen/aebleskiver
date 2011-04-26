@@ -10,36 +10,42 @@
         statsTemplate       : _.template($('#application-stats-template').html()),
         loginTemplate       : _.template($('#login-template').html()),
         signupTemplate      : _.template($('#signup-template').html()),
+        settingsTemplate    : _.template($('#settings-template').html()),
         createRoomTemplate  : _.template($('#create-room-template').html()),
         
         // Interaction events
         events    : {
             "click #show-rooms"  : "showRooms",
             "click #show-users"  : "showUsers",
-            "click #create-room" : "showCreateRoom",
-            "click #login"       : "showLogin",
-            "click #logout"      : "logout",
-            "click #signup"      : "showSignup",
             "click .cancel"      : "hideDialogs",
-            
-            // Login form
-            "click #login-form .submit"       : "authenticate",
-            "keypress #login-form input"      : "authenticateOnEnter",
-      
-            // Registration form
-            "click #signup-form .submit"      : "register",
-            "keypress #signup-form input"     : "registerOnEnter",
+            "click #logout"      : "logout",
             
             // Create new room form
+            "click #create-room"              : "showCreateRoom",
             "click #create-room-form .submit" : "createRoom",
             "keypress #create-room-form input": "createRoomOnEnter",
+            
+            // Login form
+            "click #login"                    : "showLogin",
+            "click #login-form .submit"       : "authenticate",
+            "keypress #login-form input"      : "authenticateOnEnter",
+            
+            // Settings form
+            "click #settings"                 : "showSettings",
+            "click #settings-form .submit"    : "saveSettings",
+            "keypress #settings-form input"   : "saveSettingsOnEnter",
+      
+            // Registration form
+            "click #signup"                   : "showSignup",
+            "click #signup-form .submit"      : "register",
+            "keypress #signup-form input"     : "registerOnEnter",
         },
         
         // Constructor
         initialize : function(options) {
             _.bindAll(this, 
                 'render', 'addRoom', 'createRoom', 'addUser',
-                'authenticate', 'register', 'finishedEvent'
+                'authenticate', 'register', 'allRooms'
             );    
             this.render = _.bind(this.render, this);
 
@@ -58,8 +64,8 @@
             this.model.users.bind('change', this.render);
             this.model.rooms.bind('add', this.addRoom);
             this.model.rooms.bind('change', this.render);
-            this.model.rooms.bind('subscribe', this.subscribeEvent);
-            this.model.rooms.bind('refresh', this.finishedEvent);
+            this.model.rooms.bind('subscribe', this.ready);
+            this.model.rooms.bind('refresh', this.allRooms);
             
             // Render template contents
             var content = this.model.toJSON();
@@ -73,21 +79,10 @@
             this.loginDialog      = this.$('#login-dialog');
             this.signupDialog     = this.$('#signup-dialog');
             this.createRoomDialog = this.$('#create-room-dialog');
+            this.settingsDialog   = this.$('#settings-dialog');
             this.overlay          = this.$('#overlay');
             
             this.render();
-        },
-        
-        finishedEvent : function() {
-            console.log('rooms finished event: ')
-            
-            // Start history once we have model data
-            Backbone.history.start();
-            this.render();
-        },
-        
-        subscribeEvent : function() {
-            console.log('room subscribed event: ')
         },
         
         // Refresh statistics
@@ -110,40 +105,44 @@
             return this;
         },
         
-        // Show the sidebar user list
-        showUsers : function() {
-            this.roomList.fadeOut(150);
-            this.userList.fadeIn(150);
+        // The model has been subscribed to, and is now
+        // synchronized with the server
+        ready : function() {
+        
+        },
+        
+        // Alternate navigation based on user authentication
+        toggleNav : function() {
+            this.$('#signup').fadeOut(150);
+            this.$('#login').fadeOut(150);
+            
+            this.$('#settings').fadeIn(150);
+            this.$('#logout').fadeIn(150);
+            this.$('#create-room').fadeIn(150);
+        },
+        
+        // Remove all defined dialoges from the view
+        hideDialogs : function() {
+            this.loginDialog.hide();
+            this.signupDialog.hide();
+            this.createRoomDialog.hide();
+            this.settingsDialog.hide();
+            this.overlay.hide();
+        },
+        
+        // All rooms have been loaded into collection
+        allRooms : function() {
+            // Start history once we have model data
+            Backbone.history.start();
+            
+            // Refresh model statistics
+            this.render();
         },
         
         // Show the sidebar user list
         showRooms : function() {
             this.userList.fadeOut(150);
             this.roomList.fadeIn(150);
-        },
-        
-        // Destroy the current user object and restore original
-        // navigation display
-        logout : function() {
-            delete window.user;
-            window.user = new Models.UserModel();
-            
-            this.$('#signup').fadeIn(150);
-            this.$('#login').fadeIn(150);
-            
-            this.$('#settings').fadeOut(150);
-            this.$('#logout').fadeOut(150);
-            this.$('#create-room').fadeOut(150);
-        },
-        
-        // Add a single room room to the current veiw
-        addUser : function(user) {
-            var view = new Views.UserView({
-                model : user
-            }).render();
-            
-            this.userList
-                .append(view.el);
         },
         
         // Add a single room room to the current veiw
@@ -209,14 +208,75 @@
             if (e.keyCode == 13) this.createRoom();
         },
         
-        // Alternate navigation based on user authentication
-        toggleNav : function() {
-            this.$('#signup').fadeOut(150);
-            this.$('#login').fadeOut(150);
+        // Show the login form
+        showCreateRoom : function() {
+            this.hideDialogs();
+            this.overlay.fadeIn(150);
+            this.createRoomDialog
+                .html(Mustache.to_html(this.createRoomTemplate()))
+                .fadeIn(150, function(){
+                });
+                
+            this.$('input[name="room"]').focus();
+        },
+        
+        // Show the login form
+        showSettings : function() {
+            this.hideDialogs();
+            this.overlay.fadeIn(150);
+            this.settingsDialog
+                .html(Mustache.to_html(this.settingsTemplate()))
+                .fadeIn(150, function(){
+                });
+                
+            this.$('input[name="displayname"]').focus();
+        },
+        
+        // Save updated user settings
+        saveSettings : function() {
+            var options = {
+                displayName : this.$('input[name="displayname"]').val(),
+                email       : this.$('input[name="email"]').val(),
+            };
+            var model = window.user.toJSON();
             
-            this.$('#settings').fadeIn(150);
-            this.$('#logout').fadeIn(150);
-            this.$('#create-room').fadeIn(150);
+            //TODO: Save settings on server securely
+            
+            this.saveSettingsDialog.fadeOut(150);
+            this.overlay.hide();
+        },
+        
+        // Create room keystroke listener
+        saveSettingsOnEnter: function(e) {
+            if (e.keyCode == 13) this.saveSettings();
+        },
+        
+        // Show the sidebar user list
+        showUsers : function() {
+            this.roomList.fadeOut(150);
+            this.userList.fadeIn(150);
+        },
+        
+        // Add a single room room to the current veiw
+        addUser : function(user) {
+            var view = new Views.UserView({
+                model : user
+            }).render();
+            
+            this.userList
+                .append(view.el);
+        },
+        
+        // Show the login form
+        showLogin : function() {
+            this.hideDialogs();
+            this.overlay.fadeIn(150);
+            this.loginDialog
+                .html(Mustache.to_html(this.loginTemplate()))
+                .fadeIn(150, function(){
+                });
+                
+            this.$('#login input[name="username"]').focus();
         },
         
         // Authenticate the current user, check the credentials
@@ -283,6 +343,18 @@
             if (e.keyCode == 13) this.authenticate();
         },
         
+        // Show the login form
+        showSignup : function() {
+            this.hideDialogs();
+            this.overlay.fadeIn(150);
+            this.signupDialog
+                .html(Mustache.to_html(this.signupTemplate()))
+                .fadeIn(150, function(){
+                });
+                
+            this.$('#register input[name="username"]').focus();
+        },
+        
         // Authenticate the current user, check the credentials
         // sent on the server side, which will return the client 
         // data to update the default model with
@@ -345,78 +417,19 @@
             if (e.keyCode == 13) this.register();
         },
         
-        // Remove all defined dialoges from the view
-        hideDialogs : function() {
-            this.loginDialog.hide();
-            this.signupDialog.hide();
-            this.createRoomDialog.hide();
-            this.overlay.hide();
-        },
-        
-        // Show the login form
-        showCreateRoom : function() {
-            this.hideDialogs();
-            this.overlay.fadeIn(150);
-            this.createRoomDialog
-                .html(Mustache.to_html(this.createRoomTemplate()))
-                .fadeIn(150, function(){
-                });
-                
-            this.$('input[name="room"]').focus();
-        },
-        
-        // Save updated user settings
-        saveSettings : function() {
-            var options = {
-                displayName : this.$('input[name="displayname"]').val(),
-                email       : this.$('input[name="email"]').val(),
-            };
-            var model = window.user.toJSON();
+        // Destroy the current user object and restore original
+        // navigation display
+        logout : function() {
+            delete window.user;
+            window.user = new Models.UserModel();
             
+            this.$('#signup').fadeIn(150);
+            this.$('#login').fadeIn(150);
             
-            this.saveSettingsDialog.fadeOut(150);
-            this.overlay.hide();
+            this.$('#settings').fadeOut(150);
+            this.$('#logout').fadeOut(150);
+            this.$('#create-room').fadeOut(150);
         },
         
-        // Create room keystroke listener
-        createRoomOnEnter: function(e) {
-            if (e.keyCode == 13) this.saveSettings();
-        },
-        
-        // Show the login form
-        showSettings : function() {
-            this.hideDialogs();
-            this.overlay.fadeIn(150);
-            this.createRoomDialog
-                .html(Mustache.to_html(this.settingsTemplate()))
-                .fadeIn(150, function(){
-                });
-                
-            this.$('input[name="displayname"]').focus();
-        },
-        
-        // Show the login form
-        showLogin : function() {
-            this.hideDialogs();
-            this.overlay.fadeIn(150);
-            this.loginDialog
-                .html(Mustache.to_html(this.loginTemplate()))
-                .fadeIn(150, function(){
-                });
-                
-            this.$('#login input[name="username"]').focus();
-        },
-        
-        // Show the login form
-        showSignup : function() {
-            this.hideDialogs();
-            this.overlay.fadeIn(150);
-            this.signupDialog
-                .html(Mustache.to_html(this.signupTemplate()))
-                .fadeIn(150, function(){
-                });
-                
-            this.$('#register input[name="username"]').focus();
-        },
     });
 })(Views)

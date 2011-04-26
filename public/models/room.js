@@ -73,7 +73,7 @@
         // Create and send a new message
         createMessage : function(attr) {
             var self = this;
-            var params = {
+            this.messages.create(attr, {
                 finished : function(resp) {
                     // Add the newly created ID to this model's
                     // key collection for future lookups
@@ -86,8 +86,7 @@
                     self.save({messages : keys});
                     delete keys;
                 },
-            };
-            this.messages.create(attr, params);
+            });
         },
     });
     
