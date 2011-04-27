@@ -7,10 +7,13 @@
         
         type     : 'user',
         defaults : {
-            username : 'anonymous',
-            avatar   : '/images/undefined.png',
-            status   : 'offline',
-            messages : [],
+            created     : 'now',
+            displayName : 'now',
+            username    : 'anonymous',
+            avatar      : '/images/undefined.png',
+            status      : 'offline',
+            messages    : [],
+            statistics  : {},
         },
         
         initialize : function(options) {
@@ -22,7 +25,6 @@
     Models.UserCollection = Backbone.Collection.extend({
         
         model : Models.UserModel,
-        type  : 'user',
         url   : 'users',
         
         // Initialize

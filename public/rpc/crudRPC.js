@@ -8,16 +8,28 @@
         
         // Created model (NOTE) New models must be created through collections
         this.created = function(resp, options) {
-            if (!Store[options.channel].get(resp.id)) Store[options.channel].add(resp);
+            console.log('CREATED: ', resp);
+            console.log('CREATED: ', options);
+            console.log('CREATED:STORE: ', Store[options.channel]);
+            
+            if (Store[options.channel] instanceof Backbone.Model) 
+                Store[options.channel].set(resp);
+            
+            else if (!Store[options.channel].get(resp._id)) 
+                Store[options.channel].add(resp);
+                
             options.finished && options.finished(resp);
         };
         
         // Fetched model
         this.read = function(resp, options) {
+            console.log('READ: ', resp);
+            console.log('READ: ', options);
+        
             if (Store[options.channel] instanceof Backbone.Model) 
                 Store[options.channel].set(resp);
             
-            else if (Store[options.channel] instanceof Backbone.Collection && !Store[options.channel].get(resp.id))
+            else if (Store[options.channel] instanceof Backbone.Collection && !Store[options.channel].get(resp._id))
                 Store[options.channel].add(resp);
             
             options.finished && options.finished(resp);
@@ -25,13 +37,19 @@
         
         // Updated model data
         this.updated = function(resp, options) {
-            if (Store[options.channel].get(resp.id)) Store[options.channel].get(resp.id).set(resp);
+            console.log('UPDATED: ', resp);
+            console.log('UPDATED: ', options);
+            
+            if (Store[options.channel].get(resp._id)) Store[options.channel].get(resp._id).set(resp);
             else Store[options.channel].set(resp);
             options.finished && options.finished(resp);
         };
         
         // Destroyed model
         this.destroyed = function(resp, options) {
+            console.log('DEST: ', resp);
+            console.log('DEST: ', options);
+            
             Store[options.channel].remove(resp) || delete Store[options.channel];
             options.finished && options.finished(resp);
         };

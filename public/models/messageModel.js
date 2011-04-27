@@ -9,7 +9,6 @@
         
         // Default model attributes
         defaults : {
-            //created : 'now',
         },
         
         // Constructor
@@ -27,6 +26,7 @@
         
         model : Models.MessageModel,
         url   : 'messages',
+        type  : 'message',
         
         // Constructor
         initialize : function(options) {

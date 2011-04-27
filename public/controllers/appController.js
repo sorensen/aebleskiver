@@ -46,10 +46,6 @@
         
             // Make sure that the room has been 
             // loaded by the application first
-            if (!id || !this.view.model.rooms.get(id)) {
-                this.saveLocation('/');
-                return;
-            }
             this.view.activateRoom(id);
         },
         

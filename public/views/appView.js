@@ -131,7 +131,9 @@
         },
         
         // All rooms have been loaded into collection
-        allRooms : function() {
+        allRooms : function(rooms) {
+            console.log('allRooms', rooms);
+        
             // Start history once we have model data
             Backbone.history.start();
             
@@ -166,14 +168,17 @@
         },
         
         activateRoom : function(params) {
+            console.log('activateRoom: ', params);
             this.deactivateRoom();
             
             // Get model by ID
-            var model = this.model.rooms.get(params);
+            var model = this.model.rooms.filter(function(room) {
+                return room.get('name') === params;
+            });
             if (!model) return;
             
             this.activeRoom = new Views.RoomMainView({
-                model : model
+                model : model[0]
             }).render();
             
             var self = this;

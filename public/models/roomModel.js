@@ -8,7 +8,6 @@
         type  : 'room',
         
         defaults : {
-            //created  : 'now',
             name     : 'Unknown',
             messages : [],
             tags     : [
@@ -22,36 +21,15 @@
             this.messages.url = this.url() + ':messages';
             
             var self = this;
-            var add = (this.messages.length === 0) ? false : true;
             var params = {
             };
             this.messages.subscribe(params, function() {
-                self.attributes.messages = _.uniq(self.attributes.messages);
-                
-                // Models that contain collections hold an array of 
-                // id's, backbone will build the complete url/key
-                _.each(self.attributes.messages, function(id) {
-                    // Create a backbone object
-                    var model = new Models.MessageModel();
-                    
-                    // Set the lookup id
-                    model.set({id : id});
-                    
-                    // Tell backbone that incomming model belongs 
-                    // to this model's message collection
-                    model.collection = self.messages;
-                    
-                    var params = {
-                        // This will be called from the server through 
-                        // DNode once the async processing is done
-                        finished : function(data) {
-                            //if (!self.model.messages.get(data.id)) self.model.messages.add(data);
-                            if (add) self.messages.add(data);
-                        },
-                    };
-                    // Fetch the data from the server
-                    model.fetch(params);
-                });
+            
+                var params = {
+                    finished : function(data) {
+                    },
+                };
+                self.messages.fetch(params);
             });
         },
         
@@ -72,21 +50,7 @@
         
         // Create and send a new message
         createMessage : function(attr) {
-            var self = this;
-            this.messages.create(attr, {
-                finished : function(resp) {
-                    // Add the newly created ID to this model's
-                    // key collection for future lookups
-                    var keys = _.without(self.get('messages'), resp.id);
-                    keys.push(resp.id);
-                    
-                    // Only keep the last 200 messages that were sent, the rest will 
-                    // become archived by virtue of not being used any further
-                    //if (keys.length > 200) keys = _.rest(keys, (keys.length - 200));
-                    self.save({messages : keys});
-                    delete keys;
-                },
-            });
+            this.messages.create(attr);
         },
     });
     
@@ -95,7 +59,7 @@
         
         model : Models.RoomModel,
         url   : 'rooms',
-        name  : 'rooms',
+        type  : 'room',
         
         // Initialize
         initialize : function(options) {
