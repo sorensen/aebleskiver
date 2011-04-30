@@ -10,7 +10,7 @@ var express      = require('express'),
     Gravatar     = require('protocol-gravatar'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
-    version      = '0.2.0',
+    version      = '0.2.1',
     port         = 80,
     token        = '',
     server       = module.exports = express.createServer();
@@ -31,10 +31,10 @@ server.get('/', function(req, res) {
 
     token = req.session.id;
     
-    //req.session.regenerate(function () {
+    req.session.regenerate(function () {
         console.log('regenerated session id ' + req.session.id);
         token = req.session.id;
-    //});
+    });
     
     res.render('index.jade', {
         locals : {
