@@ -15,42 +15,15 @@
             ],
         },
         
-        // Populate room with messages
-        populate : function() {
-            this.messages = new Models.MessageCollection();
-            this.messages.url = this.url() + ':messages';
-            
-            var self = this;
-            var params = {
-            };
-            this.messages.subscribe(params, function() {
-            
-                var params = {
-                    finished : function(data) {
-                    },
-                };
-                self.messages.fetch(params);
-            });
-        },
-        
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
             var self = this;
-            var params = {
-                error    : function(data) {},
-                finished : function(data) {},
-            };
-            this.messages.unsubscribe(params, function(resp) {
+            this.messages.unsubscribe({}, function(resp) {
                 self.messages.each(function(message) {
                     //message.clear();
                 });
             });
-        },
-        
-        // Create and send a new message
-        createMessage : function(attr) {
-            this.messages.create(attr);
         },
     });
     

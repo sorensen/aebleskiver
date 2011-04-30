@@ -82,7 +82,7 @@
             this.settingsDialog   = this.$('#settings-dialog');
             this.overlay          = this.$('#overlay');
             
-            this.render();
+            //this.render();
         },
         
         // Refresh statistics
@@ -133,9 +133,9 @@
         // All rooms have been loaded into collection
         allRooms : function(rooms) {
             console.log('allRooms', rooms);
-        
-            // Start history once we have model data
-            Backbone.history.start();
+            
+            this.roomList.html('');
+            this.model.rooms.each(this.addRoom);
             
             // Refresh model statistics
             this.render();
@@ -165,6 +165,7 @@
             
             // Join Channel
             this.activeRoom && this.activeRoom.remove();
+            Backbone.history.saveLocation('/');
         },
         
         activateRoom : function(params) {
@@ -185,10 +186,10 @@
             this.mainContent
                 .fadeIn(0, function(){
                     $(this).html(self.activeRoom.el);
-                    self.activeRoom.messagelist.scrollTop(
+                    self.activeRoom.messageList.scrollTop(
                     
                         // Scroll to the bottom of the message window
-                        self.activeRoom.messagelist[0].scrollHeight
+                        self.activeRoom.messageList[0].scrollHeight
                     );
                     delete self;
                 });

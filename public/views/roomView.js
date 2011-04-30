@@ -79,15 +79,19 @@
         // Constructor
         initialize : function(options) {
             _.bindAll(this, 
-                'addMessage', 'createMessage', 'render'
+                'allMessages', 'addMessage', 'createMessage', 'render'
             );
             
             // Bind to model
             this.render = _.bind(this.render, this);
             this.model.view = this;
             this.model.bind('change', this.render);
-            this.model.populate();
+            //this.model.populate();
+            this.model.messages = new Models.MessageCollection();
+            this.model.messages.url = this.model.url() + ':messages';
+            
             this.model.messages.bind('add', this.addMessage);
+            this.model.messages.bind('refresh', this.allMessages);
             this.model.messages.bind('add', this.render);
             
             // Send model contents to the template
@@ -97,11 +101,19 @@
             
             // Set shortcut methods for DOM items
             this.input       = this.$(".create-message");
-            this.messagelist = this.$(".messages");
+            this.messageList = this.$(".messages");
             this.input.focus();
             
-            // Update statistics
-            this.render();
+            var self = this;
+            this.model.messages.subscribe({}, function() {
+            
+                var params = {
+                    query    : {room : self.model.get('_id')},
+                    finished : function(data) {
+                    },
+                };
+                self.model.messages.fetch(params);
+            });
         },
         
         // Refresh statistics
@@ -126,27 +138,38 @@
             this.model.remove();
         },
         
+        // All rooms have been loaded into collection
+        allMessages : function(rooms) {
+            console.log('allMessages', rooms);
+            
+            this.messageList.html('');
+            this.model.messages.each(this.addMessage);
+            
+            // Refresh model statistics
+            this.render();
+        },
+        
         addMessage : function(message) {
             var view = new Views.MessageView({
                 model : message
             }).render();
             
-            this.messagelist
+            this.messageList
                 .append(view.el)
-                .scrollTop(this.messagelist[0].scrollHeight);
+                .scrollTop(this.messageList[0].scrollHeight);
         },
         
         // Send a message to the server
         createMessage : function() {
             if (!this.input.val()) return;
-            this.model.createMessage(this.newAttributes());
+            this.model.messages.create(this.newAttributes());
             this.input.val('');
         },
         
         // Generate the attributes
         newAttributes : function() {
             return {
-                room     : this.model.escape('id'),
+                room     : this.model.escape('_id'),
                 text     : this.input.val(),
                 username : window.user.get('displayName') || window.user.get('username'),
                 avatar   : window.user.get('avatar')
