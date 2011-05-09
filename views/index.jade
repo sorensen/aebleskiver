@@ -5,8 +5,6 @@ html(lang="en")
     
     // CSS
     link(rel='stylesheet', href='/css/style.css')
-    link(rel='stylesheet', href='/css/grid.css')
-    link(rel='stylesheet', href='css/aebleskiver/jquery-ui-1.8.11.aebleskiver.css')
     
     // Dependencies
     script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
@@ -18,35 +16,12 @@ html(lang="en")
     script(src="/js/json2.js")
     script(src="/dnode.js")
     
-    
-    script(type='text/javascript')
-      WebFontConfig = {
-        google: {families: [ 
-          'Droid+Sans', 
-          'Crushed', 
-          'Dancing+Script', 
-          'Dawning+of+a+New+Day', 
-          'Waiting+for+the+Sunrise', 
-          'Tangerine', 
-          'Smythe', 
-          'Cuprum', 
-          'Arvo', 
-          'Irish+Grover',
-          'Goudy+Bookletter+1911',
-          'Ubuntu', 
-          'Sue+Ellen+Francisco', 
-          'Kreon' 
-        ]}
-      };
-      (function() {
-        var wf = document.createElement('script');
-        wf.src = ('https:' == document.location.protocol ? 'https' : 'http') +
-          '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
-        wf.type = 'text/javascript';
-        wf.async = 'true';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(wf, s);
-      })();
+    // Notification template
+    script#notification-template(type='text/template')
+      .notification
+        .close
+        .type {{ type }}
+        .message {{ message }}
     
     // Settings template
     script#settings-template(type='text/template')
@@ -117,23 +92,12 @@ html(lang="en")
           p
             label Name: 
             input(type='text', name='room', placeholder='Room name')
+          p
+            label Tags:
+            input#tags(type='text', name='tags', placeholder='Tags')
         .controls
           button.submit Create
           button.cancel Cancel
-    
-    // User listing
-    script#user-list-template(type='text/template')
-      a(href='#/user/{{ username }}')
-        h3.name
-          span: img(src='{{ avatar }}')
-          span {{ username }}
-          span.destroy
-      .statistics.user-stats
-    
-    // User full
-    script#user-template(type='text/template')
-      a.gravatar(href='#/user/{{ username }}'): span: img(src='{{ avatar }}')
-      span.username {{ username }}
               
     // Main application
     script#application-template(type='text/template')
@@ -162,6 +126,8 @@ html(lang="en")
           #sidebar-controls
           
           #sidebar-up
+            #search-form
+              input#search(type='text', name='search', placeholder='Search')
           #sidebar-content  
             #users
             #rooms
@@ -196,9 +162,6 @@ html(lang="en")
 
     // Application statistics
     script#application-stats-template(type='text/template')
-      .stat.total-messages
-        span.title Messages
-        span.value {{ totalMessages }}
       .stat.total-users
         span.title Users
         span.value {{ totalUsers }}
@@ -209,7 +172,23 @@ html(lang="en")
         span.title Version
         span.value {{ version }}
     
-    // Room room
+    // User full
+    script#user-template(type='text/template')
+      h1.name
+        span.headline {{ username }}
+        span.destroy
+      span.avatar: img(src='{{ avatar }}')
+        
+      
+    // User listing
+    script#user-list-template(type='text/template')
+      a(href='/#/users/{{ username }}')
+        h3.name
+          span.avatar: img(src='{{ avatar }}')
+          span.username {{ username }}
+      .statistics.user-stats
+      
+    // Room
     script#room-template(type='text/template')
       h1.name
         span.headline {{ name }}
@@ -219,18 +198,25 @@ html(lang="en")
       p.description {{ description }}
       .users
       .messages
-      form.message-form(method="post", action="#", onsubmit="return false")
+      .message-form
         button Send
         input.create-message(type='text', name='message', placeholder='Say something...', length="40")
 
     // Room listing
     script#room-list-template(type='text/template')
-      a(href='#/rooms/{{ name }}')
+      a(href='/#/rooms/{{ slug }}')
         h3.name
           span {{ name }}
           span.destroy
       p.description {{ description }}
       .statistics.room-stats
+      .ranking
+      
+    // Room rankings
+    script#room-rank-template(type='text/template')
+      .rank {{ rank }}
+      button.upvote: span.arrow-wrap: span.arrow &uarr;
+      button.downvote: span.arrow-wrap: span.arrow &darr;
       
     // Room statistics
     script#room-stats-template(type='text/template')

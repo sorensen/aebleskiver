@@ -8,6 +8,7 @@
         // Definitions
         routes : {
             '/rooms/:id' : 'joinRoom',
+            '/users/:id' : 'viewProfile',
             '/signup'    : 'signup',
             '/login'     : 'login',
             '/'          : 'home',
@@ -37,7 +38,6 @@
         
         // Default action
         invalid : function(uri) {
-            console.log('Router: invalid: ', uri);
             this.saveLocation('/');
         },
         
@@ -47,6 +47,14 @@
             // Make sure that the room has been 
             // loaded by the application first
             this.view.activateRoom(id);
+        },
+        
+        // View a user profile
+        viewProfile : function(id) {
+        
+            // Make sure that the room has been 
+            // loaded by the application first
+            this.view.activateUser(id);
         },
         
         // Show the login form

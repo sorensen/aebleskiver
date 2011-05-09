@@ -4,26 +4,37 @@ require.paths.unshift(__dirname + '/lib');
 
 // Dependencies
 var express      = require('express'),
-    SessionStore = require('connect-redis'),
+    SessionStore = require('connect-mongodb'),
     PubSub       = require('protocol-pubsub'),
     CRUD         = require('protocol-crud'),
     Gravatar     = require('protocol-gravatar'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
     version      = '0.2.1',
-    port         = 80,
+    port         = 3000,
     token        = '',
     server       = module.exports = express.createServer();
 
 // Server configuration
 server.configure(function() {
+    // View settings
     server.use(express.bodyParser());
     server.use(express.cookieParser());
-    server.use(express.session({ secret: 'abcdefghijklmnopqrstuvwxyz', store: new SessionStore }));
     server.use(express.methodOverride());
     server.use(express.static(__dirname + '/public'));
     server.set('view engine', 'jade');
     server.set('view options', {layout : false});
+    
+    // Session settings
+    server.use(express.session({
+        cookie : {maxAge : 60000 * 20}, // 20 minutes
+        secret : 'abcdefghijklmnopqrstuvwxyz',
+        store  : new SessionStore({
+            dbname   : 'db',
+            username : '',
+            password : ''
+        })
+    }));
 });
 
 // Main application

@@ -26,9 +26,6 @@
         
         initialize : function(options) {
             
-            // Grab the authentication token and remove it from the DOM
-            var sid = $('#token').html();
-            
             // Current user collection
             this.users = new Models.UserCollection();
             this.users.url = this.url() + ':users';
@@ -42,23 +39,15 @@
             // passing a callback, though, it will still execute a
             // 'finished' function if you pass one in theim n options
             this.subscribe({}, function(resp) {
-            
                 // Sync up with the server through DNode, Backbone will
                 // supply the channel url if one is not supplied
                 self.rooms.subscribe({}, function(resp) {
-                
+                    self.rooms.trigger('subscribed', resp);
                     self.rooms.fetch({
-                        query : {
-                        },
-                        error : function(code, msg, opt) {
-                            console.log('fetch error', code); 
-                            console.log('fetch error', msg); 
-                            console.log('fetch error', opt); 
-                        },
+                        query    : {},
+                        error    : function(code, msg, opt) {},
                         finished : function(resp) {
-                            console.log('rooms fetched', resp);
-                            
-                            // Start history once we have model data
+                            //history();
                             Backbone.history.start();
                         },
                     });
@@ -67,47 +56,18 @@
                 // Sync up with the server through DNode, Backbone will
                 // supply the channel url if one is not supplied
                 self.users.subscribe({}, function(resp) {
-                
-                    // Create a new user for the current client, only the 
-                    // defaults will be used until the client authenticates
-                    // with valid credentials
-                    window.user = new Models.UserModel();
-                    /**
-                    var params = {
-                        token : sid,
-                        error : function(code, data, options) {
-                        
-                            console.log('get user error: code: ', code);
-                            console.log('get user error: data: ', data);
-                            console.log('get user error: options: ', options);
-                            
-                            switch(code) {
-                                case 400 : console.log('Bad parameters'); break;
-                                case 500 : console.log('Internal server error'); break;
-                            }
+                    self.users.trigger('subscribed', resp);
+                    self.users.fetch({
+                        query    : {},
+                        error    : function(code, msg, opt) {},
+                        finished : function(resp) {
+                            //history();
                         },
-                    };
-                    Server.getSession(window.user.toJSON(), params, function(session, options) {
-                        if (!session) return;
-                        
-                        if (session.user) {
-                            window.user.set(session.user);
-                            
-                            console.log('session.user: ', window.user);
-                        }
-                        
-                        self.users.fetch({
-                            query : {status : 'online'},
-                            error : function(code) { 
-                                console.log('users fetch error', code); 
-                            },
-                            success : function(resp) {
-                                console.log('users fetched', resp);
-                            },
-                        });
                     });
-                    **/
                 });
+                
+                
+                //history();
             });
         }
     });

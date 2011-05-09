@@ -13,13 +13,8 @@
         // Constructor
         initialize : function(options) {
             _.bindAll(this, 'render');
-            this.model.bind('all', this.render);
+            this.model.bind('change', this.render);
             this.model.view = this;
-        },
-
-        // Toggle the item state
-        toggle: function() {
-            this.set({read: !this.get("read")});
         },
         
         // Remove this view from the DOM.
@@ -32,8 +27,12 @@
         render : function() {
             var content = this.model.toJSON();
             content.created && (content.created = Helpers.timeFormat(content.created));
-            var view = Mustache.to_html(this.template(content), content);
+            var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
+            
+            // Post-formatting, done here as to prevent conflict
+            // with Mustache HTML entity escapement
+            this.$('.data').html(Helpers.linkify(content.text))
             return this;
         }
     });

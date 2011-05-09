@@ -20,7 +20,6 @@
         // Published from the server
         this.published = function(resp, options) {
             if (!options.channel) return;
-            
             switch (options.method) {
                 case 'create' : this.created(resp, options); break;
                 case 'update' : this.updated(resp, options); break;
@@ -41,6 +40,10 @@
     // Common extention object for both models and collections
     var extention = {
     
+        // Subscribe to the server for model changes, if 'override' is set to true
+        // in the options, this model will replace any other models in the local 
+        // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
+        // for subscriptions, relabeled to 'channel' for clarity
         subscribe : function(options, callback) {
             if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
@@ -49,21 +52,22 @@
             
             // Add the model to a local object container so that other methods
             // called from the server have access to it
-            if (!Store[options.channel]) Store[options.channel] = model;
-            
-            // Trigger custom subscribe event
-            if (!options.silent) this.trigger('subscribe', this, options);
-            Server.subscribe(model.toJSON(), options, callback);
+            if (!Store[options.channel] || options.override) {
+                Store[options.channel] = model;
+                if (!options.silent) this.trigger('subscribe', this, options);
+                Server.subscribe(model.toJSON(), options, callback);
+            }
             return this;
         },
         
+        // Stop listening for published model data, removing the reference in the local
+        // subscription 'Store', will trigger an unsubscribe event unless 'silent' 
+        // is passed in the options
         unsubscribe : function(options, callback) {
             if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
-            
-            // Trigger custom subscribe event
             if (!options.silent) this.trigger('unsubscribe', this, options);
             Server.unsubscribe(model.toJSON(), options, callback);
             delete Store[options.channel];

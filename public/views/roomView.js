@@ -14,32 +14,35 @@
         tagName        : 'div',
         className      : 'room inactive',
         template       : _.template($('#room-list-template').html()),
-        statsTemplate  : _.template($('#room-stats-template').html()),
+        rankTemplate   : _.template($('#room-rank-template').html()),
         
         // Interaction events
         events : {
-            "click" : "activate"
+            "click"           : "activate",
+            "click .upvote"   : "upVote",
+            "click .downvote" : "downVote"
         },
         
         // Constructor
         initialize : function(options) {
             // Bind to model
             _.bindAll(this, 'render');
-            this.render = _.bind(this.render, this);
             this.model.bind('change', this.render);
             this.model.view = this;
             
             // Send model contents to the template
             var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(content), content);            
+            var view = Mustache.to_html(this.template(), content);            
             $(this.el).html(view);
+            
+            this.render();
         },
         
         // Refresh statistics
         render : function() {
-            var totalMessages = this.model.get('messages').length;
-            this.$('.room-stats').html(Mustache.to_html(this.statsTemplate(), {
-                totalMessages : totalMessages
+            var rank = this.model.get('upvotes') - this.model.get('downvotes');
+            this.$('.ranking').html(Mustache.to_html(this.rankTemplate(), {
+                rank : rank
             }));
             return this;
         },
@@ -48,6 +51,18 @@
         remove : function() {
             this.el.remove();
         },
+        
+        // Increment the room ranking
+        upVote : _.throttle(function() {
+            this.model.save({upvotes : this.model.get('upvotes') + 1});
+            this.model.collection.sort();
+        }, 0),
+        
+        // Decrement the room ranking
+        downVote : _.throttle(function() {
+            this.model.save({downvotes : this.model.get('downvotes') + 1});
+            this.model.collection.sort();
+        }, 0),
         
         // Join Channel
         activate : function() {            
@@ -71,9 +86,9 @@
         
         // Interaction events
         events    : {
-            "submit .message-form"        : "createMessage",
-            "click .message-form button"  : "createMessage",
-            "click .destroy"              : "deactivate"
+            "keypress .message-form input" : "createMessageOnEnter",
+            "click .message-form button"   : "createMessage",
+            "click .destroy"               : "deactivate"
         },
         
         // Constructor
@@ -83,10 +98,9 @@
             );
             
             // Bind to model
-            this.render = _.bind(this.render, this);
             this.model.view = this;
             this.model.bind('change', this.render);
-            //this.model.populate();
+            
             this.model.messages = new Models.MessageCollection();
             this.model.messages.url = this.model.url() + ':messages';
             
@@ -96,7 +110,7 @@
             
             // Send model contents to the template
             var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(content), content);            
+            var view = Mustache.to_html(this.template(), content);            
             $(this.el).html(view);
             
             // Set shortcut methods for DOM items
@@ -130,6 +144,7 @@
             //TODO: Move to the controller or 
             // affect the display only
             Application.deactivateRoom(this.model);
+            Backbone.history.saveLocation('/');
         },
         
         // Remove this view from the DOM, and unsubscribe from 
@@ -139,8 +154,9 @@
         },
         
         // All rooms have been loaded into collection
-        allMessages : function(rooms) {
-            console.log('allMessages', rooms);
+        allMessages : function(messages) {
+            console.log('allMessages', messages);
+            console.log('allMessages', this);
             
             this.messageList.html('');
             this.model.messages.each(this.addMessage);
@@ -150,6 +166,7 @@
         },
         
         addMessage : function(message) {
+            console.log('addMessage', message);
             var view = new Views.MessageView({
                 model : message
             }).render();
@@ -166,14 +183,21 @@
             this.input.val('');
         },
         
+        // Create message keystroke listener
+        createMessageOnEnter : function(e) {
+            if (e.keyCode == 13) this.createMessage();
+        },
+        
         // Generate the attributes
         newAttributes : function() {
             return {
-                room     : this.model.escape('_id'),
                 text     : this.input.val(),
-                username : window.user.get('displayName') || window.user.get('username'),
-                avatar   : window.user.get('avatar')
+                room     : this.model.escape('_id'),
+                user     : window.user.escape('_id'),
+                username : window.user.escape('displayName') || window.user.get('username'),
+                avatar   : window.user.escape('avatar')
             };
         },
     });
+    
 })(Views)

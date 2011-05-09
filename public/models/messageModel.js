@@ -9,6 +9,9 @@
         
         // Default model attributes
         defaults : {
+            text     : '',
+            username : '',
+            avatar   : ''
         },
         
         // Constructor
@@ -19,6 +22,13 @@
         clear : function() {
             this.view.remove();
         },
+        
+        // Parse data from the server to convert any 
+        // links to HTML output
+        parse : function(resp) {
+            //resp.text && (resp.text = Helpers.linkify(resp.text));
+            return resp;
+        }
     });
     
     // Message Collection
@@ -31,5 +41,20 @@
         // Constructor
         initialize : function(options) {
         },
+        
+        comparator : function(message) {
+            return new Date(message.get('created')).getTime();
+        },
+        
+        // Parse data from the server to convert any 
+        // links to HTML output
+        parse : function(resp) {
+            _.each(resp, function(record, index) {
+            
+                //resp[index].text && (resp[index].text = Helpers.linkify(record.text));
+            });
+            return resp;
+        }
     });
+
 })(Models)
