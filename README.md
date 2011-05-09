@@ -22,6 +22,7 @@ this project, as it has for me.  This project is only for fun, so enjoy!
     underscore@1.1.5
     mongoose@1.3.0
     connect-mongodb@0.3.0
+    bcrypt@0.2.3
     mongodb@0.9.4-1
         connect-redis@1.0.0
         keys@0.1.2
