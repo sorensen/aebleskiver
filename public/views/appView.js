@@ -69,7 +69,7 @@
             this.model.bind('subscribe', this.ready);
             
             // User collection event bindings
-            this.model.users.bind('subscribed', this.usersReady);
+            this.model.users.bind('subscribe', this.usersReady);
             this.model.users.bind('add', this.addUser);
             //this.model.users.bind('add', this.render);
             //this.model.users.bind('change', this.render);
@@ -77,7 +77,7 @@
             //this.model.users.bind('refresh', this.render);
             
             // Room collection event bindings
-            this.model.rooms.bind('subscribed', this.roomsReady);
+            this.model.rooms.bind('subscribe', this.roomsReady);
             this.model.rooms.bind('add', this.addRoom);
             //this.model.rooms.bind('add', this.render);
             //this.model.rooms.bind('change', this.render);
@@ -365,6 +365,11 @@
                 console.log('Got Session: ', session);
                 session._id && self.toggleNav();
                 console.log('session.user: ', window.user);
+                
+                
+                Server.online(function(resp) {
+                    console.log('ONLINE: ', resp);
+                });
             });
         },
         

@@ -11,7 +11,7 @@ var express      = require('express'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
     version      = '0.2.4',
-    port         = 80,
+    port         = 3000,
     token        = '',
     server       = module.exports = express.createServer();
 
@@ -42,10 +42,10 @@ server.get('/', function(req, res) {
 
     token = req.session.id;
     
-    req.session.regenerate(function () {
+    //req.session.regenerate(function () {
         console.log('regenerated session id ' + req.session.id);
         token = req.session.id;
-    });
+    //});
     
     res.render('index.jade', {
         locals : {

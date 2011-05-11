@@ -54,8 +54,10 @@
             // called from the server have access to it
             if (!Store[options.channel] || options.override) {
                 Store[options.channel] = model;
-                if (!options.silent) this.trigger('subscribe', this, options);
-                Server.subscribe(model.toJSON(), options, callback);
+                Server.subscribe(model.toJSON(), options, function(resp, options) {
+                    if (!options.silent) model.trigger('subscribe', model, options);
+                    callback && callback(resp, options);
+                });
             }
             return this;
         },
@@ -68,8 +70,14 @@
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
-            if (!options.silent) this.trigger('unsubscribe', this, options);
-            Server.unsubscribe(model.toJSON(), options, callback);
+            Server.unsubscribe(model.toJSON(), options, function(resp, options){
+                if (!options.silent) model.trigger('unsubscribe', model, options);
+                callback && callback(resp, options);
+            });
+            
+            // The object must be deleted, or a new subscription with the same 
+            // channel name will not be correctly 'synced', unless a 'override' 
+            // option is sent upon subscription
             delete Store[options.channel];
             return this;
         }

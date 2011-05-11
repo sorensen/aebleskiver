@@ -12,13 +12,11 @@
             created : function(resp, options) {
                 resp = Helpers.getMongoId(resp);
                 var model = Store[options.channel];
-                console.log('Created: ', resp);
-                console.log('Created: ', model);
+                // Model processing
                 if (model instanceof Backbone.Model) {
-                    console.log('Created: Model: ', model);
                     model.set(model.parse(resp));
+                // Collection processing
                 } else if (model instanceof Backbone.Collection) {
-                    console.log('Created: Collection: ', model);
                     if (!model.get(resp.id)) model.add(model.parse(resp));
                 }
                 options.finished && options.finished(resp);
@@ -26,37 +24,28 @@
             
             read : function(resp, options) {
                 resp = Helpers.getMongoId(resp);
-                //var model = Store[options.channel];
-                console.log('Read: ', resp);
-                //console.log('Read: ', model);
-                // Check for direct model attributes
-                if (Store[options.channel] instanceof Backbone.Model) {
-                    //console.log('Read Model: ', model);
-                    Store[options.channel].set(Store[options.channel].parse(resp));
+                var model = Store[options.channel];
+                // Model Processing
+                if (model instanceof Backbone.Model) {
+                    model.set(model.parse(resp));
                 // Collection processing
-                } else if (Store[options.channel] instanceof Backbone.Collection) {
-                    //console.log('Read Collection: ', model);
+                } else if (model instanceof Backbone.Collection) {
                     if (_.isArray(resp)) {
-                        //console.log('Read Collection Refresh: ', model);
-                        // Set of models received
-                        Store[options.channel].refresh(resp);
-                    } else if (!Store[options.channel].get(resp.id)) {
-                        console.log('Read Single: ', model);
-                        // Single model received
-                        Store[options.channel].add(Store[options.channel].parse(resp));
+                        model.refresh(model.parse(resp));
+                    } else if (!model.get(resp.id)) {
+                        model.add(model.parse(resp));
                     }
                 }
-                //options.success && options.success(resp);
                 options.finished && options.finished(resp);
             },
             
             updated : function(resp, options) {
                 resp = Helpers.getMongoId(resp);
                 var model = Store[options.channel];
-                console.log('Updated: ', resp);
-                console.log('Updated: ', model);
+                // Collection processing
                 if (model.get(resp.id)) {
                     model.get(resp.id).set(model.parse(resp));
+                // Model processing
                 } else {
                     model.set(model.parse(resp));
                 }
@@ -65,7 +54,6 @@
             
             destroyed : function(resp, options) {
                 resp = Helpers.getMongoId(resp);
-                console.log('Destroyed: ', resp);
                 Store[options.channel].remove(resp) || delete Store[options.channel];
                 options.finished && options.finished(resp);
             },

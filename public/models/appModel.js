@@ -42,12 +42,10 @@
                 // Sync up with the server through DNode, Backbone will
                 // supply the channel url if one is not supplied
                 self.rooms.subscribe({}, function(resp) {
-                    self.rooms.trigger('subscribed', resp);
                     self.rooms.fetch({
                         query    : {},
                         error    : function(code, msg, opt) {},
                         finished : function(resp) {
-                            //history();
                             Backbone.history.start();
                         },
                     });
@@ -56,18 +54,13 @@
                 // Sync up with the server through DNode, Backbone will
                 // supply the channel url if one is not supplied
                 self.users.subscribe({}, function(resp) {
-                    self.users.trigger('subscribed', resp);
                     self.users.fetch({
                         query    : {},
                         error    : function(code, msg, opt) {},
                         finished : function(resp) {
-                            //history();
                         },
                     });
                 });
-                
-                
-                //history();
             });
         }
     });

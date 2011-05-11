@@ -455,7 +455,8 @@ body {
 .wrapper {
     height: 100%;
 }
-#header {
+#header,
+#footer {
     width: 100%;
     overflow: hidden;
     z-index: 9;
@@ -555,9 +556,11 @@ body {
                     filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#ffffff', EndColorStr='#EFEFEF');
             }
 #footer {
-    display: none;
-    overflow: hidden;
-    clear: both;
+    z-index: 3;
+    position: absolute;
+    bottom: 0;
+    border: 0;
+    border-top: 1px solid #bbb;
 }
     #copyright {
         margin: 20px 0 0 5px;
@@ -579,7 +582,7 @@ body {
 #sidebar {
     width: 200px;
     top: 207px;
-    bottom: 100px;
+    bottom: 130px;
     margin: 0;
     left: 0;
     position: absolute;
@@ -886,7 +889,7 @@ body {
 **/
 #main {
     top: 30px;
-    bottom: 0;
+    bottom: 30px;
     margin: 0;
     position: absolute;
     width: 100%;
