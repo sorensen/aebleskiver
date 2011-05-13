@@ -46,7 +46,7 @@ server.configure(function() {
 });
 
 // Connect to the database
-Mongoose.connect('mongodb://184.106.208.74/db');
+Mongoose.connect('mongodb://localhost/db');
 
 // Main application
 server.get('/', function(req, res) {
