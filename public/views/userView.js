@@ -16,22 +16,20 @@
         },
     
         initialize : function(options) {
-            console.log('User view init: ', options);
-            
             _.bindAll(this, 'render');
+            
             this.model.bind('change', this.render);
-            //this.model.bind('remove', this.clear);
+            this.model.bind('remove', this.clear);
             this.model.view = this;
             
-            // Send model contents to Mustache
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);
-            console.log('user before render: ');
-            $(this.el).html(view);
+            this.render();
         },
     
         // Re-render contents
         render : function() {
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(), content);
+            $(this.el).html(view);
             return this;
         },
         
@@ -46,8 +44,8 @@
                 .addClass('current')
                 .removeClass('inactive')
                 .siblings()
-                .addClass('inactive')
-                .removeClass('current');
+                    .addClass('inactive')
+                    .removeClass('current');
         },
     });
     
@@ -56,7 +54,7 @@
     
         // DOM attributes
         tagName   : 'div',
-        className : 'user inactive',
+        className : 'user-profile',
         template  : _.template($('#user-template').html()),
         
         // The DOM events specific to an item.
@@ -65,23 +63,30 @@
         },
     
         initialize : function(options) {
-            console.log('User main view init: ', options);
-            console.log('User main view init: ', this);
-            
             _.bindAll(this, 'render');
+            
             this.model.bind('change', this.render);
-            //this.model.bind('remove', this.clear);
+            this.model.bind('remove', this.clear);
             this.model.view = this;
             
-            // Send model contents to Mustache
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);   
-            console.log('user before render2: ');         
-            $(this.el).html(view);
+            var self = this;
+            // Request a gravatar image for the current 
+            // user based on email address
+            Server.gravatar({
+                email : self.model.get('email'),
+                size  : 100
+            }, function(resp) {
+                self.model.set({ avatar : resp });
+            });
+            
+            this.render();
         },
     
-        // Re-render contents
+        // Render contents
         render : function() {
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(), content);   
+            $(this.el).html(view);
             return this;
         },
         

@@ -39,6 +39,9 @@
             // passing a callback, though, it will still execute a
             // 'finished' function if you pass one in theim n options
             this.subscribe({}, function(resp) {
+                var history = _.after(2, function() {
+                    Backbone.history.start();
+                });
                 // Sync up with the server through DNode, Backbone will
                 // supply the channel url if one is not supplied
                 self.rooms.subscribe({}, function(resp) {
@@ -46,7 +49,7 @@
                         query    : {},
                         error    : function(code, msg, opt) {},
                         finished : function(resp) {
-                            Backbone.history.start();
+                            history();
                         },
                     });
                 });
@@ -58,6 +61,7 @@
                         query    : {},
                         error    : function(code, msg, opt) {},
                         finished : function(resp) {
+                            history();
                         },
                     });
                 });

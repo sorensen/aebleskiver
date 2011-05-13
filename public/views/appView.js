@@ -48,10 +48,9 @@
         // Constructor
         initialize : function(options) {
             _.bindAll(this, 
-                'render', 
-                'addRoom', 'createRoom', 'allRooms', 'roomsReady',
-                'addUser', 'register', 'allUsers', 'usersReady', 
-                'authenticate'
+                'render', 'toggleNav',
+                'addRoom', 'showCreateRoom', 'createRoom', 'allRooms', 'roomsReady',
+                'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout'
             );
 
             // Set the application model directly, since there is a 
@@ -71,26 +70,30 @@
             // User collection event bindings
             this.model.users.bind('subscribe', this.usersReady);
             this.model.users.bind('add', this.addUser);
-            //this.model.users.bind('add', this.render);
-            //this.model.users.bind('change', this.render);
+            this.model.users.bind('add', this.render);
+            this.model.users.bind('change', this.render);
             this.model.users.bind('refresh', this.allUsers);
-            //this.model.users.bind('refresh', this.render);
+            this.model.users.bind('refresh', this.render);
             
             // Room collection event bindings
             this.model.rooms.bind('subscribe', this.roomsReady);
             this.model.rooms.bind('add', this.addRoom);
-            //this.model.rooms.bind('add', this.render);
-            //this.model.rooms.bind('change', this.render);
+            this.model.rooms.bind('add', this.render);
+            this.model.rooms.bind('change', this.render);
             this.model.rooms.bind('refresh', this.allRooms);
-            //this.model.rooms.bind('refresh', this.render);
+            this.model.rooms.bind('refresh', this.render);
             
             // Render template contents
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(), content);            
             this.el.html(view);
             
+            // Assign pre-pouplated locals from Express
+            this.sid              = token;
+            this.port             = port;
+            this.version          = version;
+            
             // Set shortcuts to collection DOM
-            this.sid              = $('#token').html();
             this.searchInput      = this.$('#search');
             this.userList         = this.$('#users');
             this.roomList         = this.$('#rooms');
@@ -101,19 +104,23 @@
             this.settingsDialog   = this.$('#settings-dialog');
             this.overlay          = this.$('#overlay');
             this.roomName         = this.$('input[name="room"]');
-            this.roomTags         = this.$('#tags');
             
-            //this.$('#signup').hide();
-            //this.$('#login').hide();
-            this.$('#settings').hide();
-            this.$('#logout').hide();
-            //this.$('#show-users').hide();
-            //this.$('#show-rooms').hide();
+            // Navigation items for authentication toggling
+            this.nav = {
+                signup     : this.$('#signup'),
+                login      : this.$('#login'),
+                logout     : this.$('#logout'),
+                settings   : this.$('#settings'),
+                createRoom : this.$('#create-room')
+            };
+            this.nav.settings.hide();
+            this.nav.logout.hide();
             
             // Create a new user for the current client, only the 
             // defaults will be used until the client authenticates
             // with valid credentials
             window.user = new Models.UserModel();
+            window.user.subscribe();
             
             // Available room tags
             this.tags = [
@@ -126,26 +133,25 @@
             
             // Common autocomplete procedures
             this.auto = {
-                minLength: 0,
-                source: function(request, response) {
-                
+                minLength : 2,
+                source : function(request, response) {
                     // delegate back to autocomplete, but extract the last term
                     response( $.ui.autocomplete.filter(
                         self.tags, Helpers.extractLast( request.term ) ) );
                 },
-                focus: function() {
+                focus : function() {
                     // prevent value inserted on focus
                     return false;
                 },
-                select: function(event, ui) {
+                select : function(event, ui) {
                     console.log('autocomp select', ui);
-                    var terms = Helpers.split( this.value );
+                    var terms = Helpers.split(this.value);
                     
                     // remove the current input
                     terms.pop();
                     
                     // add the selected item
-                    terms.push( ui.item.value );
+                    terms.push(ui.item.value);
                     
                     // add placeholder to get the comma-and-space at the end
                     terms.push("");
@@ -155,7 +161,7 @@
             };
 
             // Register autocomplete inputs
-            this.searchInput.autocomplete(self.auto);
+            this.searchInput.autocomplete(this.auto);
         },
         
         // Refresh statistics
@@ -167,7 +173,7 @@
             this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
                 totalUsers : totalUsers,
                 totalRooms : totalRooms,
-                version    : $('#version').html()
+                version    : this.version
             }));
             return this;
         },
@@ -213,11 +219,11 @@
         
         // Alternate navigation based on user authentication
         toggleNav : function() {
-            this.$('#signup').fadeOut(150);
-            this.$('#login').fadeOut(150);
-            this.$('#settings').fadeIn(150);
-            this.$('#logout').fadeIn(150);
-            this.$('#create-room').fadeIn(150);
+            this.nav.signup.fadeOut(150);
+            this.nav.login.fadeOut(150);
+            this.nav.settings.fadeIn(150);
+            this.nav.logout.fadeIn(150);
+            this.nav.createRoom.fadeIn(150);
         },
         
         // Remove all defined dialoges from the view
@@ -272,15 +278,17 @@
         },
         
         activateRoom : function(params) {
-            console.log('activateRoom: ', params);
+            // Should probably hide room instead, maybe 
+            // minimize it to the bottom toolbar
             this.deactivateRoom();
             
-            // Get model by ID
+            // Get model by slug
             var model = this.model.rooms.filter(function(room) {
                 return room.get('slug') === params;
             });
             if (!model) return;
             
+            // Create a new main room view
             this.activeRoom = new Views.RoomMainView({
                 model : model[0]
             }).render();
@@ -295,21 +303,41 @@
                         self.activeRoom.messageList[0].scrollHeight
                     );
                     delete self;
-                });
-                
-            this.activeRoom.$('input[name="message"]').focus();
+                })
+                .find('input[name="message"]').focus();
         },
         
         // Create new room room
         createRoom : function() {
-            var name = this.$('input[name="room"]');
+            // User input
+            var name        = this.$('input[name="room"]'),
+                tags        = this.$('input[name="tags"]'),
+                image       = this.$('input[name="image"]'),
+                restricted  = this.$('input[name="restricted"]'),
+                description = this.$('textarea[name="description"]');
+            
+            // Validation
             if (!name.val()) return;
+            
+            // Delegate to Backbone.sync
             this.model.createRoom({
-                name : name.val(),
+                name        : name.val(),
+                tags        : tags.val(),
+                user        : window.user.get('id'),
+                restricted  : restricted.val(),
+                description : description.val()
             });
+            
+            // Should probably pass this in a success function
             this.createRoomDialog.fadeOut(150);
             this.overlay.hide();
+            
+            // Reset fields
             name.val('');
+            tags.val('');
+            image.val('');
+            restricted.val('');
+            description.val('');
         },
         
         // Create room keystroke listener
@@ -324,16 +352,15 @@
             this.createRoomDialog
                 .html(Mustache.to_html(this.createRoomTemplate()))
                 .fadeIn(150, function(){
-                });
-                
-            this.$('input[name="room"]').focus();
-            this.roomTags.autocomplete(self.auto);
+                })
+                .find('input[name="room"]').focus();
         },
         
         // Users collection has been subscribed to
         usersReady : function() {
             console.log('usersReady: ', window.user);
             
+            var self = this;
             var params = {
                 token : this.sid,
                 error : function(code, data, options) {
@@ -348,25 +375,16 @@
                     }
                 },
             };
-            console.log('how....');
-            var self = this;
             Server.getSession(window.user.toJSON(), params, function(session, options) {
                 if (!session) return;
+                session = Helpers.getMongoId(session);
+                
                 window.user.set(session);
-                // Request a gravatar image for the current 
-                // user based on email address
-                var params = {
-                    email : window.user.get('email'),
-                    size  : 40
-                };
-                Server.gravatar(params, function(resp) {
-                    window.user.set({ avatar : resp });
-                });
-                console.log('Got Session: ', session);
+                window.user.url = self.model.url() + ':users:' + session.id;
+                
                 session._id && self.toggleNav();
-                console.log('session.user: ', window.user);
                 
-                
+                // Online user test
                 Server.online(function(resp) {
                     console.log('ONLINE: ', resp);
                 });
@@ -401,8 +419,11 @@
             var self = this;
             this.mainContent
                 .fadeIn(75, function(){
-                    $(this).html(self.activeUser.el);
-                });
+                    $(this)
+                        .html(self.activeUser.el)
+                        .find('.avatar')
+                        .fadeIn(1500);
+                })
         },
         
         // Show the login form
@@ -410,24 +431,30 @@
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.settingsDialog
-                .html(Mustache.to_html(this.settingsTemplate()))
+                .html(Mustache.to_html(this.settingsTemplate(), window.user.toJSON()))
                 .fadeIn(150, function(){
-                });
-                
-            this.$('input[name="displayname"]').focus();
+                })
+                .find('input[name="displayname"]').focus();
         },
         
         // Save updated user settings
         saveSettings : function() {
-            var options = {
-                displayName : this.$('input[name="displayname"]').val(),
+            console.log('save settings before: ', window.user);
+            
+            var data = {
+                bio         : this.$('textarea[name="bio"]').val(),
                 email       : this.$('input[name="email"]').val(),
+                password    : this.$('input[name="password"]').val(),
+                displayName : this.$('input[name="displayname"]').val()
             };
-            var model = window.user.toJSON();
-            
-            //TODO: Save settings on server securely
-            
-            this.saveSettingsDialog.fadeOut(150);
+            var self = this;
+            window.user.save(data, {
+                channel  : 'app:users',
+                finished : function(resp) {
+                    console.log('finished', resp);
+                }
+            });
+            this.settingsDialog.fadeOut(150);
             this.overlay.hide();
         },
         
@@ -471,9 +498,9 @@
             this.loginDialog
                 .html(Mustache.to_html(this.loginTemplate()))
                 .fadeIn(150, function(){
-                });
-                
-            this.$('#login input[name="username"]').focus();
+                    
+                })
+                .find('input[name="username"]').focus();
         },
         
         // Authenticate the current user, check the credentials
@@ -515,9 +542,8 @@
             this.signupDialog
                 .html(Mustache.to_html(this.signupTemplate()))
                 .fadeIn(150, function(){
-                });
-                
-            this.$('#register input[name="username"]').focus();
+                })
+                .find('input[name="username"]').focus();
         },
         
         // Authenticate the current user, check the credentials
@@ -531,7 +557,7 @@
                 password    : this.$('input[name="password"]').val(),
             };
             var options = {
-                token : $('#token').html(),
+                token : this.sid,
                 error : function(code, data, options) {
                     console.log('register error: code: ', code);
                     console.log('register error: data: ', data);
@@ -562,12 +588,11 @@
             Server.logout(window.user.toJSON(), options);
             window.user = new Models.UserModel();
             
-            this.$('#signup').fadeIn(150);
-            this.$('#login').fadeIn(150);
-            
-            this.$('#settings').fadeOut(150);
-            this.$('#logout').fadeOut(150);
-            this.$('#create-room').fadeOut(150);
+            this.nav.signup.fadeIn(150);
+            this.nav.login.fadeIn(150);
+            this.nav.settings.fadeOut(150);
+            this.nav.logout.fadeOut(150);
+            this.nav.createRoom.fadeOut(150);
         },
         
     });

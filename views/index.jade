@@ -7,8 +7,10 @@ html(lang="en")
     link(rel='stylesheet', href='/css/style.css')
     
     // Dependencies
-    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js")
-    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.min.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js")
+    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js")
+    script(src="/js/jquery.livequery.js")
+    script(src="/js/jquery.timeago.js")
     script(src="/js/modernizr-1.7.min.js")
     script(src="/js/underscore-min.js")
     script(src="/js/backbone.js")
@@ -30,17 +32,27 @@ html(lang="en")
           h3 Settings
         .content
           p
-            label Username: 
-            input(type='text', name='username', disabled='disabled')
+            label(for='settings-username') ID: 
+            input#settings-id(type='text', name='id', disabled='disabled', value='{{ id }}')
           p
-            label Display Name: (optional)
-            input(type='text', name='displayname')
           p
-            label Email: 
-            input(type='text', name='email')
+            label(for='settings-username') Username: 
+            input#settings-username(type='text', name='username', disabled='disabled', value='{{ username }}')
           p
-            label Password: 
-            input(type='password', name='password')
+            label(for='settings-displayname') Display Name: (optional)
+            input#settings-displayname(type='text', name='displayname', value='{{ displayName }}')
+          p
+            label(for='settings-email') Email: 
+            input#settings-email(type='text', name='email', value='{{ email }}')
+          p
+            label(for='settings-bio') Bio: 
+            textarea#settings-bio(name='bio', rows='3') {{ bio }}
+          p
+            label(for='settings-password') Password: 
+            input#settings-password(type='password', name='password')
+          p
+            label(for='settings-password-confirm') Confirm Password: 
+            input#settings-password-confirm(type='password', name='password_confirm')
         .controls
           button.submit Save
           button.cancel Cancel
@@ -52,17 +64,17 @@ html(lang="en")
           h3 Signup
         .content
           p
-            label Username: 
-            input(type='text', name='username')
+            label(for='signup-username') Username: 
+            input#signup-username(type='text', name='username')
           p
-            label Display Name: (optional)
-            input(type='text', name='displayname')
+            label(for='signup-displayname') Display Name: (optional)
+            input#signup-displayname(type='text', name='displayname')
           p
-            label Email: 
-            input(type='text', name='email')
+            label(for='signup-email') Email: 
+            input#signup-email(type='text', name='email')
           p
-            label Password: 
-            input(type='password', name='password')
+            label(for='signup-password') Password: 
+            input#signup-password(type='password', name='password')
         .controls
           button.submit Signup
           button.cancel Cancel
@@ -74,11 +86,11 @@ html(lang="en")
           h3 Login
         .content
           p
-            label Username: 
-            input(type='text', name='username')
+            label(for='login-username') Username: 
+            input#login-username(type='text', name='username')
           p
-            label Password: 
-            input(type='password', name='password')
+            label(for='login-password') Password: 
+            input#login-password(type='password', name='password')
         .controls
           button.submit Login
           button.cancel Cancel
@@ -90,20 +102,26 @@ html(lang="en")
           h3 Create a new room
         .content
           p
-            label Name: 
-            input(type='text', name='room', placeholder='Room name')
+            label(for='create-room-name') Name: 
+            input#create-room-name(type='text', name='room', placeholder='Room name')
           p
-            label Tags:
+            label(for='tags') Tags:
             input#tags(type='text', name='tags', placeholder='Tags')
+          p
+            label(for='create-room-description') Description:
+            textarea#create-room-description(type='text', name='description', placeholder='Description')
+          p
+            label(for='create-room-image') Image
+            input#create-room-image(type='file', name='image')
+          p
+            label(for='create-room-restricted') Private room:
+            input#create-room-restricted(type='checkbox', name='restricted')
         .controls
           button.submit Create
           button.cancel Cancel
               
     // Main application
     script#application-template(type='text/template')
-      span.massive.top-text beau
-      span.massive.bottom-text sorensen
-      
       a#heart(href='/')
         #heart-left
         #heart-right
@@ -111,26 +129,29 @@ html(lang="en")
           
       .wrapper
         #header
-          h1#logo Sorensen
           nav#navigation
-            // a(href='/#/') Home
+            a(href='/#/') Home
             a#login Login
             a#signup Sign up
             a#settings Settings
             a#logout Logout
-            a#show-users Users
-            a#show-rooms Rooms
             a#create-room Create Room
             
         #sidebar
           #sidebar-controls
           
           #sidebar-up
-            #search-form
-              input#search(type='text', name='search', placeholder='Search')
+            button#show-rooms Rooms
+            button#show-users Users
+            
           #sidebar-content  
             #users
             #rooms
+            
+          #search-form
+            button#search-now Go
+            input#search(type='text', name='search', placeholder='Search')
+              
           #sidebar-down
             .statistics#app-stats
         
@@ -162,8 +183,11 @@ html(lang="en")
 
     // Application statistics
     script#application-stats-template(type='text/template')
+      .stat.total-online
+        span.title Online
+        span.value {{ totalOnline }}
       .stat.total-users
-        span.title Users
+        span.title Members
         span.value {{ totalUsers }}
       .stat.total-rooms
         span.title Rooms
@@ -174,10 +198,39 @@ html(lang="en")
     
     // User full
     script#user-template(type='text/template')
+      .avatar: img(src='{{ avatar }}')
       h1.name
         span.headline {{ username }}
         span.destroy
-      span.avatar: img(src='{{ avatar }}')
+      .details
+        .created
+          span.title Joined 
+          abbr.value.timeago(title='{{ created }}') {{ created }}
+        .last-online
+          span.title Last Online
+          abbr.value.timeago(title='{{ modified }}') {{ modified }}
+        .status
+          span.title Status
+          span.value {{ status }}
+        .email
+          span.title Email
+          span.value {{ email }}
+        .bio
+          span.title Bio
+          span.value {{ bio }}
+      
+      .controls
+        button.add-friend Add Friend
+        button.send-message Send a Message
+        button.call.submit Call
+        button.video-chat.submit Video Call
+        
+       .wall
+         .posts
+         .post-form
+           button.submit Post
+           input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255')
+        
         
       
     // User listing
@@ -192,15 +245,15 @@ html(lang="en")
     script#room-template(type='text/template')
       h1.name
         span.headline {{ name }}
+        p.description {{ description }}
         span.destroy
       .statistics.room-stats
       
-      p.description {{ description }}
       .users
       .messages
       .message-form
         button Send
-        input.create-message(type='text', name='message', placeholder='Say something...', length="40")
+        input.create-message(type='text', name='message', placeholder='Say something...', length='255')
 
     // Room listing
     script#room-list-template(type='text/template')
@@ -208,7 +261,7 @@ html(lang="en")
         h3.name
           span {{ name }}
           span.destroy
-      p.description {{ description }}
+        p.description {{ description }}
       .statistics.room-stats
       .ranking
       
@@ -227,10 +280,10 @@ html(lang="en")
     // Single message
     script#message-list-template(type='text/template')
     script#message-template(type='text/template')
-      span.created {{ created }}
       span.avatar: img(src='{{ avatar }}')
-      a.username(href='#/users/{{ username }}') {{ username }}
+      a.username(href='#/users/{{ username }}') {{ displayName }}
       span.data {{ text }}
+      abbr.created.timeago(title='{{ created }}') {{ created }}
     
     // Application core
     script(src="/bootstrap.js")
@@ -244,6 +297,7 @@ html(lang="en")
     script(src="/rpc/pubsubRPC.js")
     script(src="/rpc/crudRPC.js")
     script(src="/rpc/gravatarRPC.js")
+    script(src="/rpc/uploadRPC.js")
     
     // Models
     script(src="/models/messageModel.js")
@@ -262,8 +316,9 @@ html(lang="en")
     
     // Start application
     script(src="/init.js")
-  body
-    #application
-    #port= locals.port
-    #token= locals.token
-    #version= locals.version
+    
+    script(type='text/javascript')
+      var port    = '!{locals.port}',
+          token   = '!{locals.token}',
+          version = '!{locals.version}';
+  body: div#application

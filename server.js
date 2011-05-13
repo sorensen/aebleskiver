@@ -5,12 +5,19 @@ require.paths.unshift(__dirname + '/lib');
 // Dependencies
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
+    
+    fs           = require('fs'),
+    Seq          = require('seq'),
+    formidable   = require('formidable'),
+    sys          = require('sys'),
+    Upload       = require('protocol-upload'),
+
     PubSub       = require('protocol-pubsub'),
     CRUD         = require('protocol-crud'),
     Gravatar     = require('protocol-gravatar'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
-    version      = '0.2.4',
+    version      = '0.3.0',
     port         = 3000,
     token        = '',
     server       = module.exports = express.createServer();
@@ -27,8 +34,8 @@ server.configure(function() {
     
     // Session settings
     server.use(express.session({
-        cookie : {maxAge : 60000 * 20}, // 20 minutes
-        secret : 'abcdefghijklmnopqrstuvwxyz',
+        cookie : {maxAge : 60000 * 60 * 24},   // 24 Hours
+        secret : 'abcdefghijklmnopqrstuvwxyz', // Hashing salt
         store  : new SessionStore({
             dbname   : 'db',
             username : '',
@@ -62,5 +69,6 @@ DNode()
     .use(Auth)      // Authentication support
     .use(PubSub)    // Pub/sub channel support
     .use(CRUD)      // Backbone integration
+    .use(Upload)    // File upload support
     .use(Gravatar)  // Gravatar integration
     .listen(server) // Start your engines!

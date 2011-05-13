@@ -26,7 +26,7 @@
         // Render contents
         render : function() {
             var content = this.model.toJSON();
-            content.created && (content.created = Helpers.timeFormat(content.created));
+            //content.created && (content.created = Helpers.timeFormat(content.created));
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
             

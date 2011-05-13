@@ -27,6 +27,7 @@
         initialize : function(options) {
             // Bind to model
             _.bindAll(this, 'render');
+            
             this.model.bind('change', this.render);
             this.model.view = this;
             
@@ -40,6 +41,8 @@
         
         // Refresh statistics
         render : function() {
+            //$(this.el).effect('highlight', {}, 3000);
+                    
             var rank = this.model.get('upvotes') - this.model.get('downvotes');
             this.$('.ranking').html(Mustache.to_html(this.rankTemplate(), {
                 rank : rank
@@ -120,13 +123,11 @@
             
             var self = this;
             this.model.messages.subscribe({}, function() {
-            
-                var params = {
-                    query    : {room : self.model.get('_id')},
+                self.model.messages.fetch({
+                    query    : {room_id : self.model.get('_id')},
                     finished : function(data) {
                     },
-                };
-                self.model.messages.fetch(params);
+                });
             });
         },
         
@@ -155,18 +156,12 @@
         
         // All rooms have been loaded into collection
         allMessages : function(messages) {
-            console.log('allMessages', messages);
-            console.log('allMessages', this);
-            
             this.messageList.html('');
             this.model.messages.each(this.addMessage);
-            
-            // Refresh model statistics
             this.render();
         },
         
         addMessage : function(message) {
-            console.log('addMessage', message);
             var view = new Views.MessageView({
                 model : message
             }).render();
@@ -191,11 +186,12 @@
         // Generate the attributes
         newAttributes : function() {
             return {
-                text     : this.input.val(),
-                room     : this.model.escape('_id'),
-                user     : window.user.escape('_id'),
-                username : window.user.escape('displayName') || window.user.get('username'),
-                avatar   : window.user.escape('avatar')
+                text        : this.input.val(),
+                room_id     : this.model.get('_id'),
+                user_id     : window.user.get('_id'),
+                username    : window.user.get('username'),
+                displayName : window.user.get('displayName') || window.user.get('username'),
+                avatar      : window.user.get('avatar')
             };
         },
     });

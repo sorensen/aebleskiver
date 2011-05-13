@@ -9,12 +9,25 @@
         defaults : {
             username : 'anonymous',
             avatar   : '/images/undefined.png',
-            status   : 'offline'
+            status   : 'offline',
+            email    : '',
+            created  : '',
+            modified : '',
+            bio      : ''
         },
         
         initialize : function(options) {
-            console.log('User init: ', options);
-            console.log('User init: ', this);
+            // Request a gravatar image for the current 
+            // user based on email address if not default
+            if (this.get('avatar') === this.defaults.avatar) {
+                var self = this;
+                Server.gravatar({
+                    email : self.get('email'),
+                    size  : 30
+                }, function(resp) {
+                    self.set({ avatar : resp });
+                });
+            }
         },
         
         // Authenticate the current user model
@@ -26,26 +39,11 @@
             // Update the current model with the returned data, 
             // increase total visits, and chage the status to 'online'
             Server.authenticate(data, options, function(resp) {
-                
-                console.log('authenticated: ', resp);
-                
                 self.set(resp);
                 self.set({
                     visits : self.get('visits') + 1,
                     status : 'online',
                 });
-                
-                // Request a gravatar image for the current 
-                // user based on email address
-                var params = {
-                    email : self.get('email'),
-                    size  : 40
-                };
-                
-                Server.gravatar(params, function(resp) {
-                    self.set({ avatar : resp });
-                });
-                
                 next && next(resp);
             });
         },
@@ -65,18 +63,6 @@
                     visits : self.get('visits') + 1,
                     status : 'online',
                 });
-                
-                // Request a gravatar image for the current 
-                // user based on email address
-                var params = {
-                    email : self.get('email'),
-                    size  : 40
-                };
-                
-                Server.gravatar(params, function(resp) {
-                    self.set({ avatar : resp });
-                });
-                
                 next && next(resp);
             });
         },

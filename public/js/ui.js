@@ -36,4 +36,9 @@ $(function() {
     // Load any global UI enhancements here, opposed to 
     // setting the same effects / animations to every 
     // backbone view rendering
+    $('abbr.timeago').livequery(function() {
+        $(this).timeago();
+    });
+    
+    $('.timeago').timeago();
 });
