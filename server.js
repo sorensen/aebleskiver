@@ -5,6 +5,7 @@ require.paths.unshift(__dirname + '/lib');
 // Dependencies
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
+    Mongoose     = require('mongoose');
     
     fs           = require('fs'),
     Seq          = require('seq'),
@@ -18,7 +19,7 @@ var express      = require('express'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
     version      = '0.3.0',
-    port         = 3000,
+    port         = 80,
     token        = '',
     server       = module.exports = express.createServer();
 
@@ -43,6 +44,9 @@ server.configure(function() {
         })
     }));
 });
+
+// Connect to the database
+Mongoose.connect('mongodb://184.106.208.74/db');
 
 // Main application
 server.get('/', function(req, res) {
