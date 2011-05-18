@@ -15,7 +15,8 @@
             rank      : 0,
             tags      : [
                 'general'
-            ]
+            ],
+            banned    : []
         },
         
         // Remove this view from the DOM, and unsubscribe from 
@@ -23,6 +24,40 @@
         remove : function() {
             this.messages.unsubscribe();
         },
+        
+        allowedToEdit : function(user) {
+            if (!user.get('id') || !this.get('user_id')) {
+                return false;
+            }
+        
+            console.log('allowedToEdit', user.get('id'));
+            console.log('allowedToEdit', this.get('user_id'));
+            console.log('allowedToEdit', user.get('id') === this.get('user_id'));
+            console.log('allowedToEdit', _.indexOf(user.get('id'), this.get('user_id')));
+            console.log('allowedToEdit', user.get('id').indexOf(this.get('user_id')));
+            
+            return user.get('id') === this.get('user_id');
+        },
+        
+        allowedToView : function(user) {
+            return _.indexOf(this.get('banned'), user.get('id')) === -1;
+        }
+    });
+    
+    Models.PrivateRoomModel = Models.RoomModel.extend({
+    
+        defaults : {
+            name      : 'Unknown',
+            messages  : [],
+            allowed   : [],
+            banned    : []
+        },
+        
+        allowedToView : function(user) {
+            return _.indexOf(this.get('allowed'), user.get('id')) !== -1
+                || user.get('id') === this.get('user_id');
+        }
+        
     });
     
     // Room Collection

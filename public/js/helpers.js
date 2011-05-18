@@ -3,6 +3,7 @@
     // -------
     
     _.extend(Helpers, {
+    
         // Format a timestamp from miliseconds to a 
         // human readable string
         timeFormat : function(miliseconds) {
@@ -43,6 +44,7 @@
             data._id && (data.id = data._id);
             if (_.isArray(data)) {
                 _.each(data, function(model, key) {
+                    if (model.id && !model._id) data[key]._id = model.id;
                     data[key].id = model._id;
                 });
             }

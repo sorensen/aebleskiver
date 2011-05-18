@@ -12,13 +12,13 @@ var express      = require('express'),
     formidable   = require('formidable'),
     sys          = require('sys'),
     Upload       = require('protocol-upload'),
-
+    Misc         = require('protocol-misc'),
     PubSub       = require('protocol-pubsub'),
     CRUD         = require('protocol-crud'),
     Gravatar     = require('protocol-gravatar'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
-    version      = '0.3.0',
+    version      = '0.3.1',
     port         = 80,
     token        = '',
     server       = module.exports = express.createServer();
@@ -67,6 +67,35 @@ server.get('/', function(req, res) {
     });
 });
 
+server.use('/upload', function(req, res, next) {
+    console.log('upload!!!');
+    var incomingForm = formidable.IncomingForm();
+    incomingForm.on('fileBegin', function(field, file) {
+
+        var tracker = {file: file, progress: [], ended: false};
+        var push = setInterval(function() {
+            publish('data', null, tracker);
+        }, 2000)
+
+        //publish('data', null, tracker);
+        file
+            .on('progress', function(recieved) {
+                tracker.progress.push(recieved);
+            })
+            .on('end', function() {
+                tracker.ended = true;
+                publish('data', null, tracker);
+                clearInterval(push);
+            })
+    })
+
+    incomingForm.parse(req, function(err, fields, files) {
+        res.writeHead(200, {'content-type': 'text/plain'});
+        res.write('received upload:\n\n');
+        res.end(sys.inspect({fields: fields, files: files}));
+    });
+})
+
 // Start application
 server.listen(port);
 DNode()
@@ -75,4 +104,6 @@ DNode()
     .use(CRUD)      // Backbone integration
     .use(Upload)    // File upload support
     .use(Gravatar)  // Gravatar integration
+    .use(Misc)      // Misc. resources
+    .listen(5050)
     .listen(server) // Start your engines!

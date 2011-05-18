@@ -7,7 +7,9 @@
     DNode()
         .use(Protocols.Auth)
         .use(Protocols.CRUD)
+        .use(Protocols.Misc)
         .use(Protocols.Pubsub)
+        .use(Protocols.Upload)
         .use(Protocols.Gravatar)
         .connect(function(remote) {
             

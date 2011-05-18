@@ -15,6 +15,8 @@
             _.bindAll(this, 'render');
             this.model.bind('change', this.render);
             this.model.view = this;
+            
+            //this.data = this.$('.data');
         },
         
         // Remove this view from the DOM.
@@ -29,6 +31,8 @@
             //content.created && (content.created = Helpers.timeFormat(content.created));
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
+            
+            this.model.concurrent && $(this.el).addClass('concurrent');
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement

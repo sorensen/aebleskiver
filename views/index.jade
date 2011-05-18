@@ -1,5 +1,5 @@
 !!! 5
-html(lang="en")
+html(lang='en')
   head
     title &AElig;bleskiver
     
@@ -7,21 +7,256 @@ html(lang="en")
     link(rel='stylesheet', href='/css/style.css')
     
     // Dependencies
-    script(src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js")
-    script(src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js")
-    script(src="/js/jquery.livequery.js")
-    script(src="/js/jquery.timeago.js")
-    script(src="/js/modernizr-1.7.min.js")
-    script(src="/js/underscore-min.js")
-    script(src="/js/backbone.js")
-    script(src="/js/mustache.js")
-    script(src="/js/json2.js")
-    script(src="/dnode.js")
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
+    script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
+    script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
+    script(scr='//cdn.wijmo.com/external/raphael-min.js')
+    script(src='//cdn.wijmo.com/external/jquery.mousewheel.min.js')
+    script(src='/js/jquery.livequery.js')
+    script(src='/js/jquery.cookie.js')
+    script(src='/js/jquery.timeago.js')
+    script(src='/js/jquery.jscrollpane.js')
+    script(src='/js/modernizr-1.7.min.js')
+    script(src='/js/underscore-min.js')
+    script(src='/js/backbone.js')
+    script(src='/js/mustache.js')
+    script(src='/js/json2.js')
+    script(src='/js/webcam/jquery.webcam.js')
+    script(src='/dnode.js')
     
+    // Main application
+    script#application-template(type='text/template')
+          
+      .wrapper
+        #header
+          nav#navigation
+            a#home(href='/#/') Home
+            a#create-room Create Room
+            a#open-webcam Webcam
+            a#login Login
+            a#signup Sign up
+            a#settings Settings
+            a#logout Logout
+        
+        #sidebar-wrapper
+          a.heart(href='/')
+            .heart-left
+            .heart-right
+            .heart-content
+            
+          #sidebar
+            #sidebar-controls
+          
+            #sidebar-up
+              button#show-rooms Rooms
+              button#show-users Users
+            
+            #sidebar-content
+              #users
+              #rooms
+            
+            #search-form
+              button#search-now Go
+              input#search(type='text', name='search', placeholder='Search')
+              
+            #sidebar-down
+              .statistics#app-stats
+        
+        #main
+          #main-tabs
+            button#news News
+            button#help Help
+            
+          #main-controls
+            .main-controls
+              button.new-room Create Channel
+            
+            .layout-controls
+              button.list List
+          
+          #main-content
+          
+      #create-room-dialog
+      #login-dialog
+      #signup-dialog
+      #settings-dialog
+      #footer
+        #start-menu
+          .button.title.submit
+            | Menu
+            .heart(href='/')
+              .heart-left
+              .heart-right
+              .heart-content
+        #friend-list
+          .button.title Friends
+          .friend-wrapper
+            .heading Your Friends
+            .controls
+              .open
+              .close
+            .friends
+            
+        #favorite-list
+          .button.title Favorites
+          .favorite-wrapper
+            .heading Your Favorites
+            .controls
+              .open
+              .close
+            .favorites
+          
+        #copyright
+          p &copy;
+        #authors
+          p.author Beau Sorensen
+      #overlay
+
+    // Application statistics
+    script#application-stats-template(type='text/template')
+      .stat.total-online
+        span.title Online
+        span.value {{ totalOnline }}
+      .stat.total-users
+        span.title Members
+        span.value {{ totalUsers }}
+      .stat.total-rooms
+        span.title Rooms
+        span.value {{ totalRooms }}
+      .stat.version
+        span.title Version
+        span.value {{ version }}
+    
+    // Friend chat box
+    script#friend-chat-template(type='text/template')
+      .title To: {{ username }}
+      .destroy
+      .messages
+      .message-form
+        button.submit Send
+        input.create-message(type='text', name='message', placeholder='Say something...', length='255')
+        
+    // User profile
+    script#user-template(type='text/template')
+      h1.name
+        span.headline 
+          {{ username }}
+          span.displayname ({{ displayName }})
+        span.destroy
+      .statistics.user-stats
+      .picture: img(src='{{ avatar }}')
+      .details
+        //.avatar: img(src='{{ avatar }}')
+        //img.picture(src='uploads/users/{{ id }}.png', height='120', width='160')
+        .created
+          span.title Joined 
+          abbr.value.timeago(title='{{ created }}') {{ created }}
+        .last-online
+          span.title Last Online
+          abbr.value.timeago(title='{{ modified }}') {{ modified }}
+        .status
+          span.title Status
+          span.value {{ status }}
+        .email
+          span.title Email
+          span.value {{ email }}
+        .bio
+          span.title Bio
+          span.value {{ bio }}
+      
+      .controls
+        button.add-friend.submit + Add to Friends
+        button.remove-friend - Remove Friend
+        button.send-message Send a Message
+        
+       .wall
+         .posts
+         .post-form
+           button.submit Post
+           input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255')
+        
+    // User listing
+    script#user-list-template(type='text/template')
+      a(href='/#/users/{{ username }}')
+        h3.name
+          span.avatar: img(src='{{ avatar }}')
+          span.username {{ displayName }}
+      .statistics.user-stats
+    
+    // User statistics
+    script#user-stats-template(type='text/template')
+      .stat.total-messages
+        span.title Posts
+        span.value {{ totalPosts }}
+      
+    // Room
+    script#room-template(type='text/template')
+      h1.name
+        span.headline {{ name }}
+        span.destroy
+        .controls
+          button.add-favorite.submit + Add to Favorites
+          button.remove-favorite - Remove Favorite
+          .admin-controls
+            button.delete-room.delete Delete Room
+            button.ban-user Ban User
+            button.invite-user Invite User
+          
+        p.description {{ description }}
+      .statistics.room-stats
+      
+      .users
+      .messages
+      .message-form
+        button.submit Send
+        input.create-message(type='text', name='message', placeholder='Say something...', length='255')
+
+    // Room listing
+    script#room-list-template(type='text/template')
+      a(href='/#/rooms/{{ slug }}')
+        h3.name
+          span {{ name }}
+          span.destroy
+        p.description {{ description }}
+      .statistics.room-stats
+      .ranking
+      
+    // Room rankings
+    script#room-rank-template(type='text/template')
+      .rank {{ rank }}
+      button.upvote: span.arrow-wrap: span.arrow &uarr;
+      button.downvote: span.arrow-wrap: span.arrow &darr;
+      
+    // Room statistics
+    script#room-stats-template(type='text/template')
+      .stat.total-messages
+        span.title Messages
+        span.value {{ totalMessages }}
+        
+    // Single message
+    script#message-list-template(type='text/template')
+    script#message-template(type='text/template')
+      span.small-avatar: img(src='{{ avatar }}')
+      a.username(href='#/users/{{ username }}') {{ displayName }}
+      span.data {{ text }}
+      abbr.created.timeago(title='{{ created }}') {{ created }}
+    
+    // Webcam
+    script#webcam-template(type='text/template')
+      .title
+        h3 Webcam
+      .destroy
+      .camera
+      .controls
+        button.stream Stream
+        button.reset Restart
+        button.snapshot.submit Snapshot
+      .status
+      .list
     // Notification template
     script#notification-template(type='text/template')
       .notification
-        .close
+        .destroy
         .type {{ type }}
         .message {{ message }}
     
@@ -104,221 +339,59 @@ html(lang="en")
           p
             label(for='create-room-name') Name: 
             input#create-room-name(type='text', name='room', placeholder='Room name')
-          p
-            label(for='tags') Tags:
-            input#tags(type='text', name='tags', placeholder='Tags')
+          //p
+          //  label(for='tags') Tags:
+          //  input#tags(type='text', name='tags', placeholder='Tags')
           p
             label(for='create-room-description') Description:
             textarea#create-room-description(type='text', name='description', placeholder='Description')
-          p
-            label(for='create-room-image') Image
-            input#create-room-image(type='file', name='image')
-          p
-            label(for='create-room-restricted') Private room:
-            input#create-room-restricted(type='checkbox', name='restricted')
+          //p
+          //  label(for='create-room-image') Image
+          //  input#create-room-image(type='file', name='image')
+          //p
+          //  label(for='create-room-restricted') Private room:
+          //  input#create-room-restricted(type='checkbox', name='restricted')
         .controls
           button.submit Create
           button.cancel Cancel
-              
-    // Main application
-    script#application-template(type='text/template')
-      a#heart(href='/')
-        #heart-left
-        #heart-right
-        #heart-content
-          
-      .wrapper
-        #header
-          nav#navigation
-            a(href='/#/') Home
-            a#login Login
-            a#signup Sign up
-            a#settings Settings
-            a#logout Logout
-            a#create-room Create Room
-            
-        #sidebar
-          #sidebar-controls
-          
-          #sidebar-up
-            button#show-rooms Rooms
-            button#show-users Users
-            
-          #sidebar-content  
-            #users
-            #rooms
-            
-          #search-form
-            button#search-now Go
-            input#search(type='text', name='search', placeholder='Search')
-              
-          #sidebar-down
-            .statistics#app-stats
-        
-        #main
-          #main-tabs
-            button#news News
-            button#help Help
-            
-          #main-controls
-            .main-controls
-              button.new-room Create Channel
-              button.new-game Create Game
-            
-            .layout-controls
-              button.list List
-          
-          #main-content
-          
-      #create-room-dialog
-      #login-dialog
-      #signup-dialog
-      #settings-dialog
-      #footer.container_16
-        #copyright
-          p &copy;
-        #authors
-          p.author Beau Sorensen
-      #overlay
-
-    // Application statistics
-    script#application-stats-template(type='text/template')
-      .stat.total-online
-        span.title Online
-        span.value {{ totalOnline }}
-      .stat.total-users
-        span.title Members
-        span.value {{ totalUsers }}
-      .stat.total-rooms
-        span.title Rooms
-        span.value {{ totalRooms }}
-      .stat.version
-        span.title Version
-        span.value {{ version }}
-    
-    // User full
-    script#user-template(type='text/template')
-      .avatar: img(src='{{ avatar }}')
-      h1.name
-        span.headline {{ username }}
-        span.destroy
-      .details
-        .created
-          span.title Joined 
-          abbr.value.timeago(title='{{ created }}') {{ created }}
-        .last-online
-          span.title Last Online
-          abbr.value.timeago(title='{{ modified }}') {{ modified }}
-        .status
-          span.title Status
-          span.value {{ status }}
-        .email
-          span.title Email
-          span.value {{ email }}
-        .bio
-          span.title Bio
-          span.value {{ bio }}
-      
-      .controls
-        button.add-friend Add Friend
-        button.send-message Send a Message
-        button.call.submit Call
-        button.video-chat.submit Video Call
-        
-       .wall
-         .posts
-         .post-form
-           button.submit Post
-           input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255')
-        
-        
-      
-    // User listing
-    script#user-list-template(type='text/template')
-      a(href='/#/users/{{ username }}')
-        h3.name
-          span.avatar: img(src='{{ avatar }}')
-          span.username {{ username }}
-      .statistics.user-stats
-      
-    // Room
-    script#room-template(type='text/template')
-      h1.name
-        span.headline {{ name }}
-        p.description {{ description }}
-        span.destroy
-      .statistics.room-stats
-      
-      .users
-      .messages
-      .message-form
-        button Send
-        input.create-message(type='text', name='message', placeholder='Say something...', length='255')
-
-    // Room listing
-    script#room-list-template(type='text/template')
-      a(href='/#/rooms/{{ slug }}')
-        h3.name
-          span {{ name }}
-          span.destroy
-        p.description {{ description }}
-      .statistics.room-stats
-      .ranking
-      
-    // Room rankings
-    script#room-rank-template(type='text/template')
-      .rank {{ rank }}
-      button.upvote: span.arrow-wrap: span.arrow &uarr;
-      button.downvote: span.arrow-wrap: span.arrow &darr;
-      
-    // Room statistics
-    script#room-stats-template(type='text/template')
-      .stat.total-messages
-        span.title Messages
-        span.value {{ totalMessages }}
-        
-    // Single message
-    script#message-list-template(type='text/template')
-    script#message-template(type='text/template')
-      span.avatar: img(src='{{ avatar }}')
-      a.username(href='#/users/{{ username }}') {{ displayName }}
-      span.data {{ text }}
-      abbr.created.timeago(title='{{ created }}') {{ created }}
     
     // Application core
-    script(src="/bootstrap.js")
+    script(src='/bootstrap.js')
     
     // Helpers
-    script(src="/js/ui.js")
-    script(src="/js/helpers.js")
+    script(src='/js/ui.js')
+    script(src='/js/helpers.js')
     
     // Remote procedure calls
-    script(src="/rpc/authRPC.js")
-    script(src="/rpc/pubsubRPC.js")
-    script(src="/rpc/crudRPC.js")
-    script(src="/rpc/gravatarRPC.js")
-    script(src="/rpc/uploadRPC.js")
+    script(src='/rpc/authRPC.js')
+    script(src='/rpc/pubsubRPC.js')
+    script(src='/rpc/crudRPC.js')
+    script(src='/rpc/gravatarRPC.js')
+    script(src='/rpc/uploadRPC.js')
+    script(src='/rpc/miscRPC.js')
     
     // Models
-    script(src="/models/messageModel.js")
-    script(src="/models/roomModel.js")
-    script(src="/models/userModel.js")
-    script(src="/models/appModel.js")
+    script(src='/models/messageModel.js')
+    script(src='/models/roomModel.js')
+    script(src='/models/userModel.js')
+    script(src='/models/appModel.js')
     
     // Views
-    script(src="/views/userView.js")
-    script(src="/views/messageView.js")
-    script(src="/views/roomView.js")
-    script(src="/views/appView.js")
+    script(src='/views/userView.js')
+    script(src='/views/messageView.js')
+    script(src='/views/roomView.js')
+    script(src='/views/webcamView.js')
+    script(src='/views/appView.js')
     
     // Controllers
-    script(src="/controllers/appController.js")
+    script(src='/controllers/appController.js')
     
     // Start application
-    script(src="/init.js")
+    script(src='/init.js')
     
     script(type='text/javascript')
       var port    = '!{locals.port}',
           token   = '!{locals.token}',
           version = '!{locals.version}';
-  body: div#application
+  body
+    #application

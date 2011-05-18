@@ -16,33 +16,41 @@
         
         // Interaction events
         events    : {
-            "click #show-rooms"  : "showRooms",
-            "click #show-users"  : "showUsers",
-            "click .cancel"      : "hideDialogs",
-            "click #logout"      : "logout",
+            'click #show-rooms'  : 'showRooms',
+            'click #show-users'  : 'showUsers',
+            'click .cancel'      : 'hideDialogs',
+            'click #logout'      : 'logout',
             
             // Create new room form
-            "click #create-room"               : "showCreateRoom",
-            "click #create-room-form .submit"  : "createRoom",
-            "keypress #create-room-form input" : "createRoomOnEnter",
+            'click #create-room'               : 'showCreateRoom',
+            'click #create-room-form .submit'  : 'createRoom',
+            'keypress #create-room-form input' : 'createRoomOnEnter',
             
             // Login form
-            "click #login"               : "showLogin",
-            "click #login-form .submit"  : "authenticate",
-            "keypress #login-form input" : "authenticateOnEnter",
+            'click #login'               : 'showLogin',
+            'click #login-form .submit'  : 'authenticate',
+            'keypress #login-form input' : 'authenticateOnEnter',
             
             // Settings form
-            "click #settings"               : "showSettings",
-            "click #settings-form .submit"  : "saveSettings",
-            "keypress #settings-form input" : "saveSettingsOnEnter",
+            'click #settings'               : 'showSettings',
+            'click #settings-form .submit'  : 'saveSettings',
+            'keypress #settings-form input' : 'saveSettingsOnEnter',
             
             // Registration form
-            "click #signup"               : "showSignup",
-            "click #signup-form .submit"  : "register",
-            "keypress #signup-form input" : "registerOnEnter",
+            'click #signup'               : 'showSignup',
+            'click #signup-form .submit'  : 'register',
+            'keypress #signup-form input' : 'registerOnEnter',
             
             // Search form
-            "keypress #search" : "searchOnEnter"
+            'keypress #search' : 'searchOnEnter',
+            
+            // Webcam events
+            'click #open-webcam' : 'loadWebcam',
+            
+            // Friends
+            'click #friend-list .title'   : 'toggleFriendList',
+            'click #favorite-list .title' : 'toggleFavoriteList',
+            'click #start-menu .title'    : 'toggleSidebar'
         },
         
         // Constructor
@@ -50,7 +58,10 @@
             _.bindAll(this, 
                 'render', 'toggleNav',
                 'addRoom', 'showCreateRoom', 'createRoom', 'allRooms', 'roomsReady',
-                'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout'
+                'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout',
+                'loadWebcam', 'toggleSidebar',
+                'toggleFriendList', 'allFriends', 'addFriend',
+                'toggleFavoriteList', 'allFavorites', 'addFavorite'
             );
 
             // Set the application model directly, since there is a 
@@ -62,6 +73,7 @@
                 // it is the base ID of every model url path
                 server : 's1'
             });
+            this.model.view = this;
             
             // Application model event bindings
             this.model.bind('change', this.render);
@@ -85,7 +97,7 @@
             
             // Render template contents
             var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);            
+            var view = Mustache.to_html(this.template(), content);
             this.el.html(view);
             
             // Assign pre-pouplated locals from Express
@@ -97,6 +109,7 @@
             this.searchInput      = this.$('#search');
             this.userList         = this.$('#users');
             this.roomList         = this.$('#rooms');
+            this.sidebar          = this.$('#sidebar');
             this.mainContent      = this.$('#main-content');
             this.loginDialog      = this.$('#login-dialog');
             this.signupDialog     = this.$('#signup-dialog');
@@ -104,6 +117,10 @@
             this.settingsDialog   = this.$('#settings-dialog');
             this.overlay          = this.$('#overlay');
             this.roomName         = this.$('input[name="room"]');
+            this.friends          = this.$('#friend-list');
+            this.friendList       = this.$('.friends');
+            this.favorites        = this.$('#favorite-list');
+            this.favoriteList     = this.$('.favorites');
             
             // Navigation items for authentication toggling
             this.nav = {
@@ -116,52 +133,104 @@
             this.nav.settings.hide();
             this.nav.logout.hide();
             
+            var self = this;
             // Create a new user for the current client, only the 
             // defaults will be used until the client authenticates
             // with valid credentials
             window.user = new Models.UserModel();
-            window.user.subscribe();
+            window.user.subscribe({}, function(resp) {
             
-            // Available room tags
-            this.tags = [
-                'general',
-                'random',
-                'technology'
-            ];
+                // Current user bindings
+                window.user.friends.bind('add', self.addFriend);
+                window.user.friends.bind('refresh', self.allFriends);
+                
+                window.user.favorites.bind('add', self.addFavorite);
+                window.user.favorites.bind('refresh', self.allFavorites);
+            });
             
-            var self = this;
+            // Internal sidebar settings, pull settings
+            // from the cookie and bootstrap if required
+            this.minimal = $.cookie('minimal') || 'false';
             
-            // Common autocomplete procedures
-            this.auto = {
-                minLength : 2,
-                source : function(request, response) {
-                    // delegate back to autocomplete, but extract the last term
-                    response( $.ui.autocomplete.filter(
-                        self.tags, Helpers.extractLast( request.term ) ) );
-                },
-                focus : function() {
-                    // prevent value inserted on focus
-                    return false;
-                },
-                select : function(event, ui) {
-                    console.log('autocomp select', ui);
-                    var terms = Helpers.split(this.value);
-                    
-                    // remove the current input
-                    terms.pop();
-                    
-                    // add the selected item
-                    terms.push(ui.item.value);
-                    
-                    // add placeholder to get the comma-and-space at the end
-                    terms.push("");
-                    this.value = terms.join(", ");
-                    return false;
-                }
-            };
-
-            // Register autocomplete inputs
-            this.searchInput.autocomplete(this.auto);
+            if (this.minimal === 'true') {
+                console.log('MIN: ', this.minimal);
+                $(this.el).addClass('minimal');
+            }
+            console.log('MIN: ', this.minimal);
+        },
+        
+        toggleSidebar : function() {
+            console.log('toggleSidebar', this.minimal);
+            if (this.minimal == 'true') {
+                this.minimal = 'false';
+                console.log('REMOVE', this.minimal);
+                $(this.el).removeClass('minimal');
+            } 
+            else {
+                this.minimal = 'true';
+                console.log('ADD', this.minimal);
+                $(this.el).addClass('minimal');
+            }
+            $.cookie('minimal', this.minimal);
+        },
+        
+        toggleFriendList : function() {
+            this.friends.toggleClass('open');
+        },
+        
+        // All rooms have been loaded into collection
+        allFriends : function(friends) {
+            console.log('all friendList', friends);
+            
+            this.friendList.html('');
+            window.user.friends.each(this.addFriend);
+            
+            // Refresh model statistics
+            this.render();
+        },
+        
+        // Add a single room room to the current veiw
+        addFriend : function(friend) {
+            console.log('add friendList', friend);
+            var view = new Views.UserView({
+                model : friend
+            }).render();
+            
+            this.friendList
+                .append(view.el);
+        },
+        
+        toggleFavoriteList : function() {
+            this.favorites.toggleClass('open');
+        },
+        
+        // All rooms have been loaded into collection
+        allFavorites : function(favorites) {
+            console.log('all favoriteList', favorites);
+            
+            this.favoriteList.html('');
+            window.user.favorites.each(this.addFavorite);
+            
+            // Refresh model statistics
+            this.render();
+        },
+        
+        // Add a single room room to the current veiw
+        addFavorite : function(favorite) {
+            console.log('add favoriteList', favorite);
+            var view = new Views.RoomView({
+                model : favorite
+            }).render();
+            
+            this.favoriteList
+                .append(view.el);
+        },
+        
+        loadWebcam : function() {
+            this.webcam = new Views.WebcamView();
+            this.el.append(this.webcam.render().el);
+            this.webcam.start();
+            console.log('loadWebcam:', this.webcam);
         },
         
         // Refresh statistics
@@ -187,16 +256,14 @@
         // Create room keystroke listener, throttled function
         // returned to reduce load on the server
         searchOnEnter : _.throttle(function() {
-        
-            //TODO: Finish functionality out
-            
             var self = this;
             var input = this.searchInput.val();
+            var query = (input.length < 1) ? {} : {
+                keywords : { $in : [ input ] }
+            };
             
             this.model.rooms.fetch({
-                query : {
-                    tags : { $in : [ input ] }
-                },
+                query : query,
                 error : function(code, msg, opt) {
                     console.log('search error', code); 
                     console.log('search error', msg); 
@@ -259,6 +326,7 @@
         
         // Add a single room room to the current veiw
         addRoom : function(room) {
+            console.log('addRoom: ', room);
             var view = new Views.RoomView({
                 model : room
             }).render();
@@ -281,12 +349,15 @@
             // Should probably hide room instead, maybe 
             // minimize it to the bottom toolbar
             this.deactivateRoom();
-            
+            console.log('activateRoom');
             // Get model by slug
             var model = this.model.rooms.filter(function(room) {
                 return room.get('slug') === params;
             });
-            if (!model) return;
+            if (!model || !model[0]) {
+                Backbone.history.saveLocation('/');
+                return;
+            }
             
             // Create a new main room view
             this.activeRoom = new Views.RoomMainView({
@@ -311,9 +382,9 @@
         createRoom : function() {
             // User input
             var name        = this.$('input[name="room"]'),
-                tags        = this.$('input[name="tags"]'),
-                image       = this.$('input[name="image"]'),
-                restricted  = this.$('input[name="restricted"]'),
+                //tags        = this.$('input[name="tags"]'),
+                //image       = this.$('input[name="image"]'),
+                //restricted  = this.$('input[name="restricted"]'),
                 description = this.$('textarea[name="description"]');
             
             // Validation
@@ -322,9 +393,9 @@
             // Delegate to Backbone.sync
             this.model.createRoom({
                 name        : name.val(),
-                tags        : tags.val(),
-                user        : window.user.get('id'),
-                restricted  : restricted.val(),
+                //tags        : tags.val(),
+                user_id     : window.user.get('id') || window.user.id,
+                //restricted  : restricted.val(),
                 description : description.val()
             });
             
@@ -334,9 +405,9 @@
             
             // Reset fields
             name.val('');
-            tags.val('');
-            image.val('');
-            restricted.val('');
+            //tags.val('');
+            //image.val('');
+            //restricted.val('');
             description.val('');
         },
         
@@ -360,34 +431,9 @@
         usersReady : function() {
             console.log('usersReady: ', window.user);
             
-            var self = this;
-            var params = {
-                token : this.sid,
-                error : function(code, data, options) {
-                
-                    console.log('get user error: code: ', code);
-                    console.log('get user error: data: ', data);
-                    console.log('get user error: options: ', options);
-                    
-                    switch(code) {
-                        case 400 : console.log('Bad parameters'); break;
-                        case 500 : console.log('Internal server error'); break;
-                    }
-                },
-            };
-            Server.getSession(window.user.toJSON(), params, function(session, options) {
-                if (!session) return;
-                session = Helpers.getMongoId(session);
-                
-                window.user.set(session);
-                window.user.url = self.model.url() + ':users:' + session.id;
-                
-                session._id && self.toggleNav();
-                
-                // Online user test
-                Server.online(function(resp) {
-                    console.log('ONLINE: ', resp);
-                });
+            // Online user test
+            Server.onlineUsers(function(resp) {
+                console.log('ONLINE: ', resp);
             });
         },
         
@@ -408,14 +454,20 @@
             
             // Get model by ID
             var model = this.model.users.filter(function(room) {
-                return room.get('username') === params;
+                return room.get('username') === params
+                    || room.get('id') === params;
             });
-            if (!model) return;
+            if (!model) {
+                Backbone.history.saveLocation('/');
+                return;
+            }
             
             this.activeUser = new Views.UserMainView({
                 model : model[0]
             }).render();
             
+            console.log('activeUser', model);
+
             var self = this;
             this.mainContent
                 .fadeIn(75, function(){
@@ -424,6 +476,8 @@
                         .find('.avatar')
                         .fadeIn(1500);
                 })
+            
+            console.log('activeUser', model);
         },
         
         // Show the login form
@@ -582,10 +636,12 @@
         // Destroy the current user object and restore original
         // navigation display
         logout : function() {
-            var options = {
+            window.user.logout({
                 token : this.sid
-            };
-            Server.logout(window.user.toJSON(), options);
+            });
+            
+            this.friendList.html('');
+            this.favoriteList.html('');
             window.user = new Models.UserModel();
             
             this.nav.signup.fadeIn(150);

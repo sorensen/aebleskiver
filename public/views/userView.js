@@ -10,9 +10,9 @@
         className : 'user inactive',
         template  : _.template($('#user-list-template').html()),
         
-        // The DOM events specific to an item.
+        // Interaction events
         events : {
-            "click" : "activate"
+            'click' : 'activate'
         },
     
         initialize : function(options) {
@@ -28,6 +28,10 @@
         // Re-render contents
         render : function() {
             var content = this.model.toJSON();
+            if (content.username === 'anonymous') {
+                content.displayName || (content.displayName = content.username);
+                content.username = content.id;
+            }
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
             return this;
@@ -44,29 +48,80 @@
                 .addClass('current')
                 .removeClass('inactive')
                 .siblings()
-                    .addClass('inactive')
-                    .removeClass('current');
+                .addClass('inactive')
+                .removeClass('current');
         },
+    });
+    
+    Views.FriendView = Views.UserView.extend({
+    
+        // DOM attributes
+        tagName   : 'div',
+        className : 'user friend',
+        
+        // Interaction events
+        events : {
+            'click' : 'addConversation',
+        },
+        
+        addConversation : function() {
+        
+            var to = this.model.get('id');
+            var from = window.user.get('id');
+            var key = (to > from) 
+                    ? to + ':' + from
+                    : from + ':' + to;
+            
+            if (!this.conversations[to]) {
+                this.conversations[to] = new Models.MessageCollection();
+                this.conversations[to].url = 'pm:' + key;
+                    
+                var self = this;
+                this.conversations[to].subscribe({}, function() {
+                    self.model.posts.fetch({
+                        query    : {room_id : key},
+                        finished : function(data) {
+                        },
+                    });
+                });
+            }
+        },
+        
     });
     
     // User ( Client )
     Views.UserMainView = Backbone.View.extend({
     
         // DOM attributes
-        tagName   : 'div',
-        className : 'user-profile',
-        template  : _.template($('#user-template').html()),
+        tagName        : 'div',
+        className      : 'user-profile',
+        template       : _.template($('#user-template').html()),
+        statsTemplate  : _.template($('#user-stats-template').html()),
         
-        // The DOM events specific to an item.
+        // Interaction events
         events : {
-            "click .destroy" : "deactivate"
+            'keypress .post-form input' : 'createPostOnEnter',
+            'click .post-form button'   : 'createPost',
+            'click .destroy'            : 'deactivate',
+            'click .add-friend'         : 'addToFriends',
+            'click .remove-friend'      : 'removeFromFriends',
+            'click .send-message'       : 'sendMessage'
         },
     
         initialize : function(options) {
-            _.bindAll(this, 'render');
-            
+            _.bindAll(this, 
+                'render', 'allPosts', 'addPost', 'createPost'
+            );
             this.model.bind('change', this.render);
-            this.model.bind('remove', this.clear);
+            this.model.bind('remove', this.remove);
+            
+            this.model.posts = new Models.MessageCollection();
+            this.model.posts.url = this.model.url() + ':posts';
+            
+            this.model.posts.bind('add', this.addPost);
+            this.model.posts.bind('refresh', this.allPosts);
+            this.model.posts.bind('add', this.render);
+            
             this.model.view = this;
             
             var self = this;
@@ -79,20 +134,83 @@
                 self.model.set({ avatar : resp });
             });
             
-            this.render();
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(), content);   
+            $(this.el).html(view);
+            
+            // Set shortcut methods for DOM items
+            this.input    = this.$('.create-post');
+            this.postList = this.$('.posts');
+            this.input.focus();
+            
+            var self = this;
+            this.model.posts.subscribe({}, function() {
+                self.model.posts.fetch({
+                    query    : {room_id : self.model.get('id')},
+                    finished : function(data) {
+                    },
+                });
+            });
+            return this;
+        },
+        
+        addToFriends : function() {
+            if (this.model.get('id') == window.user.get('id')
+                || this.model.get('id') == window.user.id) {
+                return;
+            }
+            
+            var friends = window.user.get('friends') || [];            
+            var find = _.indexOf(friends, this.model.get('id'));
+            
+            if (find !== -1) {
+                return;
+            }
+            friends.push(this.model.get('id'));
+            
+            window.user.set({
+                friends : _.unique(friends)
+            }).save();
+            
+            window.user.friends.add(this.model);
+        },
+        
+        removeFromFriends : function() {
+            var id = this.model.get('id');
+            var friends = _.without(window.user.get('friends'), id);
+            
+            var person = window.user.friends.get(id);
+            $(person.view.el).remove();
+            
+            window.user.friends
+                .remove(this.model, {
+                    silent : true
+                })
+                .set({
+                    friends : friends
+                })
+                .save();
+        },
+        
+        sendMessage : function() {
+            console.log('startConversation:');
+            
         },
     
         // Render contents
         render : function() {
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);   
-            $(this.el).html(view);
+            console.log('render');
+            var totalPosts = this.model.posts.length;
+            this.$('.user-stats').html(Mustache.to_html(this.statsTemplate(), {
+                totalPosts : totalPosts
+            }));
             return this;
         },
         
         // Remove this view from the DOM.
         remove : function() {
             this.model && this.model.remove();
+            $(this.el).remove();
         },
         
         // Join Channel
@@ -107,10 +225,55 @@
         
         // Tell the application to remove this room
         deactivate : function() {
-            //TODO: Move to the controller or 
-            // affect the display only
-            Application.deactivateUser(this.model);
             Backbone.history.saveLocation('/');
+            Application.deactivateUser(this.model);
+        },
+        
+        // All rooms have been loaded into collection
+        allPosts : function(posts) {
+            console.log('allPosts');
+            this.postList.html('');
+            this.model.posts.each(this.addPost);
+            this.render();
+        },
+        
+        addPost : function(post) {
+            console.log('addPosts');
+            var view = new Views.MessageView({
+                model : post
+            }).render();
+            
+            this.postList
+                .append(view.el)
+                .scrollTop(this.postList[0].scrollHeight);
+        },
+        
+        // Send a post to the server
+        createPost : function() {
+            console.log('createPosts');
+            if (!this.input.val()) return;
+            this.model.posts.create(this.newAttributes());
+            this.input.val('');
+        },
+        
+        // Create post keystroke listener
+        createPostOnEnter : function(e) {
+            if (e.keyCode == 13) this.createPost();
+        },
+        
+        // Generate the attributes
+        newAttributes : function() {
+            var username = window.user.get('username');
+            var id = window.user.get('id') || window.user.id;
+            
+            return {
+                text        : this.input.val(),
+                room_id     : this.model.get('id'),
+                user_id     : id,
+                username    : (username == Models.UserModel.defaults) ? id : window.user.get('username'),
+                displayName : window.user.get('displayName') || window.user.get('username'),
+                avatar      : window.user.get('avatar')
+            };
         },
     });
 

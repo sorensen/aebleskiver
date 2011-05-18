@@ -23,12 +23,22 @@
             this.view.remove();
         },
         
-        // Parse data from the server to convert any 
-        // links to HTML output
-        parse : function(resp) {
-            //resp.text && (resp.text = Helpers.linkify(resp.text));
-            return resp;
+        allowedToEdit : function(user) {
+            return user.get('id') == this.get('user_id');
+        },
+        
+        allowedToView : function(user) {
+            return true;
         }
+    });
+    
+    Models.PrivateMessageModel = Models.MessageModel.extend({
+    
+        allowedToView : function(user) {
+            return user.get('id') == this.get('to')
+                || user.get('id') == this.get('user_id');
+        }
+        
     });
     
     // Message Collection
@@ -44,16 +54,6 @@
         
         comparator : function(message) {
             return new Date(message.get('created')).getTime();
-        },
-        
-        // Parse data from the server to convert any 
-        // links to HTML output
-        parse : function(resp) {
-            _.each(resp, function(record, index) {
-            
-                //resp[index].text && (resp[index].text = Helpers.linkify(record.text));
-            });
-            return resp;
         }
     });
 

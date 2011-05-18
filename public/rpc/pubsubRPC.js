@@ -5,27 +5,32 @@
     // Remote protocol
     Protocols.Pubsub = function(client, con) {
     
-        // New subscription received
-        this.subscribed = function(resp, options) {
-            if (options.channel) return;
-            options.finished && options.finished(resp);
-        };
-    
-        // Someone has unsubscribed
-        this.unsubscribed = function(resp, options) {
-            if (options.channel) return;
-            options.finished && options.finished(resp);
-        };
+        _.extend(this, {
         
-        // Published from the server
-        this.published = function(resp, options) {
-            if (!options.channel) return;
-            switch (options.method) {
-                case 'create' : this.created(resp, options); break;
-                case 'update' : this.updated(resp, options); break;
-                case 'delete' : this.destroyed(resp, options); break;
-            };
-        };
+            // New subscription received
+            subscribed : function(resp, options) {
+                if (options.channel) return;
+                options.finished && options.finished(resp);
+            },
+        
+            // Someone has unsubscribed
+            unsubscribed : function(resp, options) {
+                if (options.channel) return;
+                options.finished && options.finished(resp);
+            },
+            
+            // Published from the server
+            published : function(resp, options) {
+                console.log('Published: ', resp);
+                if (!options.channel) return;
+                switch (options.method) {
+                    case 'create' : this.created(resp, options); break;
+                    case 'read'   : this.read(resp, options); break;
+                    case 'update' : this.updated(resp, options); break;
+                    case 'delete' : this.destroyed(resp, options); break;
+                };
+            }
+        });
     };
     
     // Extend default Backbone functionality
@@ -35,11 +40,25 @@
             if (this.isNew()) return base;
             return base + (base.charAt(base.length - 1) == ':' ? '' : ':') + encodeURIComponent(this.id);
         },
+        
+        // Publish the model's data to everyone that 
+        // has subscribed to it
+        publish : function(options, callback) {
+            if (!Server) return (options.error && options.error(503, model, options));
+            var model = this;
+            options         || (options = {});
+            options.method  || (options.method = 'update');
+            options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
+            Server.publish(model.toJSON(), options, function(resp, options){
+                if (!options.silent) model.trigger('publish', model, options);
+                callback && callback(resp, options);
+            });
+            return this;
+        }
     });
     
     // Common extention object for both models and collections
-    var extention = {
-    
+    var common = {
         // Subscribe to the server for model changes, if 'override' is set to true
         // in the options, this model will replace any other models in the local 
         // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
@@ -83,7 +102,7 @@
         }
     };
 
-    _.extend(Backbone.Model.prototype, extention);
-    _.extend(Backbone.Collection.prototype, extention);
+    _.extend(Backbone.Model.prototype, common);
+    _.extend(Backbone.Collection.prototype, common);
     
 })(Protocols)

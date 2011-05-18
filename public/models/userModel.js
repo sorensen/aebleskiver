@@ -7,16 +7,24 @@
         
         type     : 'user',
         defaults : {
-            username : 'anonymous',
-            avatar   : '/images/undefined.png',
-            status   : 'offline',
-            email    : '',
-            created  : '',
-            modified : '',
-            bio      : ''
+            username  : 'anonymous',
+            avatar    : '/images/undefined.png',
+            status    : 'offline',
+            email     : '',
+            created   : '',
+            modified  : '',
+            bio       : '',
+            friends   : [],
+            images    : [],
+            favorites : [],
+            password  : ''
         },
         
         initialize : function(options) {
+            // Add friends list
+            this.friends = new Models.UserCollection();
+            this.favorites = new Models.RoomCollection();
+            
             // Request a gravatar image for the current 
             // user based on email address if not default
             if (this.get('avatar') === this.defaults.avatar) {
@@ -30,6 +38,36 @@
             }
         },
         
+        loadFriends : function() {
+            console.log('loadFriends', this);
+            var self = this;
+            this.friends.url = this.url + ':friends';
+            this.friends.subscribe({}, function(resp) {
+                if (!self.get('friends')) {
+                    return;
+                }
+                self.friends.fetch({
+                    query : { _id : { $in : self.get('friends') }},
+                });
+            });
+            
+            this.favorites.url = this.url + ':favorites';
+            this.favorites.subscribe({}, function(resp) {
+                if (!self.get('favorites')) {
+                    return;
+                }
+                self.favorites.fetch({
+                    query : { _id : { $in : self.get('favorites') }},
+                });
+            });
+            return this;
+        },
+        
+        logout : function(options) {
+            Server.logout(this.toJSON(), options);
+            this.trigger('logout');
+        },
+        
         // Authenticate the current user model
         authenticate : function(data, options, next) {
         
@@ -40,10 +78,11 @@
             // increase total visits, and chage the status to 'online'
             Server.authenticate(data, options, function(resp) {
                 self.set(resp);
-                self.set({
+                self.save({
                     visits : self.get('visits') + 1,
                     status : 'online',
                 });
+                self.loadFriends();
                 next && next(resp);
             });
         },
@@ -59,10 +98,11 @@
             Server.register(data, options, function(resp) {
                 console.log('model register: ', resp);
                 self.set(resp);
-                self.set({
+                self.save({
                     visits : self.get('visits') + 1,
                     status : 'online',
                 });
+                self.loadFriends();
                 next && next(resp);
             });
         },
@@ -70,7 +110,7 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
-            this.messages && this.messages.unsubscribe();
+            this.posts && this.posts.unsubscribe();
         },
     });
     

@@ -39,7 +39,7 @@
             // passing a callback, though, it will still execute a
             // 'finished' function if you pass one in theim n options
             this.subscribe({}, function(resp) {
-                var history = _.after(2, function() {
+                var history = _.after(3, function() {
                     Backbone.history.start();
                 });
                 // Sync up with the server through DNode, Backbone will
@@ -62,9 +62,38 @@
                         error    : function(code, msg, opt) {},
                         finished : function(resp) {
                             history();
+                            
+                            var params = {
+                                token : self.view.sid,
+                                error : function(code, data, options) {
+                                    console.log('get user error: code: ', code);
+                                    console.log('get user error: data: ', data);
+                                    console.log('get user error: options: ', options);
+                                },
+                            };
+                            Server.getSession(window.user.toJSON(), params, function(session, options) {
+                                console.log('getSession: ', session);
+                                console.log('getSession: ', options);
+                                
+                                if (!session) return;
+                                options.password && (session.password = options.password);
+                                session = Helpers.getMongoId(session);
+                                
+                                window.user.set(session);
+                                window.user.url = self.url() + ':users:' + session.id;
+                                window.user.collection = self.users;
+                                window.user.loadFriends();
+                                
+                                history();
+                                session._id && self.view.toggleNav();
+                            });
                         },
                     });
                 });
+                
+                _.delay(function() {
+                    Backbone.history.start();
+                }, 3000);
             });
         }
     });
