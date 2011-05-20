@@ -112,9 +112,6 @@
         initialize : function(options) {
             this.viewable = this.model.allowedToView(window.user);
             
-            console.log('VIEWABLE', this.viewable);
-            console.log('editable', this.editable);
-            
             if (!this.viewable) {
                 return;
             }
@@ -223,6 +220,7 @@
         
         // Tell the application to remove this room
         deactivate : function() {
+            console.log('room deactivate');
             Backbone.history.saveLocation('/');
             Application.deactivateRoom(this.model);
         },
@@ -230,6 +228,7 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
+            console.log('room remove');
             this.model && this.model.remove();
             $(this.el).remove();
         },
@@ -248,11 +247,17 @@
         },
         
         addMessage : function(message) {
-            this.concurrency(message);
+            //this.concurrency(message);
             
             var view = new Views.MessageView({
                 model : message
             }).render();
+            
+            //var elem = $('#box');
+            //var inner = $('#box > .inner');
+            //if ( Math.abs(inner.offset().top) + elem.height() + elem.offset().top >= inner.outerHeight() ) {
+                // We're at the bottom!
+            //}
             
             this.messageList
                 .append(view.el)

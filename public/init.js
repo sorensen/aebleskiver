@@ -18,7 +18,7 @@
             // for the DOM to render before starting main controller
             Server = remote;
             
-            $(function() {
+            $(document).ready(function() {
                 new Controllers.Application();
             });
         });

@@ -22,6 +22,7 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
+            console.log('room model remove');
             this.messages.unsubscribe();
         },
         
@@ -29,13 +30,6 @@
             if (!user.get('id') || !this.get('user_id')) {
                 return false;
             }
-        
-            console.log('allowedToEdit', user.get('id'));
-            console.log('allowedToEdit', this.get('user_id'));
-            console.log('allowedToEdit', user.get('id') === this.get('user_id'));
-            console.log('allowedToEdit', _.indexOf(user.get('id'), this.get('user_id')));
-            console.log('allowedToEdit', user.get('id').indexOf(this.get('user_id')));
-            
             return user.get('id') === this.get('user_id');
         },
         

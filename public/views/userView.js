@@ -193,13 +193,11 @@
         },
         
         sendMessage : function() {
-            console.log('startConversation:');
             
         },
     
         // Render contents
         render : function() {
-            console.log('render');
             var totalPosts = this.model.posts.length;
             this.$('.user-stats').html(Mustache.to_html(this.statsTemplate(), {
                 totalPosts : totalPosts
@@ -231,14 +229,12 @@
         
         // All rooms have been loaded into collection
         allPosts : function(posts) {
-            console.log('allPosts');
             this.postList.html('');
             this.model.posts.each(this.addPost);
             this.render();
         },
         
         addPost : function(post) {
-            console.log('addPosts');
             var view = new Views.MessageView({
                 model : post
             }).render();
@@ -250,7 +246,6 @@
         
         // Send a post to the server
         createPost : function() {
-            console.log('createPosts');
             if (!this.input.val()) return;
             this.model.posts.create(this.newAttributes());
             this.input.val('');

@@ -12,6 +12,7 @@ this project, as it has for me.  This project is only for fun, so enjoy!
 
 ## Project dependancies (npm)
 
+    dnode@0.6.10
     backbone@0.3.3
     connect@1.4.1
     express@2.1.1

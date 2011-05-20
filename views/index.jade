@@ -165,8 +165,8 @@ html(lang='en')
           span.value {{ bio }}
       
       .controls
-        button.add-friend.submit + Add to Friends
-        button.remove-friend - Remove Friend
+        button.add-friend.submit(title='Add to Friends') +
+        button.remove-friend(title='Remove from Friends') -
         button.send-message Send a Message
         
        .wall
@@ -195,8 +195,8 @@ html(lang='en')
         span.headline {{ name }}
         span.destroy
         .controls
-          button.add-favorite.submit + Add to Favorites
-          button.remove-favorite - Remove Favorite
+          button.add-favorite.submit(title='Add to Favorites') +
+          button.remove-favorite(title='Remove from Favorites') -
           .admin-controls
             button.delete-room.delete Delete Room
             button.ban-user Ban User

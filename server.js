@@ -19,7 +19,7 @@ var express      = require('express'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
     version      = '0.3.1',
-    port         = 80,
+    port         = 3000,
     token        = '',
     server       = module.exports = express.createServer();
 

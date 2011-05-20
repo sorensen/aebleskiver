@@ -66,14 +66,9 @@
                             var params = {
                                 token : self.view.sid,
                                 error : function(code, data, options) {
-                                    console.log('get user error: code: ', code);
-                                    console.log('get user error: data: ', data);
-                                    console.log('get user error: options: ', options);
                                 },
                             };
                             Server.getSession(window.user.toJSON(), params, function(session, options) {
-                                console.log('getSession: ', session);
-                                console.log('getSession: ', options);
                                 
                                 if (!session) return;
                                 options.password && (session.password = options.password);
@@ -92,7 +87,12 @@
                 });
                 
                 _.delay(function() {
-                    Backbone.history.start();
+                    try {
+                        Backbone.history.start();
+                    } catch (error) {
+                        // Error's only occur when we try to 
+                        // re-start backbone history
+                    }
                 }, 3000);
             });
         }

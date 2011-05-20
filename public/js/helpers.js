@@ -40,7 +40,6 @@
         // Backbone's 'id' attribute that is used internally,
         // can be used with an array of models or a single one
         getMongoId : function(data) {
-            console.log('mongo..', data);
             data._id && (data.id = data._id);
             if (_.isArray(data)) {
                 _.each(data, function(model, key) {

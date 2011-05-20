@@ -17,7 +17,8 @@
             friends   : [],
             images    : [],
             favorites : [],
-            password  : ''
+            password  : '',
+            visits    : 0
         },
         
         initialize : function(options) {
@@ -39,7 +40,6 @@
         },
         
         loadFriends : function() {
-            console.log('loadFriends', this);
             var self = this;
             this.friends.url = this.url + ':friends';
             this.friends.subscribe({}, function(resp) {
@@ -96,7 +96,6 @@
             // Update the current model with the returned data, 
             // increase total visits, and chage the status to 'online'
             Server.register(data, options, function(resp) {
-                console.log('model register: ', resp);
                 self.set(resp);
                 self.save({
                     visits : self.get('visits') + 1,
@@ -123,7 +122,6 @@
         
         // Initialize
         initialize : function(options) {
-            console.log('User collection init: ', options);
         }
     });
 

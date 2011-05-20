@@ -5,19 +5,20 @@
     // Remote protocol
     Protocols.Auth = function(client, con) {
     
-        // New subscription
         _.extend(this, {
+        
+            // User has been registered
             registered : function(resp, options) {
-                console.log('registered: ', resp);
-                console.log('registered: ', options);
+                //console.log('registered: ', resp);
+                //console.log('registered: ', options);
                 
                 options.finished && options.finished(resp);
             },
         
-            // New subscription
+            // User has been authenticated
             authenticated : function(resp, options) {
-                console.log('authenticated: ', resp);
-                console.log('authenticated: ', options);
+                //console.log('authenticated: ', resp);
+                //console.log('authenticated: ', options);
                 
                 options.finished && options.finished(resp);
             }

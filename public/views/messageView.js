@@ -15,20 +15,18 @@
             _.bindAll(this, 'render');
             this.model.bind('change', this.render);
             this.model.view = this;
-            
-            //this.data = this.$('.data');
         },
         
         // Remove this view from the DOM.
         remove : function() {
-            //$(this.el).remove();
-            console.log('msg remove?');
+            $(this.el).remove();
         },
     
         // Render contents
         render : function() {
             var content = this.model.toJSON();
-            //content.created && (content.created = Helpers.timeFormat(content.created));
+            content.text = this.model.escape('text');
+            content.created && (content.created = Helpers.timeFormat(content.created));
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
             
@@ -36,8 +34,9 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            this.$('.data').html(Helpers.linkify(content.text))
+            this.$('.data').html(Helpers.linkify(content.text));
             return this;
         }
     });
+
 })(Views)

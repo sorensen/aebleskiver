@@ -19,6 +19,7 @@
             'click #show-rooms'  : 'showRooms',
             'click #show-users'  : 'showUsers',
             'click .cancel'      : 'hideDialogs',
+            'click #overlay'     : 'hideDialogs',
             'click #logout'      : 'logout',
             
             // Create new room form
@@ -153,22 +154,17 @@
             this.minimal = $.cookie('minimal') || 'false';
             
             if (this.minimal === 'true') {
-                console.log('MIN: ', this.minimal);
                 $(this.el).addClass('minimal');
             }
-            console.log('MIN: ', this.minimal);
         },
         
         toggleSidebar : function() {
-            console.log('toggleSidebar', this.minimal);
             if (this.minimal == 'true') {
                 this.minimal = 'false';
-                console.log('REMOVE', this.minimal);
                 $(this.el).removeClass('minimal');
             } 
             else {
                 this.minimal = 'true';
-                console.log('ADD', this.minimal);
                 $(this.el).addClass('minimal');
             }
             $.cookie('minimal', this.minimal);
@@ -180,8 +176,6 @@
         
         // All rooms have been loaded into collection
         allFriends : function(friends) {
-            console.log('all friendList', friends);
-            
             this.friendList.html('');
             window.user.friends.each(this.addFriend);
             
@@ -191,7 +185,6 @@
         
         // Add a single room room to the current veiw
         addFriend : function(friend) {
-            console.log('add friendList', friend);
             var view = new Views.UserView({
                 model : friend
             }).render();
@@ -206,8 +199,6 @@
         
         // All rooms have been loaded into collection
         allFavorites : function(favorites) {
-            console.log('all favoriteList', favorites);
-            
             this.favoriteList.html('');
             window.user.favorites.each(this.addFavorite);
             
@@ -217,7 +208,6 @@
         
         // Add a single room room to the current veiw
         addFavorite : function(favorite) {
-            console.log('add favoriteList', favorite);
             var view = new Views.RoomView({
                 model : favorite
             }).render();
@@ -230,12 +220,10 @@
             this.webcam = new Views.WebcamView();
             this.el.append(this.webcam.render().el);
             this.webcam.start();
-            console.log('loadWebcam:', this.webcam);
         },
         
         // Refresh statistics
         render : function() {
-            console.log('app render', this);
             var totalUsers = this.model.users.length || 0;
             var totalRooms = this.model.rooms.length || 0;
             
@@ -265,12 +253,8 @@
             this.model.rooms.fetch({
                 query : query,
                 error : function(code, msg, opt) {
-                    console.log('search error', code); 
-                    console.log('search error', msg); 
-                    console.log('search error', opt); 
                 },
                 finished : function(resp) {
-                    console.log('rooms searched', resp);
                 }
             });
             
@@ -309,8 +293,6 @@
         
         // All rooms have been loaded into collection
         allRooms : function(rooms) {
-            console.log('allRooms', rooms);
-            
             this.roomList.html('');
             this.model.rooms.each(this.addRoom);
             
@@ -326,7 +308,6 @@
         
         // Add a single room room to the current veiw
         addRoom : function(room) {
-            console.log('addRoom: ', room);
             var view = new Views.RoomView({
                 model : room
             }).render();
@@ -349,7 +330,7 @@
             // Should probably hide room instead, maybe 
             // minimize it to the bottom toolbar
             this.deactivateRoom();
-            console.log('activateRoom');
+            
             // Get model by slug
             var model = this.model.rooms.filter(function(room) {
                 return room.get('slug') === params;
@@ -429,11 +410,8 @@
         
         // Users collection has been subscribed to
         usersReady : function() {
-            console.log('usersReady: ', window.user);
-            
             // Online user test
             Server.onlineUsers(function(resp) {
-                console.log('ONLINE: ', resp);
             });
         },
         
@@ -449,7 +427,6 @@
         
         // Show the user profile / main view
         activateUser : function(params) {
-            console.log('activeUser: ', params);
             this.deactivateUser();
             
             // Get model by ID
@@ -466,8 +443,6 @@
                 model : model[0]
             }).render();
             
-            console.log('activeUser', model);
-
             var self = this;
             this.mainContent
                 .fadeIn(75, function(){
@@ -476,8 +451,6 @@
                         .find('.avatar')
                         .fadeIn(1500);
                 })
-            
-            console.log('activeUser', model);
         },
         
         // Show the login form
@@ -493,8 +466,6 @@
         
         // Save updated user settings
         saveSettings : function() {
-            console.log('save settings before: ', window.user);
-            
             var data = {
                 bio         : this.$('textarea[name="bio"]').val(),
                 email       : this.$('input[name="email"]').val(),
@@ -505,7 +476,6 @@
             window.user.save(data, {
                 channel  : 'app:users',
                 finished : function(resp) {
-                    console.log('finished', resp);
                 }
             });
             this.settingsDialog.fadeOut(150);
@@ -525,8 +495,6 @@
         
         // All rooms have been loaded into collection
         allUsers : function(users) {
-            console.log('allUsers', users);
-            
             this.userList.html('');
             this.model.users.each(this.addUser);
             
@@ -536,7 +504,6 @@
         
         // Add a single room room to the current veiw
         addUser : function(user) {
-            console.log('add user', user);
             var view = new Views.UserView({
                 model : user
             }).render();
@@ -569,15 +536,11 @@
             var options = {
                 token : this.sid,
                 error : function(code, data, options) {
-                    console.log('Auth error: code: ', code);
-                    console.log('Auth error: data: ', data);
-                    console.log('Auth error: options: ', options);
                 },
             };
             
             var self = this;
             window.user.authenticate(data, options, function(resp) {
-                console.log('app authenticated: ', resp);
                 self.toggleNav();
             });
             this.loginDialog.hide();
@@ -613,12 +576,8 @@
             var options = {
                 token : this.sid,
                 error : function(code, data, options) {
-                    console.log('register error: code: ', code);
-                    console.log('register error: data: ', data);
-                    console.log('register error: options: ', options);
                 }
             };
-            console.log('register', options);
             
             var self = this;
             window.user.register(data, options, function(resp) {

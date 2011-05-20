@@ -21,7 +21,7 @@
             
             // Published from the server
             published : function(resp, options) {
-                console.log('Published: ', resp);
+                //console.log('Published: ', resp);
                 if (!options.channel) return;
                 switch (options.method) {
                     case 'create' : this.created(resp, options); break;

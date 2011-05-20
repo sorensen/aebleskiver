@@ -528,7 +528,7 @@ body {
     position: absolute;
     height: 30px;
     margin: 0;
-    left: 200px;
+    left: 0;
     right: 0;
     border-left: 1px solid #aaa;
     color: #444;
@@ -661,7 +661,7 @@ body {
 }
     #start-menu .heart {
         font-size: 5px;
-        top: 12px;
+        top: 14px;
         left: 20px;
     }
     .minimal #sidebar-wrapper {
@@ -672,6 +672,15 @@ body {
     }
     .minimal #navigation {
         left: 0;
+    }
+    .minimal #start-menu .title {
+        background-color: #eee;
+        background-image: -moz-linear-gradient(top, #eee, #ddd);
+        background-image: -o-linear-gradient(top, #eee, #ddd);
+        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eee),color-stop(1, #ddd));
+        background-image: -webkit-linear-gradient(#eee, #ddd);
+        background-image: linear-gradient(top, #eee, #ddd);
+                  filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eee', EndColorStr='#ddd');
     }
 
 
@@ -689,7 +698,7 @@ body {
 }
 #sidebar {
     width: 200px;
-    top: 207px;
+    top: 80px;
     bottom: 201px;
     margin: 0;
     left: 0;
@@ -707,6 +716,7 @@ body {
         height: 157px;
         border-right: 1px solid #AAA;
         border-bottom: 1px solid #AAA;
+        display: none;
     }
     #sidebar-up {
         border-bottom: 1px solid #CCC;
@@ -732,6 +742,7 @@ body {
             border-top: 0;
             border-bottom: 0;
             border-radius: 0;
+            width: 99px;
         }
             #sidebar-up button:first-child {
                 margin-left: 1px;
@@ -973,6 +984,8 @@ body {
            -moz-border-radius: 4px 0 4px 40px;
         -webkit-border-radius: 4px 0 4px 40px;
                 border-radius: 4px 0 4px 40px;
+                
+        display: none;
     }
         .upvote,
         .downvote
@@ -1112,10 +1125,11 @@ body {
     font-size: 13px;
     line-height: 1.6;
     margin: 50px 10px 10px;
+    display: none;
 }
 .main-room .controls {
     float: right;
-    margin: 30px 10px 10px 20px;
+    margin: -4px 40px 0 0;
     height: 87px;
 }
     .admin-controls {
@@ -1126,6 +1140,7 @@ body {
     }
         .editable .admin-controls {
             display: block;
+            display: none;
         }
         .admin-controls button {
             font-size: 11px;
@@ -1139,7 +1154,7 @@ body {
     position: relative;
     top: 0;
     padding: 0;
-    height: 127px;
+    height: 50px;
     border-bottom: 1px solid #aaa;
 }
     .user-profile .name {
@@ -1241,9 +1256,11 @@ body {
     .user-profile .controls {
         margin: 0 10px;
     }
-        .user-profile .controls button {
+        .user-profile .controls button,
+        .main-room .controls button {
             padding: 0 10px;
             height: 30px;
+            min-width: 30px;
             font-size: 13px;
                -moz-border-radius: 30px;
             -webkit-border-radius: 30px;
@@ -1271,6 +1288,9 @@ body {
     right: 0;
     left: 0;
 }
+.messages {
+    top: 50px;
+}
     .post,
     .message {
         list-style: none outside;
@@ -1284,6 +1304,8 @@ body {
         }
             .concurrent .username,
             .concurrent .small-avatar {
+                opacity: .40;
+                filter: Alpha(Opacity=40);
             }
         .post:first-child,
         .message:first-child {
@@ -1385,6 +1407,7 @@ body {
 .user-profile .statistics {
     position: absolute;
     right: 50px;
+    display: none;
 }
     .statistics .stat {
         display: block;
@@ -1565,6 +1588,7 @@ body {
 /**
     Danish heart
 **/
+
 .heart {
     position: absolute;
     left: 77px;
@@ -1575,6 +1599,9 @@ body {
     top: 60px;
     cursor: pointer;
     opacity: 0.75;
+}
+#sidebar-wrapper .heart {
+    display: none;
 }
     .heart:hover {
         opacity: 0.85;
