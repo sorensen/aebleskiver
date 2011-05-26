@@ -18,7 +18,7 @@
         
         // Interaction events
         events : {
-            'click'           : 'activate',
+            //'click'           : 'activate',
             'click .upvote'   : 'upVote',
             'click .downvote' : 'downVote'
         },
@@ -35,29 +35,32 @@
             // Send model contents to the template
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(), content);            
-            $(this.el).html(view);
+            $(this.el)
+                .html(view)
+                .find('[title]')
+                .wijtooltip();
             
+            this.loaded = 0;
             this.render();
         },
         
         // Refresh statistics
         render : function() {
-        
             var rank = this.model.get('upvotes') - this.model.get('downvotes');
             this.$('.ranking').html(Mustache.to_html(this.rankTemplate(), {
                 rank : rank
             }));
-            
-            //this.highlight();
-            
             return this;
         },
         
         highlight : _.debounce(function() {
-            $(this.el).effect('highlight', {
-                color : '#ddd'
-            }, 1200);
-        }, 300),
+            if (this.loaded) {
+                $(this.el).effect('highlight', {
+                    color : '#5d5d5d'
+                }, 1200);
+            }
+            this.loaded = 1;
+        }, 1200),
         
         // Remove this view from the DOM.
         remove : function() {
@@ -79,11 +82,20 @@
         // Join Channel
         activate : function() {            
             $(this.el)
+                .addClass('active')
                 .addClass('current')
                 .removeClass('inactive')
                 .siblings()
                 .addClass('inactive')
                 .removeClass('current');
+        },
+        
+        // Leave Channel
+        deactivate : function() {            
+            $(this.el)
+                .removeClass('active')
+                .removeClass('current')
+                .addClass('inactive');
         },
     });
     
@@ -110,6 +122,7 @@
         
         // Constructor
         initialize : function(options) {
+            console.log('Room init', this);
             this.viewable = this.model.allowedToView(window.user);
             
             if (!this.viewable) {
@@ -122,7 +135,7 @@
             );
             
             // Bind to model
-            //this.model.view = this;
+            this.model.mainView = this;
             this.model.bind('change', this.render);
             this.model.bind('remove', this.remove);
             
@@ -136,7 +149,10 @@
             // Send model contents to the template
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(), content);            
-            $(this.el).html(view);
+            $(this.el)
+                .html(view)
+                .find('[title]')
+                .wijtooltip();
             
             this.editable = this.model.allowedToEdit(window.user);
             // Check if the current user is the room creator
@@ -152,7 +168,6 @@
             this.description = this.$('.description');
             this.input       = this.$('.create-message');
             this.messageList = this.$('.messages');
-            this.input.focus();
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
@@ -163,10 +178,13 @@
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
                     query    : {room_id : self.model.get('_id')},
+                    sorting  : {sort: [['created',-1]], limit: 20},
                     finished : function(data) {
                     },
                 });
             });
+            
+            this.input.focus();
         },
         
         deleteRoom : function() {
@@ -220,7 +238,6 @@
         
         // Tell the application to remove this room
         deactivate : function() {
-            console.log('room deactivate');
             Backbone.history.saveLocation('/');
             Application.deactivateRoom(this.model);
         },
@@ -228,8 +245,9 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
-            console.log('room remove');
+            this.model.view && this.model.view.deactivate();
             this.model && this.model.remove();
+            this.model.messages.unsubscribe();
             $(this.el).remove();
         },
         
@@ -243,7 +261,11 @@
             this.messageList.html('');
             //this.model.messages.each(this.concurrency);
             this.model.messages.each(this.addMessage);
-            this.render();
+            this.render()
+                .messageList
+                .delay(400)
+                .animate({scrollTop : this.messageList[0].scrollHeight}, 1000, 'easeInExpo');
+                //.scrollTop(this.messageList[0].scrollHeight);
         },
         
         addMessage : function(message) {
@@ -253,15 +275,18 @@
                 model : message
             }).render();
             
-            //var elem = $('#box');
-            //var inner = $('#box > .inner');
-            //if ( Math.abs(inner.offset().top) + elem.height() + elem.offset().top >= inner.outerHeight() ) {
-                // We're at the bottom!
-            //}
-            
-            this.messageList
-                .append(view.el)
+            this.model.view && this.model.view.highlight();
+            this.messageList.append(view.el)
                 .scrollTop(this.messageList[0].scrollHeight);
+            
+            // Check to see if the user is at the bottom of the list,
+            // before scrolling, allowing them to read old msg's
+            /**
+            if (this.messageList.scrollTop() + 100 >= this.messageList.height()) {
+                this.messageList
+                    .animate({scrollTop : this.messageList[0].scrollHeight});
+            }
+            **/
         },
         
         // Send a message to the server

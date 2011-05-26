@@ -63,7 +63,7 @@
             },
         
             // The following procedures will only work for the acting client, 
-            // this may prove to be useful for procedures 
+            // this may prove to be useful for future procedures 
             selfCreated   : function(resp, options) { this.synced(resp, options) },
             selfRead      : function(resp, options) { this.synced(resp, options) },
             selfUpdated   : function(resp, options) { this.synced(resp, options) },
@@ -101,7 +101,7 @@
             
             // Delegate method call based on action
             switch (method) {
-                case 'read'   : Server.read(model.toJSON(), options); break;
+                case 'read'   : Server.read({}, options); break;
                 case 'create' : Server.create(model.toJSON(), options); break;
                 case 'update' : Server.update(model.toJSON(), options); break;
                 case 'delete' : Server.destroy(model.toJSON(), options); break;

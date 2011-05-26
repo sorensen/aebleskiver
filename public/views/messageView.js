@@ -25,8 +25,11 @@
         // Render contents
         render : function() {
             var content = this.model.toJSON();
+            
+            // Pre-formatting 
             content.text = this.model.escape('text');
             content.created && (content.created = Helpers.timeFormat(content.created));
+            
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
             
@@ -34,7 +37,14 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            this.$('.data').html(Helpers.linkify(content.text));
+            this.$('.data')
+                .html(Helpers.linkify(content.text))
+                .emoticonize({
+                    //delay: 800,
+                    //animate: false
+                    //exclude: 'pre, code, .no-emoticons'
+                });
+            
             return this;
         }
     });

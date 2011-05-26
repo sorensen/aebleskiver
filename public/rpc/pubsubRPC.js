@@ -9,13 +9,19 @@
         
             // New subscription received
             subscribed : function(resp, options) {
-                if (options.channel) return;
+                console.log('Subscribed: ', resp);
+                console.log('Subscribed: ', options);
+                
+                if (!options.channel) return;
                 options.finished && options.finished(resp);
             },
         
             // Someone has unsubscribed
             unsubscribed : function(resp, options) {
-                if (options.channel) return;
+                console.log('Unsubscribed: ', resp);
+                console.log('Unsubscribed: ', options);
+                
+                if (!options.channel) return;
                 options.finished && options.finished(resp);
             },
             
@@ -77,6 +83,9 @@
                     if (!options.silent) model.trigger('subscribe', model, options);
                     callback && callback(resp, options);
                 });
+            } else {
+                if (!options.silent) model.trigger('subscribe', model, options);
+                callback && callback(model, options);
             }
             return this;
         },
@@ -89,7 +98,7 @@
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
-            Server.unsubscribe(model.toJSON(), options, function(resp, options){
+            Server.unsubscribe({}, options, function(resp, options) {
                 if (!options.silent) model.trigger('unsubscribe', model, options);
                 callback && callback(resp, options);
             });

@@ -35,7 +35,7 @@ server.configure(function() {
     
     // Session settings
     server.use(express.session({
-        cookie : {maxAge : 60000 * 60 * 24},   // 24 Hours
+        cookie : {maxAge : 60000 * 60 * 1},    // 1 Hour
         secret : 'abcdefghijklmnopqrstuvwxyz', // Hashing salt
         store  : new SessionStore({
             dbname   : 'db',
@@ -55,7 +55,7 @@ server.get('/', function(req, res) {
     
     //req.session.regenerate(function () {
         console.log('regenerated session id ' + req.session.id);
-        token = req.session.id;
+        //token = req.session.id;
     //});
     
     res.render('index.jade', {

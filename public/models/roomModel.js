@@ -22,8 +22,7 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
-            console.log('room model remove');
-            this.messages.unsubscribe();
+            //this.messages.unsubscribe();
         },
         
         allowedToEdit : function(user) {
@@ -73,6 +72,19 @@
         
             return room.get('downvotes') - room.get('upvotes') + comparison;
         }
+    });
+        
+    Models.ConversationModel = Models.RoomModel.extend({
+    
+        type  : 'conversation',
+    });
+    
+    Models.ConversationCollection = Models.RoomCollection.extend({
+        
+        model : Models.ConversationModel,
+        url   : 'conversations',
+        type  : 'conversation',
+        
     });
     
 })(Models)

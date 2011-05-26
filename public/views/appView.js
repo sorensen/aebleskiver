@@ -16,6 +16,7 @@
         
         // Interaction events
         events    : {
+            //'keypress'           : 'hideOnEscape',
             'click #show-rooms'  : 'showRooms',
             'click #show-users'  : 'showUsers',
             'click .cancel'      : 'hideDialogs',
@@ -43,7 +44,8 @@
             'keypress #signup-form input' : 'registerOnEnter',
             
             // Search form
-            'keypress #search' : 'searchOnEnter',
+            'keypress #search'  : 'searchOnEnter',
+            'click #search-now' : 'searchOnEnter',
             
             // Webcam events
             'click #open-webcam' : 'loadWebcam',
@@ -158,6 +160,15 @@
             }
         },
         
+        // Close modal keystroke listener
+        hideOnEscape : function(e) {
+            console.log('hide', e.keyCode);
+            if (e.keyCode == 27) {
+            console.log('HIDE IT');
+                this.hideDialogs();
+            }
+        },
+        
         toggleSidebar : function() {
             if (this.minimal == 'true') {
                 this.minimal = 'false';
@@ -243,7 +254,7 @@
         
         // Create room keystroke listener, throttled function
         // returned to reduce load on the server
-        searchOnEnter : _.throttle(function() {
+        searchOnEnter : _.debounce(function() {
             var self = this;
             var input = this.searchInput.val();
             var query = (input.length < 1) ? {} : {
@@ -258,7 +269,7 @@
                 }
             });
             
-        }, 500),
+        }, 1000),
         
         // Create room keystroke listener, throttled function
         // returned to reduce load on the server
@@ -331,6 +342,7 @@
             // minimize it to the bottom toolbar
             this.deactivateRoom();
             
+            
             // Get model by slug
             var model = this.model.rooms.filter(function(room) {
                 return room.get('slug') === params;
@@ -357,6 +369,8 @@
                     delete self;
                 })
                 .find('input[name="message"]').focus();
+            
+            model[0].view && model[0].view.activate();
         },
         
         // Create new room room

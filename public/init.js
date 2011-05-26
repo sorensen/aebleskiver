@@ -21,5 +21,7 @@
             $(document).ready(function() {
                 new Controllers.Application();
             });
+        }, {
+            reconnect : 5000
         });
 })()

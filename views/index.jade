@@ -16,12 +16,13 @@ html(lang='en')
     script(src='/js/jquery.cookie.js')
     script(src='/js/jquery.timeago.js')
     script(src='/js/jquery.jscrollpane.js')
+    script(src='/js/jquery.cssemoticons.js')
+    script(src='/js/webcam/jquery.webcam.js')
     script(src='/js/modernizr-1.7.min.js')
     script(src='/js/underscore-min.js')
     script(src='/js/backbone.js')
     script(src='/js/mustache.js')
     script(src='/js/json2.js')
-    script(src='/js/webcam/jquery.webcam.js')
     script(src='/dnode.js')
     
     // Main application
@@ -75,6 +76,29 @@ html(lang='en')
               button.list List
           
           #main-content
+          #welcome-text
+            h1.title Welcome to &AElig;bleskiver!
+            
+            p
+              | This is a real-time chat application, built with
+              | the Express.js and Backbone.js frameworks.
+              
+            p
+              | You can load up a chat room by clicking on one of
+              | the links in the sidebar menu.  There is also a 
+              | persistant members list there as well, where you 
+            
+            p
+              | Chat rooms and user profiles can either be added 
+              | as a 'favorite' or a 'friend', which are then 
+              | added to the lists on the bottom bar.
+            
+            p
+              | You may create your own chat room, which can be 
+              | then linked to for you and your friends. If too 
+              | many rooms appear, you can use the search bar below
+              | the list to filter them.  Room 'titles' and 
+              | 'descriptions' are both indexed.
           
       #create-room-dialog
       #login-dialog
@@ -105,7 +129,9 @@ html(lang='en')
               .open
               .close
             .favorites
-          
+            
+        #conversations
+        
         #copyright
           p &copy;
         #authors
@@ -214,7 +240,7 @@ html(lang='en')
     // Room listing
     script#room-list-template(type='text/template')
       a(href='/#/rooms/{{ slug }}')
-        h3.name
+        h3.name(title='{{ description }}')
           span {{ name }}
           span.destroy
         p.description {{ description }}

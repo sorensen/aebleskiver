@@ -142,6 +142,15 @@ h1, h2, h3, h4, h5, h6 { font-weight: bold; }
 a, a:active, a:visited { color: #607890; }
 a:hover { color: #036; }
 
+
+.description,
+.ranking,
+.statistics,
+.controls
+{
+    display: none;
+}
+
 /**
     Template
 **/
@@ -299,10 +308,11 @@ body .ui-dialog,
     Sidebar
 **/
 #sidebar {
-    height: 62%;
-    margin-top: 50px;
-    position: relative;
-    padding-bottom: 4px;
+    position: absolute;
+    top: 70px;
+    bottom: 70px;
+    left: 20px;
+    width: 200px;
 }
     #sidebar-controls {
         position: absolute;
@@ -421,10 +431,11 @@ body .ui-dialog,
     Main content screens
 **/
 #main {
-    height: 62%;
-    margin-top: 50px;
-    position: relative;
-    padding-bottom: 4px;
+    left: 240px;
+    right: 20px;
+    top: 70px;
+    bottom: 70px;
+    position: absolute;
 }
     #main-tabs {
         display: none;
@@ -502,28 +513,55 @@ body .ui-dialog,
         border-top: 1px solid #eee;
         overflow: hidden;
     }
+        .concurrent {
+        
+        }
+            .concurrent .username,
+            .concurrent .small-avatar {
+                opacity: .40;
+                filter: Alpha(Opacity=40);
+            }
+        .post:first-child,
+        .message:first-child {
+            border-top: 0;
+        }
+        .post:last-child,
+        .message:last-child {
+            border-bottom: 0;
+        }
+        .post .created,
+        .post .small-avatar,
+        .post .username,
+        .post .data,
         .message .created,
-        .message .avatar,
+        .message .small-avatar,
         .message .username,
         .message .data {
             float: left;
             margin-top: 3px;
         }
-        .message .avatar {
+        .post .created,
+        .message .created {
+            float: right;
+        }
+        .post .small-avatar,
+        .message .small-avatar {
             width: 20px;
             height: 20px;
             overflow: hidden;
             display: block;
             float: left;
-            margin: 0 5px 0 10px;
+            margin: 0 10px 0 0;
         }
-            .avatar img {
+            .small-avatar img {
                 height: 20px;
                 width: 20px;
             }
+        .post .username,
         .message .username {
             margin-right: 5px;
         }
+        .post .data,
         .message .data {
             margin-left: 5px;
         }

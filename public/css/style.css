@@ -1,6 +1,7 @@
 @import url('aebleskiver/jquery-ui-1.8.11.aebleskiver.css');
 @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.5.css');
 @import url('jquery.jscrollpane.css');
+@import url('jquery.cssemoticons.css');
 
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -536,6 +537,7 @@ body {
     text-shadow: 1px 1px 1px #fff;
     text-align: left;
     font-size: 13px;
+    z-index: 99;
 }
     #navigation a,
     #sidebar-up button {
@@ -703,7 +705,6 @@ body {
     margin: 0;
     left: 0;
     position: absolute;
-    border-right: 1px solid #aaa;
     z-index: 2;
 }
     #sidebar-controls {
@@ -724,8 +725,10 @@ body {
         height: 50px;
         overflow: hidden;
         position: absolute;
-        width: 100%;
+        left: 0;
+        right: 0;
         margin-top: -50px;
+        border-right: 1px solid #aaa;
     }
         #sidebar-up button {
             border-right: 1px solid #AAA;
@@ -751,15 +754,17 @@ body {
                 border-right: 0;
             }
     #sidebar-down {
+        border-right: 1px solid #aaa;
         position: absolute;
-        width: 100%;
         height: 99px;
         left: 0;
+        right: 0;
         border-top: 1px solid #CCC;
         overflow: hidden;
         bottom: -150px;
     }
         #sidebar-down .statistics {
+            border-right: 1px solid #aaa;
             height: 70px;
             background: #f5f5f5;
             left: 8px;
@@ -807,13 +812,14 @@ body {
     Search form
 **/
 #search-form {
-    width: 100px;
     position: absolute;
     background: #EEE;
     bottom: -50px;
     height: 49px;
-    width: 100%;
+    left: 0;
+    right: 0;
     border-top: 1px solid #bbb;
+    border-right: 1px solid #aaa;
 }
     #search {
         position: absolute;
@@ -858,6 +864,8 @@ body {
     }
         .user, 
         .room {
+            min-height: 55px;
+            border-right: 1px solid #aaa;
             position: relative;
             padding: 0;
             cursor: pointer;
@@ -899,12 +907,26 @@ body {
                 }
         #users .user.current, 
         #rooms .room.current {
-            background-color: #ee432e;
+            background-color: #fff;
             background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fff),color-stop(1, #eee));
             background-image: -webkit-linear-gradient(#fff, #eee);
         }
             .user.current a, .user.current a:hover,
             .room.current a, .room.current a:hover {
+                color: #000;
+            }
+        #rooms .room.active {
+            border-right: 1px solid #fafafa;
+            background-color: #fff;
+            background-image: -moz-linear-gradient(left, #fff, #fafafa);
+            background-image: -o-linear-gradient(left, #fff, #fafafa);
+            background-image: -webkit-gradient(linear,left,right,color-stop(0, #fff),color-stop(1, #fafafa));
+            background-image: -webkit-linear-gradient(left, #fff, #fafafa);
+            background-image: linear-gradient(left, #fff, #fafafa);
+                      filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#fafafa');
+        
+        }
+            .room.active a, .room.active a:hover {
                 color: #000;
             }
             .user.current .statistics,
@@ -969,6 +991,7 @@ body {
         line-height: 1;
     }
     .ranking {
+        display: none;
         position: absolute;
         right: 5px;
         top: 5px;
@@ -984,8 +1007,6 @@ body {
            -moz-border-radius: 4px 0 4px 40px;
         -webkit-border-radius: 4px 0 4px 40px;
                 border-radius: 4px 0 4px 40px;
-                
-        display: none;
     }
         .upvote,
         .downvote
@@ -1087,12 +1108,11 @@ body {
         height: 40px;
     }
     #main-content {
-        display: none;
         background: #fafafa;
         height: 100%;
         min-height: 300px;
         clear: both;
-        margin-left: 201px;
+        margin-left: 200px;
         min-width: 215px;
     }
     #main-controls {
@@ -1276,6 +1296,27 @@ body {
         .post-form {
         
         }
+
+
+#welcome-text {
+    overflow: hidden;
+    background: #fafafa;
+    height: 100%;
+    min-height: 300px;
+    clear: both;
+    margin-left: 200px;
+    min-width: 215px;
+}
+    #welcome-text h1 {
+        font-size: 26px;
+        margin: 20px;
+        font-weight: bold;
+    }
+    #welcome-text p {
+        font-size: 14px;
+        margin: 10px 20px;
+        max-width: 400px;
+    }
 /**
     Chat room message list and items
 **/
@@ -1534,7 +1575,11 @@ body {
 /**
     Webcam
 **/
+#open-webcam {
+    display: none;
+}
 .webcam {
+    display: none;
     width: auto;
 }
     .webcam .camera {

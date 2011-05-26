@@ -2,7 +2,6 @@
     // Application model
     // -----------------
     
-    // World Model
     Models.ApplicationModel = Backbone.Model.extend({
     
         type     : 'application',
@@ -33,6 +32,10 @@
             // Active room collection
             this.rooms = new Models.RoomCollection();
             this.rooms.url = this.url() + ':rooms';
+            
+            // Conversations collections
+            window.conversations = new Models.ConversationCollection();
+            window.conversations.url = this.url() + ':conversations';
             
             var self = this;
             // Subscribing to a model can be continued by just 
@@ -81,6 +84,15 @@
                                 
                                 history();
                                 session._id && self.view.toggleNav();
+                                
+            
+                                Server.onlineUsers(function(resp) {
+                                    console.log('onlineUsers: ', resp);
+                                });
+                                
+                                Server.activeSessions(function(resp) {
+                                    console.log('activeSessions: ', resp);
+                                });
                             });
                         },
                     });
