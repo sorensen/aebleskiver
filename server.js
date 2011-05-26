@@ -11,7 +11,7 @@ var express      = require('express'),
     Seq          = require('seq'),
     formidable   = require('formidable'),
     sys          = require('sys'),
-    Upload       = require('protocol-upload'),
+    //Upload       = require('protocol-upload'),
     Misc         = require('protocol-misc'),
     PubSub       = require('protocol-pubsub'),
     CRUD         = require('protocol-crud'),
@@ -102,7 +102,7 @@ DNode()
     .use(Auth)      // Authentication support
     .use(PubSub)    // Pub/sub channel support
     .use(CRUD)      // Backbone integration
-    .use(Upload)    // File upload support
+    //.use(Upload)    // File upload support
     .use(Gravatar)  // Gravatar integration
     .use(Misc)      // Misc. resources
     .listen(5050)
