@@ -11,7 +11,7 @@
             console.log('connection ended');
             
             // Refresh the page after 10 seconds
-            refresh = setTimeout('location.reload()', 6000);
+            refresh = setTimeout('DNode.connect()', 6000);
         });
         
         con.on('ready', function() {
@@ -37,31 +37,29 @@
             // foreign user to subscribe and create a new 
             // message collection between the two users
             startedConversation : function(resp, options) {
-                console.log('startConversation: ', resp)
+                console.log('FORCE START: ', resp)
                 
-                var to = resp.id;
+                var to = resp.id || resp._id;
                 var from = window.user.get('id');
                 var key = (to > from) 
                         ? to + ':' + from
                         : from + ':' + to;
                 
-                console.log('startConversation: ', key)
+                console.log('FORCE START: ', key)
                 
-                if (!window.conversations.get(to)) {
-                    window.conversations[to] = new Models.MessageCollection();
-                    window.conversations[to].url = 'pm:' + key;
-                        
-                    var self = this;
-                    window.conversations[to].subscribe({}, function() {
-                        window.conversations[to].messages.fetch({
-                            query    : {room_id : key},
-                            finished : function(data) {
-                            },
-                        });
+                if (!window.conversations.get(key)) {
+                
+                    var convo = new Models.ConversationModel({
+                        to   : to,
+                        id   : key,
+                        name : resp.displayName || resp.username
                     });
+                    convo.url = 'pm:' + key;
+                    
+                    window.conversations.add(convo);
                 }
                 
-                console.log('startConversation: ', window.conversations)
+                console.log('FORCE START: ', window.conversations)
             }
         });
     };

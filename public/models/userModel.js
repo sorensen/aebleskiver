@@ -50,7 +50,11 @@
                     query : { _id : { $in : self.get('friends') }},
                 });
             });
-            
+            return this;
+        },
+        
+        loadFavorites : function() {
+            var self = this;
             this.favorites.url = this.url + ':favorites';
             this.favorites.subscribe({}, function(resp) {
                 if (!self.get('favorites')) {
@@ -110,6 +114,37 @@
         // all future updates to the message collection
         remove : function() {
             this.posts && this.posts.unsubscribe();
+        },
+        
+        
+        startConversation : function() {
+            console.log('add conversation ', window.conversations);
+        
+            var to = this.get('id');
+            var from = window.user.get('id') || window.user.get('_id');
+            var key = (to > from) 
+                    ? to + ':' + from
+                    : from + ':' + to;
+            
+            console.log('add conversation ', key);
+            if (!window.conversations.get(key)) {
+            
+                var convo = new Models.ConversationModel({
+                    to   : to,
+                    id   : key,
+                    name : this.get('displayName') || this.get('username')
+                });
+                convo.url = 'pm:' + key;
+                
+                Server.startConversation(window.user.toJSON(), {
+                    channel : convo.url,
+                    id      : to
+                }, function(resp, options) {
+                    console.log('convo started: ', resp);
+                    
+                    window.conversations.add(convo);
+                });
+            }
         },
     });
     

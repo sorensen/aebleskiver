@@ -58,33 +58,15 @@
         // DOM attributes
         tagName   : 'div',
         className : 'user friend',
+        template  : _.template($('#friend-list-template').html()),
         
         // Interaction events
         events : {
-            'click' : 'addConversation',
+            'click' : 'startConversation',
         },
         
-        addConversation : function() {
-        
-            var to = this.model.get('id');
-            var from = window.user.get('id');
-            var key = (to > from) 
-                    ? to + ':' + from
-                    : from + ':' + to;
-            
-            if (!this.conversations[to]) {
-                this.conversations[to] = new Models.MessageCollection();
-                this.conversations[to].url = 'pm:' + key;
-                    
-                var self = this;
-                this.conversations[to].subscribe({}, function() {
-                    self.model.posts.fetch({
-                        query    : {room_id : key},
-                        finished : function(data) {
-                        },
-                    });
-                });
-            }
+        startConversation : function() {
+            this.model.startConversation();
         },
         
     });
@@ -105,7 +87,7 @@
             'click .destroy'            : 'deactivate',
             'click .add-friend'         : 'addToFriends',
             'click .remove-friend'      : 'removeFromFriends',
-            'click .send-message'       : 'sendMessage'
+            'click .send-message'       : 'startConversation'
         },
     
         initialize : function(options) {
@@ -154,6 +136,10 @@
             return this;
         },
         
+        startConversation : function() {
+            this.model.startConversation();
+        },
+        
         addToFriends : function() {
             if (this.model.get('id') == window.user.get('id')
                 || this.model.get('id') == window.user.id) {
@@ -190,10 +176,6 @@
                     friends : friends
                 })
                 .save();
-        },
-        
-        sendMessage : function() {
-            
         },
     
         // Render contents

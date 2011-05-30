@@ -34,7 +34,7 @@ $(function() {
 
     // Convert timestamps to timeago
     $('abbr.timeago').livequery(function() {
-        //$(this).timeago();
+        $(this).timeago();
     });
     
     // Custom scrollbars

@@ -58,7 +58,7 @@ pre, code, kbd, samp { font-family: monospace, sans-serif; }
 
 
 /**
- * Minimal base styles.
+ * menuOpen base styles.
  */
 
 /* Always force a scrollbar in non-IE */
@@ -654,6 +654,104 @@ body {
             background: white;
         }
     
+#conversations {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    height: 50px;
+    left: 600px;
+}
+    .conversation {
+        height: 50px;
+        float: left;
+        width: 200px;
+        z-index: 99;
+        position: relative;
+        margin-right: 10px;
+    }
+    .conversation .destroy {
+        z-index: 99;
+        right: 3px;
+    }
+    .conversation .messages {
+        z-index: 98;
+    }
+        #footer .conversation .heading {
+            top: 0;
+            font-weight: bold;
+            font-size: 14px;
+            display: block;
+            margin: 5px;
+            border: 1px solid #AAA;
+            height: 40px;
+            line-height: 40px;
+            z-index: 3;
+        }
+        .conversation .messages {
+            display: none;
+            min-height: 200px;
+            position: absolute;
+            margin: 0;
+            z-index: -1;
+            background-color: #eee;
+        }
+            .conversation .message .small-avatar,
+            .conversation .message .created {
+                display: none;
+            }
+        .conversation .statistics,
+        .conversation .controls {
+            display: none;
+        }
+        .conversation .message-form {
+            display: none;
+            background-color: #fff;
+            background-image: -moz-linear-gradient(top, #fff, #eee);
+            background-image: -o-linear-gradient(top, #fff, #eee);
+            background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fff),color-stop(1, #eee));
+            background-image: -webkit-linear-gradient(#fff, #eee);
+            background-image: linear-gradient(top, #fff, #eee);
+                      filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#eee');
+            border: 1px solid #aaa;
+        }
+            .conversation .message-form button {
+                display: none;
+                width: 25px;
+                margin: 5px;
+                height: 40px;
+            }
+            .conversation .message-form input {
+                position: absolute;
+                left: 0;
+                right: 0;
+                margin: 5px;
+                height: 38px;
+            }
+            
+            
+    .conversation.open .destroy {
+        top: -241px;
+        right: -3px;
+    }
+    .conversation.open .messages,
+    .conversation.open .message-form {
+        display: block;
+    }
+    #footer .conversation.open .heading {
+        top: -241px;
+        left: 0;
+        right: 0;
+        padding: 0 10px;
+        margin: 0;
+        text-align: left;
+        
+           -moz-box-shadow: none;
+        -webkit-box-shadow: none;
+                box-shadow: none;
+    }
+    .conversation.open .messages {
+        top: -200px;
+    }
 /**
     Start Menu
 **/
@@ -666,16 +764,16 @@ body {
         top: 14px;
         left: 20px;
     }
-    .minimal #sidebar-wrapper {
+    .menuOpen #sidebar-wrapper {
         top: 100%;
     }
-    .minimal #main-content {
+    .menuOpen #main-content {
         margin-left: 0;
     }
-    .minimal #navigation {
+    .menuOpen #navigation {
         left: 0;
     }
-    .minimal #start-menu .title {
+    .menuOpen #start-menu .title {
         background-color: #eee;
         background-image: -moz-linear-gradient(top, #eee, #ddd);
         background-image: -o-linear-gradient(top, #eee, #ddd);

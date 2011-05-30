@@ -16,7 +16,7 @@
         
         // Interaction events
         events    : {
-            //'keypress'           : 'hideOnEscape',
+            'keyup'              : 'hideOnEscape',
             'click #show-rooms'  : 'showRooms',
             'click #show-users'  : 'showUsers',
             'click .cancel'      : 'hideDialogs',
@@ -64,7 +64,8 @@
                 'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout',
                 'loadWebcam', 'toggleSidebar',
                 'toggleFriendList', 'allFriends', 'addFriend',
-                'toggleFavoriteList', 'allFavorites', 'addFavorite'
+                'toggleFavoriteList', 'allFavorites', 'addFavorite',
+                'conversationsReady', 'allConversations', 'addConversation'
             );
 
             // Set the application model directly, since there is a 
@@ -98,6 +99,11 @@
             this.model.rooms.bind('refresh', this.allRooms);
             this.model.rooms.bind('refresh', this.render);
             
+            // Conversation event bindings
+            window.conversations.bind('subscribe', this.coversationsReady);
+            window.conversations.bind('add', this.addConversation);
+            window.conversations.bind('refresh', this.allConversation);
+            
             // Render template contents
             var content = this.model.toJSON();
             var view = Mustache.to_html(this.template(), content);
@@ -124,6 +130,7 @@
             this.friendList       = this.$('.friends');
             this.favorites        = this.$('#favorite-list');
             this.favoriteList     = this.$('.favorites');
+            this.conversationList = this.$('#conversations');
             
             // Navigation items for authentication toggling
             this.nav = {
@@ -136,53 +143,54 @@
             this.nav.settings.hide();
             this.nav.logout.hide();
             
-            var self = this;
-            // Create a new user for the current client, only the 
-            // defaults will be used until the client authenticates
-            // with valid credentials
-            window.user = new Models.UserModel();
-            window.user.subscribe({}, function(resp) {
-            
-                // Current user bindings
-                window.user.friends.bind('add', self.addFriend);
-                window.user.friends.bind('refresh', self.allFriends);
-                
-                window.user.favorites.bind('add', self.addFavorite);
-                window.user.favorites.bind('refresh', self.allFavorites);
-            });
-            
             // Internal sidebar settings, pull settings
             // from the cookie and bootstrap if required
-            this.minimal = $.cookie('minimal') || 'false';
+            this.menuOpen      = $.cookie('menuOpen') || 'false';
+            this.friendsOpen   = $.cookie('friendsOpen') || 'false';
+            this.favoritesOpen = $.cookie('favoritesOpen') || 'false';
             
-            if (this.minimal === 'true') {
-                $(this.el).addClass('minimal');
+            if (this.menuOpen === 'true') {
+                $(this.el).addClass('menuOpen');
+            }
+            
+            if (this.friendsOpen === 'true') {
+                this.friends.addClass('open');
+            }
+            
+            if (this.favoritesOpen === 'true') {
+                this.favorites.addClass('open');
             }
         },
         
         // Close modal keystroke listener
         hideOnEscape : function(e) {
-            console.log('hide', e.keyCode);
             if (e.keyCode == 27) {
-            console.log('HIDE IT');
                 this.hideDialogs();
             }
         },
         
         toggleSidebar : function() {
-            if (this.minimal == 'true') {
-                this.minimal = 'false';
-                $(this.el).removeClass('minimal');
+            if (this.menuOpen == 'true') {
+                this.menuOpen = 'false';
+                $(this.el).removeClass('menuOpen');
             } 
             else {
-                this.minimal = 'true';
-                $(this.el).addClass('minimal');
+                this.menuOpen = 'true';
+                $(this.el).addClass('menuOpen');
             }
-            $.cookie('minimal', this.minimal);
+            $.cookie('menuOpen', this.menuOpen);
         },
         
         toggleFriendList : function() {
-            this.friends.toggleClass('open');
+            if (this.friendsOpen == 'true') {
+                this.friendsOpen = 'false';
+                this.friends.removeClass('open');
+            } 
+            else {
+                this.friendsOpen = 'true';
+                this.friends.addClass('open');
+            }
+            $.cookie('friendsOpen', this.friendsOpen);
         },
         
         // All rooms have been loaded into collection
@@ -194,9 +202,9 @@
             this.render();
         },
         
-        // Add a single room room to the current veiw
+        // Add a single friend o the current veiw
         addFriend : function(friend) {
-            var view = new Views.UserView({
+            var view = new Views.FriendView({
                 model : friend
             }).render();
             
@@ -205,7 +213,15 @@
         },
         
         toggleFavoriteList : function() {
-            this.favorites.toggleClass('open');
+            if (this.favoritesOpen == 'true') {
+                this.favoritesOpen = 'false';
+                this.favorites.removeClass('open');
+            } 
+            else {
+                this.favoritesOpen = 'true';
+                this.favorites.addClass('open');
+            }
+            $.cookie('favoritesOpen', this.favoritesOpen);
         },
         
         // All rooms have been loaded into collection
@@ -227,6 +243,28 @@
                 .append(view.el);
         },
         
+        conversationsReady : function(resp) {
+            console.log('conversationsReady');
+        },
+        
+        // All rooms have been loaded into collection
+        allConversations : function(friends) {
+            console.log('allConversations');
+            this.conversationList.html('');
+            window.conversations.each(this.addConversation);
+        },
+        
+        // Add a single friend o the current veiw
+        addConversation : function(convo) {
+            console.log('addConversation');
+            var view = new Views.ConversationView({
+                model : convo
+            }).render();
+            
+            this.conversationList
+                .append(view.el);
+        },
+        
         loadWebcam : function() {
             this.webcam = new Views.WebcamView();
             this.el.append(this.webcam.render().el);
@@ -235,13 +273,15 @@
         
         // Refresh statistics
         render : function() {
-            var totalUsers = this.model.users.length || 0;
-            var totalRooms = this.model.rooms.length || 0;
+            var totalOnline = this.model.online || 0;
+            var totalUsers  = this.model.users.length || 0;
+            var totalRooms  = this.model.rooms.length || 0;
             
             this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
-                totalUsers : totalUsers,
-                totalRooms : totalRooms,
-                version    : this.version
+                totalOnline : totalOnline,
+                totalUsers  : totalUsers,
+                totalRooms  : totalRooms,
+                version     : this.version
             }));
             return this;
         },
@@ -616,6 +656,9 @@
             this.friendList.html('');
             this.favoriteList.html('');
             window.user = new Models.UserModel();
+            
+            this.conversationList.html('');
+            window.conversations = new Models.ConversationCollection();
             
             this.nav.signup.fadeIn(150);
             this.nav.login.fadeIn(150);

@@ -208,12 +208,37 @@ html(lang='en')
           span.avatar: img(src='{{ avatar }}')
           span.username {{ displayName }}
       .statistics.user-stats
+      
+    // Friend listing
+    script#friend-list-template(type='text/template')
+      h3.name
+        span.avatar: img(src='{{ avatar }}')
+        span.username {{ displayName }}
+      .statistics.user-stats
     
     // User statistics
     script#user-stats-template(type='text/template')
       .stat.total-messages
         span.title Posts
         span.value {{ totalPosts }}
+      
+    // Conversation
+    script#conversation-template(type='text/template')
+      button.heading {{ name }}
+      span.destroy
+      .controls
+        button.add-favorite.submit(title='Add to Favorites') +
+        button.remove-favorite(title='Remove from Favorites') -
+        .admin-controls
+          button.delete-conversation.delete Delete Room
+          button.ban-user Ban User
+          button.invite-user Invite User
+      
+      .users
+      .messages
+      .message-form
+        button.submit Send
+        input.create-message(type='text', name='message', placeholder='Say something...', length='255')
       
     // Room
     script#room-template(type='text/template')

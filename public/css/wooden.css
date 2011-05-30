@@ -1,3 +1,8 @@
+@import url('aebleskiver/jquery-ui-1.8.11.aebleskiver.css');
+@import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.5.css');
+@import url('jquery.jscrollpane.css');
+@import url('jquery.cssemoticons.css');
+
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
@@ -146,7 +151,8 @@ a:hover { color: #036; }
 .description,
 .ranking,
 .statistics,
-.controls
+#sidebar .controls,
+#main .controls
 {
     display: none;
 }
@@ -193,7 +199,7 @@ body {
         list-style: none outside;
         position: absolute;
         right: 40px;
-        top: 18px;
+        top: 0;
     }
     #navigation li {
         float: left;
@@ -202,13 +208,14 @@ body {
     #navigation li:first-child {
         margin-left: 0;
     }
-    #navigation li a {
+    #navigation a {
         font-size: 14px;
         color: #efefef;
         text-decoration: none;
         text-shadow: 1px 1px 1px #222;
+        padding: 0 7px;
     }
-    #navigation li a:hover {
+    #navigation a:hover {
         color: #fff;
         text-shadow: 1px 1px 1px #000;
         border-bottom: 3px solid #333;
@@ -241,7 +248,116 @@ body {
         text-shadow: 1px 1px 3px #444;
     }
 
-    
+#welcome-text {
+    position: absolute;
+    top: 20px;
+    left: 200px;
+    z-index: -1;
+}
+#welcome-text h1 {
+    font-size: 26px;
+    margin: 20px;
+    font-weight: bold;
+    color: white;
+}
+#welcome-text p {
+    font-size: 14px;
+    margin: 10px 20px;
+    max-width: 400px;
+    color: #eee;
+}
+
+/**
+    Modal / Dialog box
+**/
+#overlay {
+    display: none;
+    background: #666;
+    opacity: .50;
+    filter: Alpha(Opacity=50);
+    z-index: 1001;
+    position: absolute;
+    top: 0; left: 0;
+    height: 100%; width: 100%;
+}
+.dialog {
+    outline: 0px;
+    height: auto;
+    width: auto;
+    top: 40px;
+    left: 212px;
+    display: block;
+    z-index: 1002;
+    position: absolute;
+    background: white;
+}
+    .dialog .content {
+        padding: 20px;
+        overflow: hidden;
+    }
+    .dialog .title {
+        border: 0;
+        border-bottom: 1px solid #9E9E9E;
+        padding: 10px;
+        background-color: #fff;
+        background-image: -moz-linear-gradient(top, #fff, #eee);
+        background-image: -o-linear-gradient(top, #fff, #eee);
+        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fff),color-stop(1, #eee));
+        background-image: -webkit-linear-gradient(#fff, #eee);
+        background-image: linear-gradient(top, #fff, #eee);
+                  filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#eee');
+    }
+    .dialog .title h3 {
+        clear: both;
+        margin: 0;
+        font-size: 28px;
+        font-weight: 300;
+        line-height: 1.2;
+    }
+    .dialog p {
+        clear: both;
+    }
+    .dialog label {
+        margin: 5px 15px 5px 5px;
+        display: block;
+        float: left;
+        clear: left;
+    }
+    #register label {
+    }
+    .dialog input[type='text'],
+    .dialog input[type='password'],
+    .dialog input[type='file'],
+    .dialog input[type='checkbox'],
+    .dialog textarea {
+        margin: 5px 0 5px 10px;
+        float: right;
+        clear: right;
+    }
+    .dialog #submit-registration,
+    .dialog #submit-login {
+        font-size: 24px;
+        margin: 10px 0;
+        padding: 20px 0;
+        font-weight: bold;
+        width: 100%;
+    }
+    .dialog .controls {
+        padding: 10px;
+        text-align: right;
+        border-top: 1px solid #9E9E9E;
+        background-color: #eee;
+        background-image: -moz-linear-gradient(top, #eee, #fff);
+        background-image: -o-linear-gradient(top, #eee, #fff);
+        background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eee),color-stop(1, #fff));
+        background-image: -webkit-linear-gradient(#eee, #fff);
+        background-image: linear-gradient(top, #eee, #fff);
+                  filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eee', EndColorStr='#fff');
+    }
+        .dialog .controls button {
+            margin-left: 5px;
+        }
+
 /**
     Top Rounded corners
 **/
@@ -433,7 +549,7 @@ body .ui-dialog,
 #main {
     left: 240px;
     right: 20px;
-    top: 70px;
+    top: 120px;
     bottom: 70px;
     position: absolute;
 }
@@ -449,6 +565,7 @@ body .ui-dialog,
         min-height: 300px;
         padding: 0% 0;
         clear: both;
+        z-index: 2;
     }
     #main-controls {
         display: none;

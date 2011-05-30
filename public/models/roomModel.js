@@ -76,7 +76,8 @@
         
     Models.ConversationModel = Models.RoomModel.extend({
     
-        type  : 'conversation',
+        defaults : {},
+        type     : 'conversation',
     });
     
     Models.ConversationCollection = Models.RoomCollection.extend({

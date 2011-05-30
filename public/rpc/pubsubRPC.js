@@ -70,11 +70,13 @@
         // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
         // for subscriptions, relabeled to 'channel' for clarity
         subscribe : function(options, callback) {
+            console.log('mod SUB', this);
             if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
             
+            console.log('mod SUB', options.channel);
             // Add the model to a local object container so that other methods
             // called from the server have access to it
             if (!Store[options.channel] || options.override) {

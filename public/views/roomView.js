@@ -122,9 +122,7 @@
         
         // Constructor
         initialize : function(options) {
-            console.log('Room init', this);
             this.viewable = this.model.allowedToView(window.user);
-            
             if (!this.viewable) {
                 return;
             }
@@ -140,7 +138,7 @@
             this.model.bind('remove', this.remove);
             
             this.model.messages = new Models.MessageCollection();
-            this.model.messages.url = this.model.url() + ':messages';
+            this.model.messages.url = Helpers.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('refresh', this.allMessages);
@@ -171,13 +169,14 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            this.title.html(Helpers.linkify(content.name))
-            this.description.html(Helpers.linkify(content.description))
+            content.name && this.title.html(Helpers.linkify(content.name))
+            content.description && this.description.html(Helpers.linkify(content.description))
+            
             
             var self = this;
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
-                    query    : {room_id : self.model.get('_id')},
+                    query    : {room_id : self.model.get('id')},
                     sorting  : {sort: [['created',-1]], limit: 20},
                     finished : function(data) {
                     },
@@ -315,6 +314,135 @@
                 avatar      : window.user.get('avatar')
             };
         },
+    });
+    
+    Views.ConversationView = Views.RoomMainView.extend({
+    
+        // DOM attributes
+        tagName        : 'div',
+        className      : 'conversation open',
+        template       : _.template($('#conversation-template').html()),
+        statsTemplate  : _.template($('#room-stats-template').html()),
+        
+        // Interaction events
+        events    : {
+            'click .heading'               : 'toggleOpen',
+            'keypress .message-form input' : 'createMessageOnEnter',
+            'click .message-form button'   : 'createMessage',
+            'click .destroy'               : 'remove',
+            'click .add-favorite'          : 'addToFavorites',
+            'click .remove-favorite'       : 'removeFromFavorites',
+            'click .delete-room'           : 'deleteRoom',
+        },
+        
+        // Constructor
+        initialize : function(options) {
+            this.viewable = this.model.allowedToView(window.user);
+            
+            if (!this.viewable) {
+                return;
+            }
+            
+            _.bindAll(this, 
+                'allMessages', 'addMessage', 'createMessage', 'render',
+                'remove'
+            );
+            
+            // Bind to model
+            this.model.mainView = this;
+            this.model.bind('change', this.render);
+            this.model.bind('remove', this.remove);
+            
+            this.model.messages = new Models.MessageCollection();
+            this.model.messages.url = Helpers.getUrl(this.model) + ':messages';
+            
+            this.model.messages.bind('add', this.addMessage);
+            this.model.messages.bind('refresh', this.allMessages);
+            this.model.messages.bind('add', this.render);
+            
+            // Send model contents to the template
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(), content);            
+            $(this.el)
+                .html(view)
+                .find('[title]')
+                .wijtooltip();
+            
+            // Set shortcut methods for DOM items
+            this.title       = this.$('.headline');
+            this.controls    = this.$('.controls');
+            this.description = this.$('.description');
+            this.input       = this.$('.create-message');
+            this.messageList = this.$('.messages');
+            
+            // Post-formatting, done here as to prevent conflict
+            // with Mustache HTML entity escapement
+            content.name && this.title.html(Helpers.linkify(content.name))
+            content.description && this.description.html(Helpers.linkify(content.description))
+            
+            
+            var self = this;
+            this.model.messages.subscribe({}, function() {
+                self.model.messages.fetch({
+                    query    : {room_id : self.model.get('id')},
+                    sorting  : {sort: [['created',-1]], limit: 20},
+                    finished : function(data) {
+                    },
+                });
+            });
+            
+            this.input.focus();
+        },
+        
+        startConversation : _.debounce(function() {
+            var self = this;
+            Server.startConversation(window.user.toJSON(), {
+                channel : self.model.url,
+                id      : self.model.get('to')
+            }, function(resp, options) {
+                console.log('convo started doublecheck: ', resp);
+            });
+        }, 1000),
+        
+        // Send a message to the server
+        createMessage : function() {
+            if (!this.input.val()) return;
+            this.startConversation();
+            this.model.messages.create(this.newAttributes());
+            this.input.val('');
+        },
+        
+        // Remove this view from the DOM, and unsubscribe from 
+        // all future updates to the message collection
+        remove : function() {
+            this.model && this.model.remove();
+            this.model.unsubscribe();
+            this.model.messages.unsubscribe();
+            $(this.el).remove();
+            delete this.model;
+            delete this;
+        },
+        
+        toggleOpen : function() {
+            $(this.el).toggleClass('open');
+        },
+        
+        // Generate the attributes
+        newAttributes : function() {
+            var username = window.user.get('username');
+            var id = window.user.get('id') || window.user.id;
+            
+            return {
+                text        : this.input.val(),
+                room_id     : this.model.get('id'),
+                user_id     : id,
+                username    : (username == Models.UserModel.defaults) ? id : window.user.get('username'),
+                displayName : window.user.get('displayName') || window.user.get('username'),
+                avatar      : window.user.get('avatar'),
+                type        : 'private'
+            };
+        },
+    
     });
     
 })(Views)

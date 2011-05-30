@@ -6,7 +6,6 @@ require.paths.unshift(__dirname + '/lib');
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
     Mongoose     = require('mongoose');
-    
     fs           = require('fs'),
     Seq          = require('seq'),
     formidable   = require('formidable'),
@@ -18,7 +17,7 @@ var express      = require('express'),
     Gravatar     = require('protocol-gravatar'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
-    version      = '0.3.1',
+    version      = '0.3.2',
     port         = 80,
     token        = '',
     server       = module.exports = express.createServer();
@@ -66,35 +65,6 @@ server.get('/', function(req, res) {
         }
     });
 });
-
-server.use('/upload', function(req, res, next) {
-    console.log('upload!!!');
-    var incomingForm = formidable.IncomingForm();
-    incomingForm.on('fileBegin', function(field, file) {
-
-        var tracker = {file: file, progress: [], ended: false};
-        var push = setInterval(function() {
-            publish('data', null, tracker);
-        }, 2000)
-
-        //publish('data', null, tracker);
-        file
-            .on('progress', function(recieved) {
-                tracker.progress.push(recieved);
-            })
-            .on('end', function() {
-                tracker.ended = true;
-                publish('data', null, tracker);
-                clearInterval(push);
-            })
-    })
-
-    incomingForm.parse(req, function(err, fields, files) {
-        res.writeHead(200, {'content-type': 'text/plain'});
-        res.write('received upload:\n\n');
-        res.end(sys.inspect({fields: fields, files: files}));
-    });
-})
 
 // Start application
 server.listen(port);
