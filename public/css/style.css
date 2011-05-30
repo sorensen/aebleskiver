@@ -585,7 +585,6 @@ body {
     #friend-list {
         height: 50px;
         float: left;
-        width: 200px;
         z-index: 99;
     }
     #favorite-list {
