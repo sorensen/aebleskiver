@@ -654,11 +654,8 @@ body {
         }
     
 #conversations {
-    position: absolute;
-    right: 0;
-    bottom: 0;
     height: 50px;
-    left: 600px;
+    font-size: 10px;
 }
     .conversation {
         height: 50px;
