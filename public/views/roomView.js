@@ -33,13 +33,11 @@
             this.model.bind('remove', this.remove);
             
             // Send model contents to the template
-            var content = this.model.toJSON(),
-                self    = this;
+            var content = this.model.toJSON();
             
-            // Post-formatting, done here as to prevent conflict
-            // with Mustache HTML entity escapement
-            content.name && this.title.html(Helpers.linkify(self.model.escape(content.name)));
-            content.description && this.description.html(Helpers.linkify(self.model.escape(content.description)));
+            // Pre-rendering formatting to prevent XSS
+            this.model.escape(content.name);
+            this.model.escape(content.description);
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
@@ -152,15 +150,13 @@
             this.model.messages.bind('add', this.render);
             
             // Send model contents to the template
-            var content = this.model.toJSON(),
-                self    = this;
+            var content = this.model.toJSON();
             
-            // Post-formatting, done here as to prevent conflict
-            // with Mustache HTML entity escapement
-            content.name && this.title.html(Helpers.linkify(self.model.escape(content.name)));
-            content.description && this.description.html(Helpers.linkify(self.model.escape(content.description)));
+            // Pre-rendering formatting to prevent XSS
+            this.model.escape(content.name);
+            this.model.escape(content.description);
             
-            var view = Mustache.to_html(this.template(), content);
+            var view = Mustache.to_html(this.template(), content);            
             $(this.el)
                 .html(view)
                 .find('[title]')
@@ -181,6 +177,13 @@
             this.input       = this.$('.create-message');
             this.messageList = this.$('.messages');
             
+            // Post-formatting, done here as to prevent conflict
+            // with Mustache HTML entity escapement
+            content.name && this.title.html(Helpers.linkify(content.name))
+            content.description && this.description.html(Helpers.linkify(content.description))
+            
+            
+            var self = this;
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
                     query    : {room_id : self.model.get('id')},
@@ -369,14 +372,6 @@
             
             // Send model contents to the template
             var content = this.model.toJSON();
-            
-            var self = this;
-            
-            // Post-formatting, done here as to prevent conflict
-            // with Mustache HTML entity escapement
-            content.name && this.title.html(Helpers.linkify(self.model.escape(content.name)));
-            content.description && this.description.html(Helpers.linkify(self.model.escape(content.description)));
-            
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
                 .html(view)
@@ -389,6 +384,13 @@
             this.description = this.$('.description');
             this.input       = this.$('.create-message');
             this.messageList = this.$('.messages');
+            
+            var self = this;
+            
+            // Post-formatting, done here as to prevent conflict
+            // with Mustache HTML entity escapement
+            content.name && this.title.html(Helpers.linkify(content.name));
+            content.description && this.description.html(Helpers.linkify(content.description));
             
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
