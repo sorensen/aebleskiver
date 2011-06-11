@@ -51,7 +51,8 @@ server.configure('development', function(){
 });
 
 // Production specific configurations
-server.configure('production', function(){
+server.configure('production', function() {
+    port = 80;
     server.use(express.static(__dirname + '/public', {
         // Set the caching lifetime
         maxAge: oneYear 
