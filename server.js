@@ -40,8 +40,8 @@ server.configure(function() {
     
 // Development specific configurations
 server.configure('development', function(){
-    app.use(express.static(__dirname + '/public'));
-    app.use(express.errorHandler({
+    server.use(express.static(__dirname + '/public'));
+    server.use(express.errorHandler({
         // Make sure we can see our errors
         // and stack traces for debugging
         dumpExceptions : true, 
@@ -51,11 +51,11 @@ server.configure('development', function(){
 
 // Production specific configurations
 server.configure('production', function(){
-    app.use(express.static(__dirname + '/public', {
+    server.use(express.static(__dirname + '/public', {
         // Set the caching lifetime
         maxAge: oneYear 
     }));
-    app.use(express.errorHandler());
+    server.use(express.errorHandler());
 });
 
 // Connect to the database
