@@ -42,9 +42,7 @@
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
-                .html(view)
-                .find('[title]')
-                .wijtooltip();
+                .html(view);
             
             this.loaded = 0;
             this.render();
@@ -117,7 +115,7 @@
         lastPoster : '',
         
         // Interaction events
-        events    : {
+        events : {
             'keypress .message-form input' : 'createMessageOnEnter',
             'click .message-form button'   : 'createMessage',
             'click .destroy'               : 'deactivate',
@@ -160,9 +158,7 @@
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
-                .html(view)
-                .find('[title]')
-                .wijtooltip();
+                .html(view);
             
             this.editable = this.model.allowedToEdit(window.user);
             // Check if the current user is the room creator

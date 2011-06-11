@@ -13,7 +13,7 @@ var express      = require('express'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
     version      = '0.3.2',
-    port         = 80,
+    port         = 8080,
     token        = '',
     server       = module.exports = express.createServer();
 
@@ -23,7 +23,6 @@ server.configure(function() {
     server.use(express.bodyParser());
     server.use(express.cookieParser());
     server.use(express.methodOverride());
-    server.use(express.static(__dirname + '/public'));
     server.set('view engine', 'jade');
     server.set('view options', {layout : false});
     
@@ -38,6 +37,26 @@ server.configure(function() {
         })
     }));
 });
+    
+// Development specific configurations
+server.configure('development', function(){
+    app.use(express.static(__dirname + '/public'));
+    app.use(express.errorHandler({
+        // Make sure we can see our errors
+        // and stack traces for debugging
+        dumpExceptions : true, 
+        showStack      : true 
+    }));
+});
+
+// Production specific configurations
+server.configure('production', function(){
+    app.use(express.static(__dirname + '/public', {
+        // Set the caching lifetime
+        maxAge: oneYear 
+    }));
+    app.use(express.errorHandler());
+});
 
 // Connect to the database
 Mongoose.connect('mongodb://localhost/db');
@@ -48,7 +67,6 @@ server.get('/', function(req, res) {
     token = req.session.id;
     
     //req.session.regenerate(function () {
-        console.log('regenerated session id ' + req.session.id);
         //token = req.session.id;
     //});
     

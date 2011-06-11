@@ -1,6 +1,6 @@
 var config = {
-    uid    : 'beau',
-    domain : 'darkteal.org'
+    uid    : '1c6fc869e31e9259e8c94d79157ceae3';
+    domain : 'sorensen.no.de';
 };
 (function(){
     function loadLB() {
@@ -9,16 +9,14 @@ var config = {
         e.setAttribute('language', 'javascript');
         e.setAttribute('type', 'text/javascript');
         e.setAttribute('src',
-            (('https:' == document.location.protocol) ? 
-                'https://cyberwoo.com/' :
-                'http://cyberwoo.com/') + 'lightboard.js');
-        
-        document.body.appendChild((e));
-    }
+            (('https:' == document.location.protocol)
+                ? 'https://cyberwoo.com/'
+                : 'http://ping.cyberwoo.com/')
+            + 'lightboard.js');
+        document.body.appendChild(e);
+  }
     var oldonload = window.onload;
-    window.onload = (typeof window.onload != 'function') ? loadLB : 
-        function() {
-            oldonload(); 
-            loadLB();
-        };
+    window.onload = (typeof window.onload != 'function') 
+        ? loadLB 
+        : function() { oldonload(); loadLB(); };
 })();
