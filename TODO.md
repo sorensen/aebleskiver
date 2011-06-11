@@ -23,6 +23,8 @@
       flood control on, but have it set by default.  Either 10 messages
       per minute, or a 1000 char limit per minute
       
+    * Replace default icon with a Guy Fawkes mask
+      
 # Ideas:
     * Create 'music' channels, in which an admin of the channel can start up a 
       https://github.com/Marak/JSONloops program, and then each client can listen

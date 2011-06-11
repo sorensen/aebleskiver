@@ -66,9 +66,9 @@
         
         // Sorting for rankings
         comparator : function(room) {
-            var now = new Date().getTime();
-            var then = new Date(room.get('created')).getTime();
-            var comparison = (now - then) / 500000;
+            var now        = new Date().getTime(),
+                then       = new Date(room.get('created')).getTime(),
+                comparison = (now - then) / 500000;
         
             return room.get('downvotes') - room.get('upvotes') + comparison;
         }

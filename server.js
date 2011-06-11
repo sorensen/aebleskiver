@@ -6,11 +6,6 @@ require.paths.unshift(__dirname + '/lib');
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
     Mongoose     = require('mongoose');
-    fs           = require('fs'),
-    Seq          = require('seq'),
-    formidable   = require('formidable'),
-    sys          = require('sys'),
-    //Upload       = require('protocol-upload'),
     Misc         = require('protocol-misc'),
     PubSub       = require('protocol-pubsub'),
     CRUD         = require('protocol-crud'),
@@ -18,7 +13,7 @@ var express      = require('express'),
     Auth         = require('protocol-auth'),
     DNode        = require('dnode'),
     version      = '0.3.2',
-    port         = 80,
+    port         = 8080,
     token        = '',
     server       = module.exports = express.createServer();
 
@@ -72,8 +67,6 @@ DNode()
     .use(Auth)      // Authentication support
     .use(PubSub)    // Pub/sub channel support
     .use(CRUD)      // Backbone integration
-    //.use(Upload)    // File upload support
     .use(Gravatar)  // Gravatar integration
     .use(Misc)      // Misc. resources
-    .listen(5050)
     .listen(server) // Start your engines!

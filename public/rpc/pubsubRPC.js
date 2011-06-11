@@ -9,7 +9,6 @@
         
             // New subscription received
             subscribed : function(resp, options) {
-                console.log('Subscribed: ', resp);
                 console.log('Subscribed: ', options);
                 
                 if (!options.channel) return;
@@ -18,7 +17,6 @@
         
             // Someone has unsubscribed
             unsubscribed : function(resp, options) {
-                console.log('Unsubscribed: ', resp);
                 console.log('Unsubscribed: ', options);
                 
                 if (!options.channel) return;
@@ -70,13 +68,11 @@
         // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
         // for subscriptions, relabeled to 'channel' for clarity
         subscribe : function(options, callback) {
-            console.log('mod SUB', this);
             if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? Helpers.getUrl(model.collection) : Helpers.getUrl(model));
             
-            console.log('mod SUB', options.channel);
             // Add the model to a local object container so that other methods
             // called from the server have access to it
             if (!Store[options.channel] || options.override) {

@@ -14,14 +14,15 @@
         .connect(function(remote) {
             
             // Save the remote connection for persistance, start 
-            // the application, and enable hash url history, wait 
-            // for the DOM to render before starting main controller
+            // the application, and enable hash url history
             Server = remote;
             
+            // Wait for the DOM to render before starting main controller
             $(document).ready(function() {
                 new Controllers.Application();
             });
         }, {
+            // Set the socket reconection interval
             reconnect : 5000
         });
 })()

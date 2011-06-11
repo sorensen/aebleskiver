@@ -34,10 +34,11 @@
             
             // Send model contents to the template
             var content = this.model.toJSON();
-            
+            console.log('before content', content);
             // Pre-rendering formatting to prevent XSS
-            this.model.escape(content.name);
-            this.model.escape(content.description);
+            content.name = this.model.escape('name');
+            content.description = this.model.escape('description');
+            console.log('after content', content);
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
@@ -150,11 +151,12 @@
             this.model.messages.bind('add', this.render);
             
             // Send model contents to the template
-            var content = this.model.toJSON();
+            var content = this.model.toJSON(),
+                self    = this;
             
-            // Pre-rendering formatting to prevent XSS
-            this.model.escape(content.name);
-            this.model.escape(content.description);
+            // Pre-formatting to prevent XSS
+            content.name = this.model.escape('name');
+            content.description = this.model.escape('description');
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
@@ -179,11 +181,9 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            content.name && this.title.html(Helpers.linkify(content.name))
-            content.description && this.description.html(Helpers.linkify(content.description))
+            this.title.html(Helpers.linkify(self.model.escape('name')));
+            this.description.html(Helpers.linkify(self.model.escape('description')));
             
-            
-            var self = this;
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
                     query    : {room_id : self.model.get('id')},
