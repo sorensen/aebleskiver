@@ -1,6 +1,6 @@
 var config = {
-    uid    : '1c6fc869e31e9259e8c94d79157ceae3';
-    domain : 'sorensen.no.de';
+    uid    : '1c6fc869e31e9259e8c94d79157ceae3',
+    domain : 'sorensen.no.de'
 };
 (function(){
     function loadLB() {
