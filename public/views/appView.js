@@ -107,9 +107,9 @@
             this.el.html(view);
             
             // Assign pre-pouplated locals from Express
-            this.sid              = token;
-            this.port             = port;
-            this.version          = version;
+            this.sid              = ß.token;
+            this.port             = ß.port;
+            this.version          = ß.version;
             
             // Set shortcuts to collection DOM
             this.searchInput      = this.$('#search');
