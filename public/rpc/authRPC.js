@@ -1,9 +1,9 @@
-(function(Protocols) {
+﻿(function(ß) {
     // Backbone dnode sync
     // -------------------
     
     // Remote protocol
-    Protocols.Auth = function(client, con) {
+    ß.Protocols.Auth = function(client, con) {
     
         _.extend(this, {
         
@@ -25,4 +25,4 @@
         });
     };
 
-})(Protocols)
+})(ß)

@@ -1,28 +1,26 @@
-(function() {
+﻿(function(ß) {
     // App Initialization
     // ------------------
 
-    // Setup our dnode listeners for Server callbacks
+    // Setup our dnode listeners for ß.Server callbacks
     // as well as model bindings on connection
     DNode()
-        .use(Protocols.Auth)
-        .use(Protocols.CRUD)
-        .use(Protocols.Misc)
-        .use(Protocols.Pubsub)
-        .use(Protocols.Upload)
-        .use(Protocols.Gravatar)
+        .use(ß.Protocols.Auth)
+        .use(ß.Protocols.CRUD)
+        .use(ß.Protocols.Misc)
+        .use(ß.Protocols.Pubsub)
+        .use(ß.Protocols.Upload)
+        .use(ß.Protocols.Gravatar)
         .connect(function(remote) {
             
             // Save the remote connection for persistance, start 
             // the application, and enable hash url history
-            Server = remote;
+            ß.Server = remote;
+            delete remote;
             
             // Wait for the DOM to render before starting main controller
             $(document).ready(function() {
-                new Controllers.Application();
+                new ß.Controllers.Application();
             });
-        }, {
-            // Set the socket reconection interval
-            reconnect : 5000
         });
-})()
+})(ß)

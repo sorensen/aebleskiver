@@ -1,8 +1,8 @@
-(function(Protocols) {
+﻿(function(ß) {
     // Gravatar dnode sync
     // -------------------
     
-    Protocols.Gravatar = function() {
+    ß.Protocols.Gravatar = function() {
     
         // Fetched gravatar
         this.gravatared = function(resp, options) {
@@ -10,4 +10,4 @@
             options.finished && options.finished(resp);
         };
     };
-})(Protocols)
+})(ß)

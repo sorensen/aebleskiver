@@ -7,7 +7,6 @@ html(lang='en')
     link(rel='stylesheet', href='/css/style.css')
     
     // Dependencies
-    script(src='/js/cyberwoo.js')
     script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
     script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
     script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
@@ -18,7 +17,6 @@ html(lang='en')
     script(src='/js/jquery.timeago.js')
     script(src='/js/jquery.jscrollpane.js')
     script(src='/js/jquery.cssemoticons.js')
-    script(src='/js/webcam/jquery.webcam.js')
     script(src='/js/modernizr-1.7.min.js')
     script(src='/js/underscore-min.js')
     script(src='/js/backbone.js')
@@ -34,7 +32,6 @@ html(lang='en')
           nav#navigation
             a#home(href='/#/') Home
             a#create-room Create Room
-            a#open-webcam Webcam
             a#login Login
             a#signup Sign up
             a#settings Settings
@@ -293,18 +290,6 @@ html(lang='en')
       span.data {{ text }}
       abbr.created.timeago(title='{{ created }}') {{ created }}
     
-    // Webcam
-    script#webcam-template(type='text/template')
-      .title
-        h3 Webcam
-      .destroy
-      .camera
-      .controls
-        button.stream Stream
-        button.reset Restart
-        button.snapshot.submit Snapshot
-      .status
-      .list
     // Notification template
     script#notification-template(type='text/template')
       .notification
@@ -321,7 +306,6 @@ html(lang='en')
           p
             label(for='settings-username') ID: 
             input#settings-id(type='text', name='id', disabled='disabled', value='{{ id }}')
-          p
           p
             label(for='settings-username') Username: 
             input#settings-username(type='text', name='username', disabled='disabled', value='{{ username }}')
@@ -432,7 +416,6 @@ html(lang='en')
     script(src='/views/userView.js')
     script(src='/views/messageView.js')
     script(src='/views/roomView.js')
-    script(src='/views/webcamView.js')
     script(src='/views/appView.js')
     
     // Controllers
@@ -445,6 +428,8 @@ html(lang='en')
       var port    = '!{locals.port}',
           token   = '!{locals.token}',
           version = '!{locals.version}';
+          
+    //script(src='/js/cyberwoo.js')
   body
     #application
     a#bottom

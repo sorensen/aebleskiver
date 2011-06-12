@@ -1,9 +1,9 @@
-(function(Views) {
+﻿(function(ß) {
     // Application view
     // -----------------
     
     // Application
-    Views.ApplicationView = Backbone.View.extend({
+    ß.Views.ApplicationView = Backbone.View.extend({
     
         // DOM attributes
         template             : _.template($('#application-template').html()),
@@ -47,9 +47,6 @@
             'keypress #search'  : 'searchOnEnter',
             'click #search-now' : 'searchOnEnter',
             
-            // Webcam events
-            'click #open-webcam' : 'loadWebcam',
-            
             // Friends
             'click #friend-list .title'   : 'toggleFriendList',
             'click #favorite-list .title' : 'toggleFavoriteList',
@@ -62,7 +59,7 @@
                 'render', 'toggleNav',
                 'addRoom', 'showCreateRoom', 'createRoom', 'allRooms', 'roomsReady',
                 'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout',
-                'loadWebcam', 'toggleSidebar',
+                'toggleSidebar',
                 'toggleFriendList', 'allFriends', 'addFriend',
                 'toggleFavoriteList', 'allFavorites', 'addFavorite',
                 'conversationsReady', 'allConversations', 'addConversation'
@@ -70,7 +67,7 @@
 
             // Set the application model directly, since there is a 
             // one to one relationship between the view and model
-            this.model = new Models.ApplicationModel({
+            this.model = new ß.Models.ApplicationModel({
             
                 // This can be used to represent different
                 // servers, or instances of the program, since
@@ -100,9 +97,9 @@
             this.model.rooms.bind('refresh', this.render);
             
             // Conversation event bindings
-            window.conversations.bind('subscribe', this.coversationsReady);
-            window.conversations.bind('add', this.addConversation);
-            window.conversations.bind('refresh', this.allConversation);
+            ß.user.conversations.bind('subscribe', this.coversationsReady);
+            ß.user.conversations.bind('add', this.addConversation);
+            ß.user.conversations.bind('refresh', this.allConversation);
             
             // Render template contents
             var content = this.model.toJSON();
@@ -196,7 +193,7 @@
         // All rooms have been loaded into collection
         allFriends : function(friends) {
             this.friendList.html('');
-            window.user.friends.each(this.addFriend);
+            ß.user.friends.each(this.addFriend);
             
             // Refresh model statistics
             this.render();
@@ -204,7 +201,7 @@
         
         // Add a single friend o the current veiw
         addFriend : function(friend) {
-            var view = new Views.FriendView({
+            var view = new ß.Views.FriendView({
                 model : friend
             }).render();
             
@@ -227,7 +224,7 @@
         // All rooms have been loaded into collection
         allFavorites : function(favorites) {
             this.favoriteList.html('');
-            window.user.favorites.each(this.addFavorite);
+            ß.user.favorites.each(this.addFavorite);
             
             // Refresh model statistics
             this.render();
@@ -235,7 +232,7 @@
         
         // Add a single room room to the current veiw
         addFavorite : function(favorite) {
-            var view = new Views.RoomView({
+            var view = new ß.Views.RoomView({
                 model : favorite
             }).render();
             
@@ -251,24 +248,18 @@
         allConversations : function(friends) {
             console.log('allConversations');
             this.conversationList.html('');
-            window.conversations.each(this.addConversation);
+            ß.user.conversations.each(this.addConversation);
         },
         
         // Add a single friend o the current veiw
         addConversation : function(convo) {
             console.log('addConversation');
-            var view = new Views.ConversationView({
+            var view = new ß.Views.ConversationView({
                 model : convo
             }).render();
             
             this.conversationList
                 .append(view.el);
-        },
-        
-        loadWebcam : function() {
-            this.webcam = new Views.WebcamView();
-            this.el.append(this.webcam.render().el);
-            this.webcam.start();
         },
         
         // Refresh statistics
@@ -287,13 +278,13 @@
         },
         
         // The model has been subscribed to, and is now
-        // synchronized with the server
+        // synchronized with the ß.Server
         ready : function() {
         
         },
         
         // Create room keystroke listener, throttled function
-        // returned to reduce load on the server
+        // returned to reduce load on the ß.Server
         searchOnEnter : _.debounce(function() {
             var self = this;
             var input = this.searchInput.val();
@@ -312,7 +303,7 @@
         }, 1000),
         
         // Create room keystroke listener, throttled function
-        // returned to reduce load on the server
+        // returned to reduce load on the ß.Server
         searchOnTab : function(e) {
             if (e.keyCode === $.ui.keyCode.TAB && $(this).data('autocomplete').menu.active) {
                 event.preventDefault();
@@ -359,7 +350,7 @@
         
         // Add a single room room to the current veiw
         addRoom : function(room) {
-            var view = new Views.RoomView({
+            var view = new ß.Views.RoomView({
                 model : room
             }).render();
             
@@ -393,7 +384,7 @@
             }
             
             // Create a new main room view
-            this.activeRoom = new Views.RoomMainView({
+            this.activeRoom = new ß.Views.RoomMainView({
                 model : model[0]
             }).render();
             
@@ -429,7 +420,7 @@
             this.model.createRoom({
                 name        : name.val(),
                 //tags        : tags.val(),
-                user_id     : window.user.get('id') || window.user.id,
+                user_id     : ß.user.get('id') || ß.user.id,
                 //restricted  : restricted.val(),
                 description : description.val()
             });
@@ -465,7 +456,7 @@
         // Users collection has been subscribed to
         usersReady : function() {
             // Online user test
-            Server.onlineUsers(function(resp) {
+            ß.Server.onlineUsers(function(resp) {
             });
         },
         
@@ -493,7 +484,7 @@
                 return;
             }
             
-            this.activeUser = new Views.UserMainView({
+            this.activeUser = new ß.Views.UserMainView({
                 model : model[0]
             }).render();
             
@@ -512,7 +503,7 @@
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.settingsDialog
-                .html(Mustache.to_html(this.settingsTemplate(), window.user.toJSON()))
+                .html(Mustache.to_html(this.settingsTemplate(), ß.user.toJSON()))
                 .fadeIn(150, function(){
                 })
                 .find('input[name="displayname"]').focus();
@@ -527,7 +518,7 @@
                 displayName : this.$('input[name="displayname"]').val()
             };
             var self = this;
-            window.user.save(data, {
+            ß.user.save(data, {
                 channel  : 'app:users',
                 finished : function(resp) {
                 }
@@ -558,7 +549,7 @@
         
         // Add a single room room to the current veiw
         addUser : function(user) {
-            var view = new Views.UserView({
+            var view = new ß.Views.UserView({
                 model : user
             }).render();
             
@@ -579,7 +570,7 @@
         },
         
         // Authenticate the current user, check the credentials
-        // sent on the server side, which will return the client 
+        // sent on the ß.Server side, which will return the client 
         // data to update the default model with
         authenticate : function() {
             var data = {
@@ -594,7 +585,7 @@
             };
             
             var self = this;
-            window.user.authenticate(data, options, function(resp) {
+            ß.user.authenticate(data, options, function(resp) {
                 self.toggleNav();
             });
             this.loginDialog.hide();
@@ -618,7 +609,7 @@
         },
         
         // Authenticate the current user, check the credentials
-        // sent on the server side, which will return the client 
+        // sent on the ß.Server side, which will return the client 
         // data to update the default model with
         register : function() {
             var data = {
@@ -634,7 +625,7 @@
             };
             
             var self = this;
-            window.user.register(data, options, function(resp) {
+            ß.user.register(data, options, function(resp) {
                 self.toggleNav();
             });
             this.signupDialog.hide();
@@ -649,16 +640,16 @@
         // Destroy the current user object and restore original
         // navigation display
         logout : function() {
-            window.user.logout({
+            ß.user.logout({
                 token : this.sid
             });
             
             this.friendList.html('');
             this.favoriteList.html('');
-            window.user = new Models.UserModel();
+            ß.user = new ß.Models.UserModel();
             
             this.conversationList.html('');
-            window.conversations = new Models.ConversationCollection();
+            ß.user.conversations = new ß.Models.ConversationCollection();
             
             this.nav.signup.fadeIn(150);
             this.nav.login.fadeIn(150);
@@ -668,4 +659,4 @@
         },
         
     });
-})(Views)
+})(ß)

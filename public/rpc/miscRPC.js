@@ -1,9 +1,9 @@
-(function(Protocols) {
-    // Miscellanious protocols
+﻿(function(ß) {
+    // Miscellanious ß.Protocols
     // -----------------------
     
     // Remote protocol
-    Protocols.Misc = function(client, con) {
+    ß.Protocols.Misc = function(client, con) {
         
         var refresh;
         
@@ -40,28 +40,28 @@
                 console.log('FORCE START: ', resp)
                 
                 var to = resp.id || resp._id;
-                var from = window.user.get('id');
+                var from = ß.user.get('id');
                 var key = (to > from) 
                         ? to + ':' + from
                         : from + ':' + to;
                 
                 console.log('FORCE START: ', key)
                 
-                if (!window.conversations.get(key)) {
+                if (!ß.user.conversations.get(key)) {
                 
-                    var convo = new Models.ConversationModel({
+                    var convo = new ß.Models.ConversationModel({
                         to   : to,
                         id   : key,
                         name : resp.displayName || resp.username
                     });
                     convo.url = 'pm:' + key;
                     
-                    window.conversations.add(convo);
+                    ß.user.conversations.add(convo);
                 }
                 
-                console.log('FORCE START: ', window.conversations)
+                console.log('FORCE START: ', ß.user.conversations)
             }
         });
     };
     
-})(Protocols)
+})(ß)

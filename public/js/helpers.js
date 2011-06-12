@@ -1,8 +1,8 @@
-(function(Helpers) {
+﻿(function(ß) {
     // Helpers
     // -------
     
-    _.extend(Helpers, {
+    _.extend(ß.Helpers, {
     
         // Format a timestamp from miliseconds to a 
         // human readable string
@@ -33,12 +33,12 @@
         
         // Return the last element of a comma delimited string
         extractLast : function(term) {
-            return Helpers.split(term).pop();
+            return ß.Helpers.split(term).pop();
         },
         
         // Assign the mongo ObjectID to sync up with 
         // Backbone's 'id' attribute that is used internally,
-        // can be used with an array of models or a single one
+        // can be used with an array of ß.Models or a single one
         getMongoId : function(data) {
             data._id && (data.id = data._id);
             if (_.isArray(data)) {
@@ -58,4 +58,4 @@
         }
     });
     
-})(Helpers)
+})(ß)

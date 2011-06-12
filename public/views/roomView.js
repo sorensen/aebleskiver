@@ -1,5 +1,5 @@
-(function(Views) {
-    // Room room views
+﻿(function(ß) {
+    // Room room Views
     // -----------------
     
     // Both the simple 'Room' view and the full 'MainRoom'
@@ -8,7 +8,7 @@
     // collection, and provides different updates
     
     // Room room
-    Views.RoomView = Backbone.View.extend({
+    ß.Views.RoomView = Backbone.View.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -104,7 +104,7 @@
     });
     
     // Room room
-    Views.RoomMainView = Backbone.View.extend({
+    ß.Views.RoomMainView = Backbone.View.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -126,7 +126,7 @@
         
         // Constructor
         initialize : function(options) {
-            this.viewable = this.model.allowedToView(window.user);
+            this.viewable = this.model.allowedToView(ß.user);
             if (!this.viewable) {
                 return;
             }
@@ -141,8 +141,8 @@
             this.model.bind('change', this.render);
             this.model.bind('remove', this.remove);
             
-            this.model.messages = new Models.MessageCollection();
-            this.model.messages.url = Helpers.getUrl(this.model) + ':messages';
+            this.model.messages = new ß.Models.MessageCollection();
+            this.model.messages.url = ß.Helpers.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('refresh', this.allMessages);
@@ -160,7 +160,7 @@
             $(this.el)
                 .html(view);
             
-            this.editable = this.model.allowedToEdit(window.user);
+            this.editable = this.model.allowedToEdit(ß.user);
             // Check if the current user is the room creator
             if (this.editable) {
                 $(this.el).addClass('editable');
@@ -177,8 +177,8 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            this.title.html(Helpers.linkify(self.model.escape('name')));
-            this.description.html(Helpers.linkify(self.model.escape('description')));
+            this.title.html(ß.Helpers.linkify(self.model.escape('name')));
+            this.description.html(ß.Helpers.linkify(self.model.escape('description')));
             
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
@@ -197,37 +197,37 @@
         },
         
         addToFavorites : function() {
-            if (this.model.get('id') == window.user.get('id')
-                || this.model.get('id') == window.user.id) {
+            if (this.model.get('id') == ß.user.get('id')
+                || this.model.get('id') == ß.user.id) {
                 return;
             }
             
-            var favorites = window.user.get('favorites') || [];            
-            var find = _.indexOf(favorites, this.model.get('id'));
+            var favorites = ß.user.get('favorites') || [],          
+                find = _.indexOf(favorites, this.model.get('id'));
             
             if (find !== -1) {
                 return;
             }
             favorites.push(this.model.get('id'));
             
-            window.user.set({
+            ß.user.set({
                 favorites : _.unique(favorites)
             }).save();
             
-            window.user.favorites.add(this.model);
+            ß.user.favorites.add(this.model);
         },
         
         removeFromFavorites : function() {
-            var id = this.model.get('id');
-            var favorites = _.without(window.user.get('favorites'), id);
+            var id = this.model.get('id'),
+                favorites = _.without(ß.user.get('favorites'), id);
             
-            var person = window.user.favorites.get(id);
+            var person = ß.user.favorites.get(id);
             $(person.view.el).remove();
             
-            window.user.favorites.remove(this.model, {
+            ß.user.favorites.remove(this.model, {
                 silent : true
             });
-            window.user.set({
+            ß.user.set({
                 favorites : favorites
             }).save();
         },
@@ -276,7 +276,7 @@
         addMessage : function(message) {
             //this.concurrency(message);
             
-            var view = new Views.MessageView({
+            var view = new ß.Views.MessageView({
                 model : message
             }).render();
             
@@ -294,7 +294,7 @@
             **/
         },
         
-        // Send a message to the server
+        // Send a message to the ß.Server
         createMessage : function() {
             if (!this.input.val()) return;
             this.model.messages.create(this.newAttributes());
@@ -308,21 +308,21 @@
         
         // Generate the attributes
         newAttributes : function() {
-            var username = window.user.get('username');
-            var id = window.user.get('id') || window.user.id;
+            var username = ß.user.get('username'),
+                id = ß.user.get('id') || ß.user.id;
             
             return {
                 text        : this.input.val(),
                 room_id     : this.model.get('id'),
                 user_id     : id,
-                username    : (username == Models.UserModel.defaults) ? id : window.user.get('username'),
-                displayName : window.user.get('displayName') || window.user.get('username'),
-                avatar      : window.user.get('avatar')
+                username    : (username == ß.Models.UserModel.defaults) ? id : ß.user.get('username'),
+                displayName : ß.user.get('displayName') || ß.user.get('username'),
+                avatar      : ß.user.get('avatar')
             };
         },
     });
     
-    Views.ConversationView = Views.RoomMainView.extend({
+    ß.Views.ConversationView = ß.Views.RoomMainView.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -343,7 +343,7 @@
         
         // Constructor
         initialize : function(options) {
-            this.viewable = this.model.allowedToView(window.user);
+            this.viewable = this.model.allowedToView(ß.user);
             
             if (!this.viewable) {
                 return;
@@ -359,8 +359,8 @@
             this.model.bind('change', this.render);
             this.model.bind('remove', this.remove);
             
-            this.model.messages = new Models.MessageCollection();
-            this.model.messages.url = Helpers.getUrl(this.model) + ':messages';
+            this.model.messages = new ß.Models.MessageCollection();
+            this.model.messages.url = ß.Helpers.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('refresh', this.allMessages);
@@ -385,8 +385,8 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            content.name && this.title.html(Helpers.linkify(content.name));
-            content.description && this.description.html(Helpers.linkify(content.description));
+            content.name && this.title.html(ß.Helpers.linkify(content.name));
+            content.description && this.description.html(ß.Helpers.linkify(content.description));
             
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
@@ -402,7 +402,7 @@
         
         startConversation : _.debounce(function() {
             var self = this;
-            Server.startConversation(window.user.toJSON(), {
+            ß.Server.startConversation(ß.user.toJSON(), {
                 channel : self.model.url,
                 id      : self.model.get('to')
             }, function(resp, options) {
@@ -410,7 +410,7 @@
             });
         }, 1000),
         
-        // Send a message to the server
+        // Send a message to the ß.Server
         createMessage : function() {
             if (!this.input.val()) return;
             this.startConversation();
@@ -435,20 +435,20 @@
         
         // Generate the attributes
         newAttributes : function() {
-            var username = window.user.get('username');
-            var id = window.user.get('id') || window.user.id;
+            var username = ß.user.get('username'),
+                id = ß.user.get('id') || ß.user.id;
             
             return {
                 text        : this.input.val(),
                 room_id     : this.model.get('id'),
                 user_id     : id,
-                username    : (username == Models.UserModel.defaults) ? id : window.user.get('username'),
-                displayName : window.user.get('displayName') || window.user.get('username'),
-                avatar      : window.user.get('avatar'),
+                username    : (username == ß.Models.UserModel.defaults) ? id : ß.user.get('username'),
+                displayName : ß.user.get('displayName') || ß.user.get('username'),
+                avatar      : ß.user.get('avatar'),
                 type        : 'private'
             };
         },
     
     });
     
-})(Views)
+})(ß)

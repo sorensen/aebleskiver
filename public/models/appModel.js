@@ -1,8 +1,8 @@
-(function(Models) {
+﻿(function(ß) {
     // Application model
     // -----------------
     
-    Models.ApplicationModel = Backbone.Model.extend({
+    ß.Models.ApplicationModel = Backbone.Model.extend({
     
         type     : 'application',
         urlRoot  : 'app',
@@ -26,21 +26,21 @@
         initialize : function(options) {
             
             // Current user collection
-            this.users = new Models.UserCollection();
+            this.users = new ß.Models.UserCollection();
             this.users.url = this.url() + ':users';
             
             // Active room collection
-            this.rooms = new Models.RoomCollection();
+            this.rooms = new ß.Models.RoomCollection();
             this.rooms.url = this.url() + ':rooms';
             
             // Create a new user for the current client, only the 
             // defaults will be used until the client authenticates
             // with valid credentials
-            window.user = new Models.UserModel();
+            ß.user = new ß.Models.UserModel();
             
             // Conversations collections
-            window.conversations = new Models.ConversationCollection();
-            window.conversations.url = this.url() + ':conversations';
+            ß.user.conversations = new ß.Models.ConversationCollection();
+            ß.user.conversations.url = this.url() + ':conversations';
             
             // Wait for three executions of history() before
             // starting, ensuring that rooms and users are loaded before
@@ -54,7 +54,7 @@
             // 'finished' function if you pass one in theim n options
             var self = this;
             
-            // Sync up with the server through DNode, Backbone will
+            // Sync up with the ß.Server through DNode, Backbone will
             // supply the channel url if one is not supplied
             this.rooms.subscribe({}, function(resp) {
                 self.rooms.fetch({
@@ -66,7 +66,7 @@
                 });
             });
             
-            // Sync up with the server through DNode, Backbone will
+            // Sync up with the ß.Server through DNode, Backbone will
             // supply the channel url if one is not supplied
             this.users.subscribe({}, function(resp) {
                 self.users.fetch({
@@ -81,27 +81,27 @@
                             error : function(code, data, options) {
                             },
                         };
-                        Server.getSession({}, params, function(session, options) {
+                        ß.Server.getSession({}, params, function(session, options) {
                         
                             console.log('got session');
                             if (!session) return;
                             options.password && (session.password = options.password);
-                            session = Helpers.getMongoId(session);
+                            session = ß.Helpers.getMongoId(session);
                             
-                            window.user.set(session);
-                            window.user.url = self.url() + ':users:' + session.id;
-                            window.user.subscribe({}, function(resp) {
+                            ß.user.set(session);
+                            ß.user.url = self.url() + ':users:' + session.id;
+                            ß.user.subscribe({}, function(resp) {
                             
                                 // Current user bindings
-                                window.user.friends.bind('add', self.view.addFriend);
-                                window.user.friends.bind('refresh', self.view.allFriends);
+                                ß.user.friends.bind('add', self.view.addFriend);
+                                ß.user.friends.bind('refresh', self.view.allFriends);
                                 
-                                window.user.favorites.bind('add', self.view.addFavorite);
-                                window.user.favorites.bind('refresh', self.view.allFavorites);
+                                ß.user.favorites.bind('add', self.view.addFavorite);
+                                ß.user.favorites.bind('refresh', self.view.allFavorites);
                             
-                                window.user.collection = self.users;
-                                window.user.loadFriends()
-                                window.user.loadFavorites();
+                                ß.user.collection = self.users;
+                                ß.user.loadFriends()
+                                ß.user.loadFavorites();
                                     
                                 console.log('BLAH');
                             });
@@ -109,12 +109,12 @@
                             history();
                             session._id && self.view.toggleNav();
                             
-                            // Sync up with the server through DNode, Backbone will
+                            // Sync up with the ß.Server through DNode, Backbone will
                             // supply the channel url if one is not supplied
                             /**
-                            window.conversations.subscribe({}, function(resp) {
+                            ß.user.conversations.subscribe({}, function(resp) {
                                 console.log('Conversation subbed', resp);
-                                window.conversations.fetch({
+                                ß.user.conversations.fetch({
                                     query    : {},
                                     error    : function(code, msg, opt) {},
                                     finished : function(resp) {
@@ -124,11 +124,11 @@
                             });
                             **/
                             
-                            Server.onlineUsers(function(resp) {
+                            ß.Server.onlineUsers(function(resp) {
                                 console.log('onlineUsers: ', resp);
                             });
                             
-                            Server.activeSessions(function(resp) {
+                            ß.Server.activeSessions(function(resp) {
                                 console.log('activeSessions: ', resp);
                                 
                                 this.online = resp.length || 0;
@@ -151,4 +151,4 @@
         }
     });
     
-})(Models)
+})(ß)

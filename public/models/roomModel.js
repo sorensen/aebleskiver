@@ -1,9 +1,9 @@
-(function(Models) {
+﻿(function(ß) {
     // Room model
     // ------------------
     
     // Room room
-    Models.RoomModel = Backbone.Model.extend({
+    ß.Models.RoomModel = Backbone.Model.extend({
     
         type  : 'room',
         
@@ -37,7 +37,7 @@
         }
     });
     
-    Models.PrivateRoomModel = Models.RoomModel.extend({
+    ß.Models.PrivateRoomModel = ß.Models.RoomModel.extend({
     
         defaults : {
             name      : 'Unknown',
@@ -54,9 +54,9 @@
     });
     
     // Room Collection
-    Models.RoomCollection = Backbone.Collection.extend({
+    ß.Models.RoomCollection = Backbone.Collection.extend({
         
-        model : Models.RoomModel,
+        model : ß.Models.RoomModel,
         url   : 'rooms',
         type  : 'room',
         
@@ -74,18 +74,18 @@
         }
     });
         
-    Models.ConversationModel = Models.RoomModel.extend({
+    ß.Models.ConversationModel = ß.Models.RoomModel.extend({
     
         defaults : {},
         type     : 'conversation',
     });
     
-    Models.ConversationCollection = Models.RoomCollection.extend({
+    ß.Models.ConversationCollection = ß.Models.RoomCollection.extend({
         
-        model : Models.ConversationModel,
+        model : ß.Models.ConversationModel,
         url   : 'conversations',
         type  : 'conversation',
         
     });
     
-})(Models)
+})(ß)

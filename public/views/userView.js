@@ -1,9 +1,9 @@
-(function(Views) {
+﻿(function(ß) {
     // User views
     // -----------------
     
     // User ( Client )
-    Views.UserView = Backbone.View.extend({
+    ß.Views.UserView = Backbone.View.extend({
     
         // DOM attributes
         tagName   : 'div',
@@ -21,7 +21,6 @@
             this.model.bind('change', this.render);
             this.model.bind('remove', this.clear);
             this.model.view = this;
-            
             this.render();
         },
     
@@ -53,7 +52,7 @@
         },
     });
     
-    Views.FriendView = Views.UserView.extend({
+    ß.Views.FriendView = ß.Views.UserView.extend({
     
         // DOM attributes
         tagName   : 'div',
@@ -72,7 +71,7 @@
     });
     
     // User ( Client )
-    Views.UserMainView = Backbone.View.extend({
+    ß.Views.UserMainView = Backbone.View.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -97,7 +96,7 @@
             this.model.bind('change', this.render);
             this.model.bind('remove', this.remove);
             
-            this.model.posts = new Models.MessageCollection();
+            this.model.posts = new ß.Models.MessageCollection();
             this.model.posts.url = this.model.url() + ':posts';
             
             this.model.posts.bind('add', this.addPost);
@@ -109,7 +108,7 @@
             var self = this;
             // Request a gravatar image for the current 
             // user based on email address
-            Server.gravatar({
+            ß.Server.gravatar({
                 email : self.model.get('email'),
                 size  : 100
             }, function(resp) {
@@ -141,34 +140,34 @@
         },
         
         addToFriends : function() {
-            if (this.model.get('id') == window.user.get('id')
-                || this.model.get('id') == window.user.id) {
+            if (this.model.get('id') == ß.user.get('id')
+                || this.model.get('id') == ß.user.id) {
                 return;
             }
             
-            var friends = window.user.get('friends') || [];            
-            var find = _.indexOf(friends, this.model.get('id'));
+            var friends = ß.user.get('friends') || [],
+                find    = _.indexOf(friends, this.model.get('id'));
             
             if (find !== -1) {
                 return;
             }
             friends.push(this.model.get('id'));
             
-            window.user.set({
+            ß.user.set({
                 friends : _.unique(friends)
             }).save();
             
-            window.user.friends.add(this.model);
+            ß.user.friends.add(this.model);
         },
         
         removeFromFriends : function() {
-            var id = this.model.get('id');
-            var friends = _.without(window.user.get('friends'), id);
-            
-            var person = window.user.friends.get(id);
+            var id      = this.model.get('id'),
+                friends = _.without(ß.user.get('friends'), id),
+                person  = ß.user.friends.get(id);
+                
             $(person.view.el).remove();
             
-            window.user.friends
+            ß.user.friends
                 .remove(this.model, {
                     silent : true
                 })
@@ -217,7 +216,7 @@
         },
         
         addPost : function(post) {
-            var view = new Views.MessageView({
+            var view = new ß.Views.MessageView({
                 model : post
             }).render();
             
@@ -226,7 +225,7 @@
                 .scrollTop(this.postList[0].scrollHeight);
         },
         
-        // Send a post to the server
+        // Send a post to the ß.Server
         createPost : function() {
             if (!this.input.val()) return;
             this.model.posts.create(this.newAttributes());
@@ -240,18 +239,18 @@
         
         // Generate the attributes
         newAttributes : function() {
-            var username = window.user.get('username');
-            var id = window.user.get('id') || window.user.id;
+            var username = ß.user.get('username');
+            var id = ß.user.get('id') || ß.user.id;
             
             return {
                 text        : this.input.val(),
                 room_id     : this.model.get('id'),
                 user_id     : id,
-                username    : (username == Models.UserModel.defaults) ? id : window.user.get('username'),
-                displayName : window.user.get('displayName') || window.user.get('username'),
-                avatar      : window.user.get('avatar')
+                username    : (username == ß.Models.UserModel.defaults) ? id : ß.user.get('username'),
+                displayName : ß.user.get('displayName') || ß.user.get('username'),
+                avatar      : ß.user.get('avatar')
             };
         },
     });
 
-})(Views)
+})(ß)

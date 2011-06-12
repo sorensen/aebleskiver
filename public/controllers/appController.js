@@ -1,9 +1,9 @@
-(function(Controllers) {
+﻿(function(ß) {
     // Application
     // ----------
     
     // Main controller and router
-    Controllers.Application = Backbone.Controller.extend({
+    ß.Controllers.Application = Backbone.Controller.extend({
     
         // Definitions
         routes : {
@@ -17,11 +17,8 @@
         
         initialize : function(options) {
             
-            // Force window location
-            //this.saveLocation('/');
-            
             // Attach the application
-            Application = this.view = new Views.ApplicationView({
+            this.view = new ß.Views.ApplicationView({
                 // Use existing DOM element
                 el : $("#application")
             });
@@ -68,4 +65,4 @@
         },
     });
     
-})(Controllers)
+})(ß)

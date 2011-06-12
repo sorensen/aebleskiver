@@ -1,9 +1,9 @@
-(function(Protocols) {
+﻿(function(ß) {
     // Backbone dnode sync
     // -------------------
     
     // Remote protocol
-    Protocols.Upload = function(client, con) {
+    ß.Protocols.Upload = function(client, con) {
     
     
         _.extend(this, {
@@ -21,4 +21,4 @@
     
     };
     
-})(Protocols)
+})(ß)

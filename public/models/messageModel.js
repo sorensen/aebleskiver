@@ -1,9 +1,9 @@
-(function(Models) {
+﻿(function(ß) {
     // Message model
     // ------------------
     
     // Single message model
-    Models.MessageModel = Backbone.Model.extend({
+    ß.Models.MessageModel = Backbone.Model.extend({
     
         type  : 'message',
         
@@ -32,7 +32,7 @@
         }
     });
     
-    Models.PrivateMessageModel = Models.MessageModel.extend({
+    ß.Models.PrivateMessageModel = ß.Models.MessageModel.extend({
     
         allowedToView : function(user) {
             return user.get('id') == this.get('to')
@@ -42,9 +42,9 @@
     });
     
     // Message Collection
-    Models.MessageCollection = Backbone.Collection.extend({
+    ß.Models.MessageCollection = Backbone.Collection.extend({
         
-        model : Models.MessageModel,
+        model : ß.Models.MessageModel,
         url   : 'messages',
         type  : 'message',
         
@@ -57,4 +57,4 @@
         }
     });
 
-})(Models)
+})(ß)

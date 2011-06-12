@@ -1,9 +1,9 @@
-(function(Models) {
+﻿(function(ß) {
     // User model
     // ------------------
     
     // User
-    Models.UserModel = Backbone.Model.extend({
+    ß.Models.UserModel = Backbone.Model.extend({
         
         type     : 'user',
         defaults : {
@@ -23,14 +23,14 @@
         
         initialize : function(options) {
             // Add friends list
-            this.friends = new Models.UserCollection();
-            this.favorites = new Models.RoomCollection();
+            this.friends = new ß.Models.UserCollection();
+            this.favorites = new ß.Models.RoomCollection();
             
             // Request a gravatar image for the current 
             // user based on email address if not default
             if (this.get('avatar') === this.defaults.avatar) {
                 var self = this;
-                Server.gravatar({
+                ß.Server.gravatar({
                     email : self.get('email'),
                     size  : 30
                 }, function(resp) {
@@ -68,7 +68,7 @@
         },
         
         logout : function(options) {
-            Server.logout(this.toJSON(), options);
+            ß.Server.logout(this.toJSON(), options);
             this.trigger('logout');
         },
         
@@ -80,7 +80,7 @@
             
             // Update the current model with the returned data, 
             // increase total visits, and chage the status to 'online'
-            Server.authenticate(data, options, function(resp) {
+            ß.Server.authenticate(data, options, function(resp) {
                 self.set(resp);
                 self.save({
                     visits : self.get('visits') + 1,
@@ -91,7 +91,7 @@
             });
         },
         
-        // Register model with the server
+        // Register model with the ß.Server
         register : function(data, options, next) {
         
             var self = this;
@@ -99,7 +99,7 @@
             
             // Update the current model with the returned data, 
             // increase total visits, and chage the status to 'online'
-            Server.register(data, options, function(resp) {
+            ß.Server.register(data, options, function(resp) {
                 self.set(resp);
                 self.save({
                     visits : self.get('visits') + 1,
@@ -118,40 +118,40 @@
         
         
         startConversation : function() {
-            console.log('add conversation ', window.conversations);
+            console.log('add conversation ', ß.user.conversations);
         
             var to = this.get('id');
-            var from = window.user.get('id') || window.user.get('_id');
+            var from = ß.user.get('id') || ß.user.get('_id');
             var key = (to > from) 
                     ? to + ':' + from
                     : from + ':' + to;
             
             console.log('add conversation ', key);
-            if (!window.conversations.get(key)) {
+            if (!ß.user.conversations.get(key)) {
             
-                var convo = new Models.ConversationModel({
+                var convo = new ß.Models.ConversationModel({
                     to   : to,
                     id   : key,
                     name : this.get('displayName') || this.get('username')
                 });
                 convo.url = 'pm:' + key;
                 
-                Server.startConversation(window.user.toJSON(), {
+                ß.Server.startConversation(ß.user.toJSON(), {
                     channel : convo.url,
                     id      : to
                 }, function(resp, options) {
                     console.log('convo started: ', resp);
                     
-                    window.conversations.add(convo);
+                    ß.user.conversations.add(convo);
                 });
             }
         },
     });
     
     // User Collection
-    Models.UserCollection = Backbone.Collection.extend({
+    ß.Models.UserCollection = Backbone.Collection.extend({
         
-        model : Models.UserModel,
+        model : ß.Models.UserModel,
         type  : 'user',
         url   : 'users',
         
@@ -160,4 +160,4 @@
         }
     });
 
-})(Models)
+})(ß)
