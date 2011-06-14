@@ -82,24 +82,24 @@
             
             // User collection event bindings
             this.model.users.bind('subscribe', this.usersReady);
-            this.model.users.bind('add', this.addUser);
-            this.model.users.bind('add', this.render);
-            this.model.users.bind('change', this.render);
-            this.model.users.bind('refresh', this.allUsers);
-            this.model.users.bind('refresh', this.render);
+            this.model.users.bind('add',       this.addUser);
+            this.model.users.bind('add',       this.render);
+            this.model.users.bind('change',    this.render);
+            this.model.users.bind('refresh',   this.allUsers);
+            this.model.users.bind('refresh',   this.render);
             
             // Room collection event bindings
             this.model.rooms.bind('subscribe', this.roomsReady);
-            this.model.rooms.bind('add', this.addRoom);
-            this.model.rooms.bind('add', this.render);
-            this.model.rooms.bind('change', this.render);
-            this.model.rooms.bind('refresh', this.allRooms);
-            this.model.rooms.bind('refresh', this.render);
+            this.model.rooms.bind('add',       this.addRoom);
+            this.model.rooms.bind('add',       this.render);
+            this.model.rooms.bind('change',    this.render);
+            this.model.rooms.bind('refresh',   this.allRooms);
+            this.model.rooms.bind('refresh',   this.render);
             
             // Conversation event bindings
             ß.user.conversations.bind('subscribe', this.coversationsReady);
-            ß.user.conversations.bind('add', this.addConversation);
-            ß.user.conversations.bind('refresh', this.allConversation);
+            ß.user.conversations.bind('add',       this.addConversation);
+            ß.user.conversations.bind('refresh',   this.allConversation);
             
             // Render template contents
             var content = this.model.toJSON();
@@ -142,18 +142,16 @@
             
             // Internal sidebar settings, pull settings
             // from the cookie and bootstrap if required
-            this.menuOpen      = $.cookie('menuOpen') || 'false';
-            this.friendsOpen   = $.cookie('friendsOpen') || 'false';
+            this.menuOpen      = $.cookie('menuOpen')      || 'false';
+            this.friendsOpen   = $.cookie('friendsOpen')   || 'false';
             this.favoritesOpen = $.cookie('favoritesOpen') || 'false';
             
             if (this.menuOpen === 'true') {
                 $(this.el).addClass('menuOpen');
             }
-            
             if (this.friendsOpen === 'true') {
                 this.friends.addClass('open');
             }
-            
             if (this.favoritesOpen === 'true') {
                 this.favorites.addClass('open');
             }
@@ -166,6 +164,8 @@
             }
         },
         
+        // Open or close the sidebar menu, setting a cookie
+        // to remember the setting
         toggleSidebar : function() {
             if (this.menuOpen == 'true') {
                 this.menuOpen = 'false';
@@ -178,6 +178,8 @@
             $.cookie('menuOpen', this.menuOpen);
         },
         
+        // Open or close the friend list, setting a cookie
+        // to remember the setting
         toggleFriendList : function() {
             if (this.friendsOpen == 'true') {
                 this.friendsOpen = 'false';
@@ -240,7 +242,9 @@
                 .append(view.el);
         },
         
+        // Conversations have been subscribed to
         conversationsReady : function(resp) {
+            // Placeholder
         },
         
         // All rooms have been loaded into collection
@@ -261,9 +265,9 @@
         
         // Refresh statistics
         render : function() {
-            var totalOnline = this.model.online || 0;
-            var totalUsers  = this.model.users.length || 0;
-            var totalRooms  = this.model.rooms.length || 0;
+            var totalOnline = this.model.online       || 0,
+                totalUsers  = this.model.users.length || 0,
+                totalRooms  = this.model.rooms.length || 0;
             
             this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
                 totalOnline : totalOnline,
@@ -283,11 +287,11 @@
         // Create room keystroke listener, throttled function
         // returned to reduce load on the ß.Server
         searchOnEnter : _.debounce(function() {
-            var self = this;
-            var input = this.searchInput.val();
-            var query = (input.length < 1) ? {} : {
-                keywords : { $in : [ input ] }
-            };
+            var self  = this,
+                input = this.searchInput.val(),
+                query = (input.length < 1) ? {} : {
+                    keywords : { $in : [ input ] }
+                };
             
             this.model.rooms.fetch({
                 query : query,
