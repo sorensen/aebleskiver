@@ -1,92 +1,27 @@
-// Application Server
-// ------------------
-require.paths.unshift(__dirname + '/lib');
+// Clustered server
+// ----------------
 
-// Dependencies
-var express      = require('express'),
-    SessionStore = require('connect-mongodb'),
-    Mongoose     = require('mongoose');
-    Misc         = require('backbone-misc'),
-    PubSub       = require('backbone-pubsub'),
-    CRUD         = require('backbone-crud'),
-    Gravatar     = require('backbone-gravatar'),
-    Auth         = require('backbone-auth'),
-    DNode        = require('dnode'),
-    version      = '0.3.2',
-    port         = 80,
-    oneYear      = 31557600000,
-    token        = '',
-    server       = module.exports = express.createServer();
+var cluster = require('cluster'),
+    live    = require('cluster-live');
 
-// Server configuration
-server.configure(function() {
-    // View settings
-    server.use(express.bodyParser());
-    server.use(express.cookieParser());
-    server.use(express.methodOverride());
-    server.set('view engine', 'jade');
-    server.set('view options', {layout : false});
+// Start the cluster
+cluster('./app')
+    .use(cluster.logger(__dirname + '/logs'))
+    .use(cluster.pidfiles(__dirname + '/pids'))
+    .use(cluster.cli())
+    .use(cluster.repl(8000))
+    .set('workers', 4)
+    .use(cluster.debug())
+    .use(cluster.stats({ 
+        connections   : true, 
+        lightRequests : true 
+    }))
+    .use(live())
     
-    // Session settings
-    server.use(express.session({
-        cookie : {maxAge : 60000 * 60 * 1},    // 1 Hour
-        secret : 'abcdefghijklmnopqrstuvwxyz', // Hashing salt
-        store  : new SessionStore({
-            dbname   : 'db',
-            username : '',
-            password : ''
-        })
-    }));
-});
+    // Development
+    .in('development')
+        .listen(8080)
     
-// Development specific configurations
-server.configure('development', function(){
-    server.use(express.static(__dirname + '/public'));
-    server.use(express.errorHandler({
-        // Make sure we can see our errors
-        // and stack traces for debugging
-        dumpExceptions : true, 
-        showStack      : true 
-    }));
-});
-
-// Production specific configurations
-server.configure('production', function() {
-    port = 80;
-    server.use(express.static(__dirname + '/public', {
-        // Set the caching lifetime
-        maxAge: oneYear 
-    }));
-    server.use(express.errorHandler());
-});
-
-// Connect to the database
-Mongoose.connect('mongodb://localhost/db');
-
-// Main application
-server.get('/', function(req, res) {
-
-    token = req.session.id;
-    
-    //req.session.regenerate(function () {
-        //token = req.session.id;
-    //});
-    
-    res.render('index.jade', {
-        locals : {
-            port    : port,
-            version : version,
-            token   : token,
-        }
-    });
-});
-
-// Start application
-//server.listen(port);
-DNode()
-    .use(Auth)      // Authentication support
-    .use(PubSub)    // Pub/sub channel support
-    .use(CRUD)      // Backbone integration
-    .use(Gravatar)  // Gravatar integration
-    .use(Misc)      // Misc. resources
-    .listen(server) // Start your engines!
+    // Production
+    .in('production')
+        .listen(80);
