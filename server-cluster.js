@@ -16,4 +16,7 @@ cluster('./server')
         lightRequests : true 
     }))
     .use(live())
-    .listen(8080);
+    .in('development')
+        .listen(8080)
+    .in('production')
+        .listen(80);
