@@ -17,11 +17,4 @@ cluster('./app')
         lightRequests : true 
     }))
     .use(live())
-    
-    // Development
-    .in('development')
-        .listen(8080)
-    
-    // Production
-    .in('production')
-        .listen(80);
+    .listen(80);
