@@ -34,11 +34,10 @@
             
             // Send model contents to the template
             var content = this.model.toJSON();
-            console.log('before content', content);
+            
             // Pre-rendering formatting to prevent XSS
             content.name = this.model.escape('name');
             content.description = this.model.escape('description');
-            console.log('after content', content);
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
@@ -406,7 +405,7 @@
                 channel : self.model.url,
                 id      : self.model.get('to')
             }, function(resp, options) {
-                console.log('convo started doublecheck: ', resp);
+                // Conversation started
             });
         }, 1000),
         
@@ -425,6 +424,7 @@
             this.model.unsubscribe();
             this.model.messages.unsubscribe();
             $(this.el).remove();
+            
             delete this.model;
             delete this;
         },

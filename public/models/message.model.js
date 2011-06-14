@@ -23,10 +23,14 @@
             this.view.remove();
         },
         
+        // Client side validation, allowed to edit if user
+        // created the message
         allowedToEdit : function(user) {
             return user.get('id') == this.get('user_id');
         },
         
+        // Client side validation, all users can see all 
+        // public messages
         allowedToView : function(user) {
             return true;
         }
@@ -34,6 +38,8 @@
     
     ß.Models.PrivateMessageModel = ß.Models.MessageModel.extend({
     
+        // Client side validation, only allowed to view message
+        // if it was sent to or from the supplied user
         allowedToView : function(user) {
             return user.get('id') == this.get('to')
                 || user.get('id') == this.get('user_id');
@@ -52,6 +58,7 @@
         initialize : function(options) {
         },
         
+        // Sort by 'created' time
         comparator : function(message) {
             return new Date(message.get('created')).getTime();
         }

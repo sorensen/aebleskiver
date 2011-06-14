@@ -241,19 +241,16 @@
         },
         
         conversationsReady : function(resp) {
-            console.log('conversationsReady');
         },
         
         // All rooms have been loaded into collection
         allConversations : function(friends) {
-            console.log('allConversations');
             this.conversationList.html('');
             ß.user.conversations.each(this.addConversation);
         },
         
         // Add a single friend o the current veiw
         addConversation : function(convo) {
-            console.log('addConversation');
             var view = new ß.Views.ConversationView({
                 model : convo
             }).render();
@@ -330,7 +327,7 @@
         
         // Room collection has been subscribed to
         roomsReady : function() {
-        
+            // Placeholder
         },
         
         // All rooms have been loaded into collection
@@ -372,7 +369,6 @@
             // Should probably hide room instead, maybe 
             // minimize it to the bottom toolbar
             this.deactivateRoom();
-            
             
             // Get model by slug
             var model = this.model.rooms.filter(function(room) {
@@ -511,13 +507,14 @@
         
         // Save updated user settings
         saveSettings : function() {
-            var data = {
-                bio         : this.$('textarea[name="bio"]').val(),
-                email       : this.$('input[name="email"]').val(),
-                password    : this.$('input[name="password"]').val(),
-                displayName : this.$('input[name="displayname"]').val()
-            };
             var self = this;
+                data = {
+                    bio         : this.$('textarea[name="bio"]').val(),
+                    email       : this.$('input[name="email"]').val(),
+                    password    : this.$('input[name="password"]').val(),
+                    displayName : this.$('input[name="displayname"]').val()
+                };
+            
             ß.user.save(data, {
                 channel  : 'app:users',
                 finished : function(resp) {
@@ -573,18 +570,17 @@
         // sent on the ß.Server side, which will return the client 
         // data to update the default model with
         authenticate : function() {
-            var data = {
-                username : this.$('input[name="username"]').val(),
-                password : this.$('input[name="password"]').val()
-            };
-            
-            var options = {
-                token : this.sid,
-                error : function(code, data, options) {
+            var self = this,
+                data = {
+                    username : this.$('input[name="username"]').val(),
+                    password : this.$('input[name="password"]').val()
                 },
-            };
+                options = {
+                    token : this.sid,
+                    error : function(code, data, options) {
+                    },
+                };
             
-            var self = this;
             ß.user.authenticate(data, options, function(resp) {
                 self.toggleNav();
             });
@@ -612,19 +608,19 @@
         // sent on the ß.Server side, which will return the client 
         // data to update the default model with
         register : function() {
-            var data = {
-                username    : this.$('input[name="username"]').val(),
-                displayName : this.$('input[name="displayname"]').val(),
-                email       : this.$('input[name="email"]').val(),
-                password    : this.$('input[name="password"]').val(),
-            };
-            var options = {
-                token : this.sid,
-                error : function(code, data, options) {
-                }
-            };
+            var self = this,
+                data = {
+                    username    : this.$('input[name="username"]').val(),
+                    displayName : this.$('input[name="displayname"]').val(),
+                    email       : this.$('input[name="email"]').val(),
+                    password    : this.$('input[name="password"]').val(),
+                },
+                options = {
+                    token : this.sid,
+                    error : function(code, data, options) {
+                    }
+                };
             
-            var self = this;
             ß.user.register(data, options, function(resp) {
                 self.toggleNav();
             });

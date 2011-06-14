@@ -13,7 +13,7 @@ var express      = require('express'),
     Auth         = require('backbone-auth'),
     DNode        = require('dnode'),
     version      = '0.3.2',
-    port         = 80,
+    port         = 8080,
     oneYear      = 31557600000,
     token        = '',
     app          = module.exports = express.createServer();
@@ -65,9 +65,7 @@ Mongoose.connect('mongodb://localhost/db');
 
 // Main application
 app.get('/', function(req, res) {
-
     token = req.session.id;
-    
     //req.session.regenerate(function () {
         //token = req.session.id;
     //});
@@ -81,9 +79,12 @@ app.get('/', function(req, res) {
     });
 });
 
-// Start application
-//app.listen(port);
+// Start application if not clustered
+if (!module.parent) {
+    app.listen(port);
+}
 
+// Configure DNode socket abstraction
 DNode()
     .use(Auth)      // Authentication support
     .use(PubSub)    // Pub/sub channel support

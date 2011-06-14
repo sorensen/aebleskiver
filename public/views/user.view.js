@@ -2,7 +2,7 @@
     // User views
     // -----------------
     
-    // User ( Client )
+    // User
     ß.Views.UserView = Backbone.View.extend({
     
         // DOM attributes
@@ -52,6 +52,7 @@
         },
     });
     
+    // Friend
     ß.Views.FriendView = ß.Views.UserView.extend({
     
         // DOM attributes
@@ -64,13 +65,15 @@
             'click' : 'startConversation',
         },
         
+        // Force the 'friend' user into a conversation
+        // with current user through RPC delegation
         startConversation : function() {
             this.model.startConversation();
         },
         
     });
     
-    // User ( Client )
+    // User profile and wall
     ß.Views.UserMainView = Backbone.View.extend({
     
         // DOM attributes
@@ -96,7 +99,7 @@
             this.model.bind('change', this.render);
             this.model.bind('remove', this.remove);
             
-            this.model.posts = new ß.Models.MessageCollection();
+            this.model.posts     = new ß.Models.MessageCollection();
             this.model.posts.url = this.model.url() + ':posts';
             
             this.model.posts.bind('add', this.addPost);
@@ -115,8 +118,8 @@
                 self.model.set({ avatar : resp });
             });
             
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);   
+            var content = this.model.toJSON(),
+                view = Mustache.to_html(this.template(), content);   
             $(this.el).html(view);
             
             // Set shortcut methods for DOM items
@@ -124,7 +127,8 @@
             this.postList = this.$('.posts');
             this.input.focus();
             
-            var self = this;
+            // Subscribe to the user's message wall for 
+            // changes and new messages
             this.model.posts.subscribe({}, function() {
                 self.model.posts.fetch({
                     query    : {room_id : self.model.get('id')},
@@ -135,10 +139,13 @@
             return this;
         },
         
+        // Force the 'friend' user into a conversation
+        // with current user through RPC delegation
         startConversation : function() {
             this.model.startConversation();
         },
         
+        // Add user to current user's friend list
         addToFriends : function() {
             if (this.model.get('id') == ß.user.get('id')
                 || this.model.get('id') == ß.user.id) {
@@ -153,6 +160,8 @@
             }
             friends.push(this.model.get('id'));
             
+            // Make sure we are not duplicating any friends by 
+            // ensuring that the array of keys is unique
             ß.user.set({
                 friends : _.unique(friends)
             }).save();
@@ -160,13 +169,16 @@
             ß.user.friends.add(this.model);
         },
         
+        // Delete user from current user's friend list
         removeFromFriends : function() {
             var id      = this.model.get('id'),
                 friends = _.without(ß.user.get('friends'), id),
                 person  = ß.user.friends.get(id);
-                
+            
+            // Remove DOM element from view
             $(person.view.el).remove();
             
+            // Remove from model and save to server
             ß.user.friends
                 .remove(this.model, {
                     silent : true
@@ -239,8 +251,8 @@
         
         // Generate the attributes
         newAttributes : function() {
-            var username = ß.user.get('username');
-            var id = ß.user.get('id') || ß.user.id;
+            var username = ß.user.get('username'),
+                id       = ß.user.get('id') || ß.user.id;
             
             return {
                 text        : this.input.val(),
@@ -252,5 +264,4 @@
             };
         },
     });
-
 })(ß)

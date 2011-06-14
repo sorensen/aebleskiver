@@ -10,7 +10,6 @@
             // Delegate to the 'synced' event unless further extention is 
             // needed per CRUD event
             created : function(resp, options) {
-                //console.log('Created: ', resp);
                 resp = ß.Helpers.getMongoId(resp);
                 var model = ß.Store[options.channel];
                 // Model processing
@@ -24,7 +23,6 @@
             },
             
             read : function(resp, options) {
-                //console.log('Read: ', resp);
                 resp = ß.Helpers.getMongoId(resp);
                 var model = ß.Store[options.channel];
                 // Model Processing
@@ -42,7 +40,6 @@
             },
             
             updated : function(resp, options) {
-                //console.log('Updated: ', resp);
                 resp = ß.Helpers.getMongoId(resp);
                 var model = ß.Store[options.channel];
                 // Collection processing
@@ -56,7 +53,6 @@
             },
             
             destroyed : function(resp, options) {
-                //console.log('Destroyed: ', resp);
                 resp = ß.Helpers.getMongoId(resp);
                 ß.Store[options.channel].remove(resp) || delete ß.Store[options.channel];
                 options.finished && options.finished(resp);

@@ -22,9 +22,10 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
-            //this.messages.unsubscribe();
         },
         
+        // Client side editing validation, allowed to edit
+        // if the supplied user is the one that created the room
         allowedToEdit : function(user) {
             if (!user.get('id') || !this.get('user_id')) {
                 return false;
@@ -32,6 +33,8 @@
             return user.get('id') === this.get('user_id');
         },
         
+        // Client side read validation, allowed to view if
+        // user ID is not contained in the 'banned' array
         allowedToView : function(user) {
             return _.indexOf(this.get('banned'), user.get('id')) === -1;
         }
@@ -46,6 +49,8 @@
             banned    : []
         },
         
+        // Client side view validation, only allowed to view if
+        // the user ID has been white-listed in the 'allowed' array
         allowedToView : function(user) {
             return _.indexOf(this.get('allowed'), user.get('id')) !== -1
                 || user.get('id') === this.get('user_id');

@@ -31,14 +31,5 @@ WebFontConfig = {google : {families : [
 // setting the same effects / animations to every 
 // backbone view rendering
 $(function() {
-
-    // Convert timestamps to timeago
-    $('abbr.timeago').livequery(function() {
-        $(this).timeago();
-    });
-    
-    // Custom scrollbars
-    $('.scrollable').livequery(function() {
-        $(this).jScrollPane();
-    });
+    // Placeholder
 });

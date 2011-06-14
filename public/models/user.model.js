@@ -23,7 +23,7 @@
         
         initialize : function(options) {
             // Add friends list
-            this.friends = new ß.Models.UserCollection();
+            this.friends   = new ß.Models.UserCollection();
             this.favorites = new ß.Models.RoomCollection();
             
             // Request a gravatar image for the current 
@@ -74,7 +74,6 @@
         
         // Authenticate the current user model
         authenticate : function(data, options, next) {
-        
             var self = this;
             options.type = this.type;
             
@@ -93,7 +92,6 @@
         
         // Register model with the ß.Server
         register : function(data, options, next) {
-        
             var self = this;
             options.type = this.type;
             
@@ -118,15 +116,12 @@
         
         
         startConversation : function() {
-            console.log('add conversation ', ß.user.conversations);
-        
             var to = this.get('id');
             var from = ß.user.get('id') || ß.user.get('_id');
             var key = (to > from) 
                     ? to + ':' + from
                     : from + ':' + to;
             
-            console.log('add conversation ', key);
             if (!ß.user.conversations.get(key)) {
             
                 var convo = new ß.Models.ConversationModel({
@@ -140,8 +135,7 @@
                     channel : convo.url,
                     id      : to
                 }, function(resp, options) {
-                    console.log('convo started: ', resp);
-                    
+                    // Conversation started
                     ß.user.conversations.add(convo);
                 });
             }
@@ -159,5 +153,4 @@
         initialize : function(options) {
         }
     });
-
 })(ß)

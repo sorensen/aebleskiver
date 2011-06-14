@@ -28,7 +28,7 @@
             
             // Pre-formatting 
             content.text = this.model.escape('text');
-            //content.created && (content.created = ß.Helpers.timeFormat(content.created));
+            content.created && (content.created = ß.Helpers.timeFormat(content.created));
             
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
@@ -45,6 +45,7 @@
                     //exclude: 'pre, code, .no-emoticons'
                 });
             
+            //this.$('.timeago').timeago();
             return this;
         }
     });
