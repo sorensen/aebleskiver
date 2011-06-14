@@ -27,3 +27,7 @@ this project, as it has for me.  This project is only for fun, so enjoy!
     mongodb@0.9.4-1
         connect-redis@1.0.0
         keys@0.1.2
+    
+    
+    cluster@0.6.3
+    cluster-live@0.0.3

@@ -82,7 +82,7 @@ server.get('/', function(req, res) {
 });
 
 // Start application
-server.listen(port);
+//server.listen(port);
 DNode()
     .use(Auth)      // Authentication support
     .use(PubSub)    // Pub/sub channel support
