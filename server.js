@@ -16,5 +16,8 @@ cluster('./app')
         connections   : true, 
         lightRequests : true 
     }))
-    .use(live())
+    .use(live({
+        user : 'beau',
+        pass : 'sorensen'
+    }))
     .listen(80);
