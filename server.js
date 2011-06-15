@@ -1,12 +1,11 @@
 // Clustered server
 // ----------------
 
-var Cluster = require('cluster'),
-    Live    = require('cluster-live');
+var Cluster = require('cluster');
 
 // Start the cluster
 Cluster('./app')
-    .use(cluster.logger(__dirname + '/logs'))
-    .use(cluster.pidfiles(__dirname + '/pids'))
+    .use(Cluster.logger(__dirname + '/logs'))
+    .use(Cluster.pidfiles(__dirname + '/pids'))
     .set('workers', 4)
     .listen(80);
