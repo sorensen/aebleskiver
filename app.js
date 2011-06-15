@@ -61,7 +61,7 @@ app.configure('production', function() {
 });
 
 // Connect to the database
-Mongoose.connect('mongodb://localhost/db');
+Mongoose.connect('mongodb://localhost/aebleskiver');
 
 // Main application
 app.get('/', function(req, res) {

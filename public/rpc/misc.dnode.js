@@ -9,7 +9,8 @@
         // Socket connection has been terminated
         con.on('end', function() {
             // Refresh the page after 10 seconds
-            refresh = setTimeout('window.location.reload()', 6000);
+            console.log('connection ended');
+            //refresh = setTimeout('window.location.reload()', 6000);
         });
         
         // Socket connection established
