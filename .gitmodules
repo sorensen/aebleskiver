@@ -16,3 +16,27 @@
 [submodule "lib/formidadable"]
 	path = lib/formidadable
 	url = git://github.com/felixge/node-formidable.git
+[submodule "public/vendor/storejs"]
+	path = public/vendor/storejs
+	url = git://github.com/marcuswestin/store.js.git
+[submodule "public/vendor/underscore"]
+	path = public/vendor/underscore
+	url = git://github.com/documentcloud/underscore.git
+[submodule "vendor/public/backbone"]
+	path = vendor/public/backbone
+	url = git://github.com/documentcloud/backbone.git
+[submodule "public/vendor/happyjs"]
+	path = public/vendor/happyjs
+	url = git://github.com/andyet/Happy.js.git
+[submodule "public/vendor/keycandy"]
+	path = public/vendor/keycandy
+	url = git://github.com/andyet/KeyCandy.git
+[submodule "public/vendor/jquery-cookie"]
+	path = public/vendor/jquery-cookie
+	url = git://github.com/carhartl/jquery-cookie.git
+[submodule "public/vendor/jquery-cssemoticons"]
+	path = public/vendor/jquery-cssemoticons
+	url = git://github.com/JangoSteve/jQuery-CSSEmoticons.git
+[submodule "public/vendor/mustachejs"]
+	path = public/vendor/mustachejs
+	url = git://github.com/janl/mustache.js.git
