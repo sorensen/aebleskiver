@@ -5,24 +5,8 @@ html(lang='en')
     
     // CSS
     link(rel='stylesheet', href='/css/style.css')
-    
-    // Dependencies
-    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
-    script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
-    script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
-    script(src='//cdn.wijmo.com/external/raphael-min.js')
-    script(src='//cdn.wijmo.com/external/jquery.mousewheel.min.js')
-    script(src='/js/jquery.livequery.js')
-    script(src='/js/jquery.cookie.js')
-    script(src='/js/jquery.timeago.js')
-    script(src='/js/jquery.jscrollpane.js')
-    script(src='/js/jquery.cssemoticons.js')
-    script(src='/js/modernizr-1.7.min.js')
-    script(src='/js/underscore-min.js')
-    script(src='/js/backbone.js')
-    script(src='/js/mustache.js')
-    script(src='/js/json2.js')
-    script(src='/dnode.js')
+  body
+    #application
     
     // Main application
     script#application-template(type='text/template')
@@ -391,12 +375,33 @@ html(lang='en')
           button.submit Create
           button.cancel Cancel
     
+    // Dependencies
+    script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
+    script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
+    script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
+    script(src='//cdn.wijmo.com/external/raphael-min.js')
+    script(src='//cdn.wijmo.com/external/jquery.mousewheel.min.js')
+    script(src='/vendor/jquery.livequery.js')
+    script(src='/vendor/jquery.cookie.js')
+    script(src='/vendor/keycandy/keyCandy.js')
+    script(src='/vendor/happyjs/happy.js')
+    script(src='/vendor/happyjs/happy.methods.js')
+    script(src='/vendor/jquery.timeago.js')
+    script(src='/vendor/jquery.jscrollpane.js')
+    script(src='/vendor/jquery.cssemoticons.js')
+    script(src='/vendor/modernizr-1.7.min.js')
+    script(src='/vendor/underscore-min.js')
+    script(src='/vendor/backbone.js')
+    script(src='/vendor/mustache.js')
+    script(src='/vendor/json2.js')
+    script(src='/dnode.js')
+    
     // Application core
     script(src='/bootstrap.js')
     
     // Helpers
-    script(src='/js/ui.js')
-    script(src='/js/helpers.js')
+    script(src='/vendor/google.js')
+    script(src='/vendor/helpers.js')
     
     // Remote procedure calls
     script(src='/rpc/auth.dnode.js')
@@ -428,5 +433,3 @@ html(lang='en')
       ß.port    = '!{locals.port}';
       ß.token   = '!{locals.token}';
       ß.version = '!{locals.version}';
-  body
-    #application
