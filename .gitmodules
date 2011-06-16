@@ -40,3 +40,9 @@
 [submodule "public/vendor/mustachejs"]
 	path = public/vendor/mustachejs
 	url = git://github.com/janl/mustache.js.git
+[submodule "public/vendor/json"]
+	path = public/vendor/json
+	url = git://github.com/douglascrockford/JSON-js.git
+[submodule "public/vendor/backbone"]
+	path = public/vendor/backbone
+	url = git://github.com/documentcloud/backbone.git
