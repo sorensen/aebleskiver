@@ -3,7 +3,7 @@
     // ----------
     
     // Main controller and router
-    ß.Controllers.Application = Backbone.Controller.extend({
+    ß.Controllers.Application = Backbone.Router.extend({
     
         // Definitions
         routes : {
