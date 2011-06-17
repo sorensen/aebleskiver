@@ -3,18 +3,18 @@ html(lang='en')
   head
     title &AElig;bleskiver
     
-    // CSS
+    //- CSS
     link(rel='stylesheet', href='/css/style.css')
   body
     #application
     
-    // Main application
+    //- Main application
     script#application-template(type='text/template')
     
       .wrapper
         #header
           nav#navigation
-            a#home(href='/#/') Home+9
+            a#home(href='/#/') Home
             a#create-room Create Room
             a#login Login
             a#signup Sign up
@@ -120,7 +120,7 @@ html(lang='en')
           p.author Beau Sorensen
       #overlay
 
-    // Application statistics
+    //- Application statistics
     script#application-stats-template(type='text/template')
       .stat.total-online
         span.title Online
@@ -135,7 +135,7 @@ html(lang='en')
         span.title Version
         span.value {{ version }}
     
-    // Friend chat box
+    //- Friend chat box
     script#friend-chat-template(type='text/template')
       .title To: {{ username }}
       .destroy
@@ -144,7 +144,7 @@ html(lang='en')
         button.submit Send
         input.create-message(type='text', name='message', placeholder='Say something...', length='255')
         
-    // User profile
+    //- User profile
     script#user-template(type='text/template')
       h1.name
         span.headline 
@@ -154,8 +154,8 @@ html(lang='en')
       .statistics.user-stats
       .picture: img(src='{{ avatar }}')
       .details
-        //.avatar: img(src='{{ avatar }}')
-        //img.picture(src='uploads/users/{{ id }}.png', height='120', width='160')
+        //-.avatar: img(src='{{ avatar }}')
+        //-img.picture(src='uploads/users/{{ id }}.png', height='120', width='160')
         .created
           span.title Joined 
           abbr.value.timeago(title='{{ created }}') {{ created }}
@@ -183,7 +183,7 @@ html(lang='en')
            button.submit Post
            input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255')
         
-    // User listing
+    //- User listing
     script#user-list-template(type='text/template')
       a(href='/#/users/{{ username }}')
         h3.name
@@ -191,20 +191,20 @@ html(lang='en')
           span.username {{ displayName }}
       .statistics.user-stats
       
-    // Friend listing
+    //- Friend listing
     script#friend-list-template(type='text/template')
       h3.name
         span.avatar: img(src='{{ avatar }}')
         span.username {{ displayName }}
       .statistics.user-stats
     
-    // User statistics
+    //- User statistics
     script#user-stats-template(type='text/template')
       .stat.total-messages
         span.title Posts
         span.value {{ totalPosts }}
       
-    // Conversation
+    //- Conversation
     script#conversation-template(type='text/template')
       button.heading {{ name }}
       span.destroy
@@ -222,7 +222,7 @@ html(lang='en')
         button.submit Send
         input.create-message(type='text', name='message', placeholder='Say something...', length='255')
       
-    // Room
+    //- Room
     script#room-template(type='text/template')
       h1.name
         span.headline {{ name }}
@@ -244,7 +244,7 @@ html(lang='en')
         button.submit Send
         input.create-message(type='text', name='message', placeholder='Say something...', length='255')
 
-    // Room listing
+    //- Room listing
     script#room-list-template(type='text/template')
       a(href='/#/rooms/{{ slug }}')
         h3.name(title='{{ description }}')
@@ -254,19 +254,19 @@ html(lang='en')
       .statistics.room-stats
       .ranking
       
-    // Room rankings
+    //- Room rankings
     script#room-rank-template(type='text/template')
       .rank {{ rank }}
       button.upvote: span.arrow-wrap: span.arrow &uarr;
       button.downvote: span.arrow-wrap: span.arrow &darr;
       
-    // Room statistics
+    //- Room statistics
     script#room-stats-template(type='text/template')
       .stat.total-messages
         span.title Messages
         span.value {{ totalMessages }}
         
-    // Single message
+    //- Single message
     script#message-list-template(type='text/template')
     script#message-template(type='text/template')
       span.small-avatar: img(src='{{ avatar }}')
@@ -274,14 +274,14 @@ html(lang='en')
       span.data {{ text }}
       abbr.created.timeago(title='{{ created }}') {{ created }}
     
-    // Notification template
+    //- Notification template
     script#notification-template(type='text/template')
       .notification
         .destroy
         .type {{ type }}
         .message {{ message }}
     
-    // Settings template
+    //- Settings template
     script#settings-template(type='text/template')
       #settings-form.dialog
         .title
@@ -312,7 +312,7 @@ html(lang='en')
           button.submit Save
           button.cancel Cancel
           
-    // Registration template
+    //- Registration template
     script#signup-template(type='text/template')
       #signup-form.dialog
         .title
@@ -334,7 +334,7 @@ html(lang='en')
           button.submit Signup
           button.cancel Cancel
             
-    // Login template
+    //- Login template
     script#login-template(type='text/template')
       #login-form.dialog
         .title
@@ -350,7 +350,7 @@ html(lang='en')
           button.submit Login
           button.cancel Cancel
     
-    // Create new room
+    //- Create new room
     script#create-room-template(type='text/template')
       #create-room-form.dialog
         .title
@@ -359,23 +359,23 @@ html(lang='en')
           p
             label(for='create-room-name') Name: 
             input#create-room-name(type='text', name='room', placeholder='Room name')
-          //p
-          //  label(for='tags') Tags:
-          //  input#tags(type='text', name='tags', placeholder='Tags')
+          //-p
+          //-  label(for='tags') Tags:
+          //-  input#tags(type='text', name='tags', placeholder='Tags')
           p
             label(for='create-room-description') Description:
             textarea#create-room-description(type='text', name='description', placeholder='Description')
-          //p
-          //  label(for='create-room-image') Image
-          //  input#create-room-image(type='file', name='image')
-          //p
-          //  label(for='create-room-restricted') Private room:
-          //  input#create-room-restricted(type='checkbox', name='restricted')
+          //-p
+          //-  label(for='create-room-image') Image
+          //-  input#create-room-image(type='file', name='image')
+          //-p
+          //-  label(for='create-room-restricted') Private room:
+          //-  input#create-room-restricted(type='checkbox', name='restricted')
         .controls
           button.submit Create
           button.cancel Cancel
     
-    // Dependencies
+    //- Dependencies
     script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
     script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
     script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
@@ -385,21 +385,21 @@ html(lang='en')
     script(src='/vendor/keycandy/keyCandy.js')
     script(src='/vendor/happyjs/happy.js')
     script(src='/vendor/happyjs/happy.methods.js')
-    script(src='/vendor/jquery-cssemoticons/jquery.cssemoticons.js')
-    script(src='/vendor/underscore-min.js')
+    script(src='/vendor/jquery-cssemoticons/javascripts/jquery.cssemoticons.js')
+    script(src='/vendor/underscore/underscore-min.js')
     script(src='/vendor/backbone/backbone.js')
     script(src='/vendor/mustachejs/mustache.js')
     script(src='/vendor/json/json2.js')
     script(src='/dnode.js')
     
-    // Application core
+    //- Application core
     script(src='/bootstrap.js')
     
-    // Helpers
-    script(src='/vendor/google.js')
-    script(src='/vendor/helpers.js')
+    //- Helpers
+    script(src='/google.js')
+    script(src='/helpers.js')
     
-    // Remote procedure calls
+    //- Remote procedure calls
     script(src='/rpc/auth.dnode.js')
     script(src='/rpc/pubsub.dnode.js')
     script(src='/rpc/crud.dnode.js')
@@ -407,22 +407,22 @@ html(lang='en')
     script(src='/rpc/upload.dnode.js')
     script(src='/rpc/misc.dnode.js')
     
-    // Models
+    //- Models
     script(src='/models/message.model.js')
     script(src='/models/room.model.js')
     script(src='/models/user.model.js')
     script(src='/models/app.model.js')
     
-    // Views
+    //- Views
     script(src='/views/user.view.js')
     script(src='/views/message.view.js')
     script(src='/views/room.view.js')
     script(src='/views/app.view.js')
     
-    // Controllers
-    script(src='/controllers/app.controller.js')
+    //- Routers
+    script(src='/routers/app.router.js')
     
-    // Start application
+    //- Start application
     script(src='/init.js')
     
     script(type='text/javascript')
