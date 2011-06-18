@@ -12,6 +12,7 @@
         Protocols   : {}, // DNode function protocols
         Models      : {}, // Backbone models
         Views       : {}, // Backbone views
-        Controllers : {} // Backbone controllers
+        Connector   : {}, // DNode socket connector
+        Routers     : {}  // Backbone routers
     }
 })(document, window)
