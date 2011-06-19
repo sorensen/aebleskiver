@@ -144,7 +144,7 @@
             this.model.messages.url = ß.Helpers.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
-            this.model.messages.bind('refresh', this.allMessages);
+            this.model.messages.bind('reset', this.allMessages);
             this.model.messages.bind('add', this.render);
             
             // Send model contents to the template
@@ -343,7 +343,6 @@
         // Constructor
         initialize : function(options) {
             this.viewable = this.model.allowedToView(ß.user);
-            
             if (!this.viewable) {
                 return;
             }
@@ -362,7 +361,7 @@
             this.model.messages.url = ß.Helpers.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
-            this.model.messages.bind('refresh', this.allMessages);
+            this.model.messages.bind('reset', this.allMessages);
             this.model.messages.bind('add', this.render);
             
             // Send model contents to the template
@@ -397,6 +396,7 @@
             });
             
             this.input.focus();
+            console.log('room.view:', this);
         },
         
         startConversation : _.debounce(function() {

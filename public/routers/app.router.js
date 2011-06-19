@@ -25,11 +25,11 @@
             
             // Circular reference
             this.view.controller = this;
-            this.view.render();
+            this.view.statistics();
         },
         
         home : function() {
-            this.view.render();
+            this.view.statistics();
             this.view.deactivateRoom();
         },
         

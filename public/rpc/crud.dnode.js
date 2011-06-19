@@ -31,7 +31,7 @@
                 // Collection processing
                 } else if (model instanceof Backbone.Collection) {
                     if (_.isArray(resp)) {
-                        model.refresh(model.parse(resp));
+                        model.reset(model.parse(resp));
                     } else if (!model.get(resp.id)) {
                         model.add(model.parse(resp));
                     }

@@ -56,7 +56,7 @@
         // Constructor
         initialize : function(options) {
             _.bindAll(this, 
-                'render', 'toggleNav',
+                'render', 'toggleNav', 'statistics',
                 'addRoom', 'showCreateRoom', 'createRoom', 'allRooms', 'roomsReady',
                 'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout',
                 'toggleSidebar',
@@ -77,34 +77,31 @@
             this.model.view = this;
             
             // Application model event bindings
-            this.model.bind('change', this.render);
+            this.model.bind('change', this.statistics);
             this.model.bind('subscribe', this.ready);
             
             // User collection event bindings
             this.model.users.bind('subscribe', this.usersReady);
             this.model.users.bind('add',       this.addUser);
-            this.model.users.bind('add',       this.render);
-            this.model.users.bind('change',    this.render);
-            this.model.users.bind('refresh',   this.allUsers);
-            this.model.users.bind('refresh',   this.render);
+            this.model.users.bind('add',       this.statistics);
+            this.model.users.bind('change',    this.statistics);
+            this.model.users.bind('reset',   this.allUsers);
+            this.model.users.bind('reset',   this.statistics);
             
             // Room collection event bindings
             this.model.rooms.bind('subscribe', this.roomsReady);
             this.model.rooms.bind('add',       this.addRoom);
-            this.model.rooms.bind('add',       this.render);
-            this.model.rooms.bind('change',    this.render);
-            this.model.rooms.bind('refresh',   this.allRooms);
-            this.model.rooms.bind('refresh',   this.render);
+            this.model.rooms.bind('add',       this.statistics);
+            this.model.rooms.bind('change',    this.statistics);
+            this.model.rooms.bind('reset',   this.allRooms);
+            this.model.rooms.bind('reset',   this.statistics);
             
             // Conversation event bindings
             ß.user.conversations.bind('subscribe', this.coversationsReady);
             ß.user.conversations.bind('add',       this.addConversation);
-            ß.user.conversations.bind('refresh',   this.allConversation);
+            ß.user.conversations.bind('reset',   this.allConversation);
             
-            // Render template contents
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);
-            this.el.html(view);
+            this.render();
             
             // Assign pre-pouplated locals from Express
             this.sid              = ß.token;
@@ -137,14 +134,15 @@
                 settings   : this.$('#settings'),
                 createRoom : this.$('#create-room')
             };
-            this.nav.settings.hide();
-            this.nav.logout.hide();
             
             // Internal sidebar settings, pull settings
             // from the cookie and bootstrap if required
             this.menuOpen      = $.cookie('menuOpen')      || 'false';
             this.friendsOpen   = $.cookie('friendsOpen')   || 'false';
             this.favoritesOpen = $.cookie('favoritesOpen') || 'false';
+            
+            this.nav.settings.hide();
+            this.nav.logout.hide();
             
             if (this.menuOpen === 'true') {
                 $(this.el).addClass('menuOpen');
@@ -155,6 +153,41 @@
             if (this.favoritesOpen === 'true') {
                 this.favorites.addClass('open');
             }
+        },
+        
+        // Render template contents
+        render : function() {
+            console.log('app render');
+            var content = this.model.toJSON(),
+                view    = Mustache.to_html(this.template(), content);
+            
+            this.el.html(view);
+            
+            ß.iconMaker('github', 'friends-icon', {
+                // Options for stroke/fill
+            });
+            return this;
+        },
+        
+        // Refresh statistics
+        statistics : function() {
+            var totalOnline = this.model.online       || 0,
+                totalUsers  = this.model.users.length || 0,
+                totalRooms  = this.model.rooms.length || 0;
+            
+            this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
+                totalOnline : totalOnline,
+                totalUsers  : totalUsers,
+                totalRooms  : totalRooms,
+                version     : this.version
+            }));
+            return this;
+        },
+        
+        // The model has been subscribed to, and is now
+        // synchronized with the ß.Server
+        ready : function() {
+        
         },
         
         // Close modal keystroke listener
@@ -198,7 +231,7 @@
             ß.user.friends.each(this.addFriend);
             
             // Refresh model statistics
-            this.render();
+            this.statistics();
         },
         
         // Add a single friend o the current veiw
@@ -229,7 +262,7 @@
             ß.user.favorites.each(this.addFavorite);
             
             // Refresh model statistics
-            this.render();
+            this.statistics();
         },
         
         // Add a single room room to the current veiw
@@ -261,27 +294,6 @@
             
             this.conversationList
                 .append(view.el);
-        },
-        
-        // Refresh statistics
-        render : function() {
-            var totalOnline = this.model.online       || 0,
-                totalUsers  = this.model.users.length || 0,
-                totalRooms  = this.model.rooms.length || 0;
-            
-            this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
-                totalOnline : totalOnline,
-                totalUsers  : totalUsers,
-                totalRooms  : totalRooms,
-                version     : this.version
-            }));
-            return this;
-        },
-        
-        // The model has been subscribed to, and is now
-        // synchronized with the ß.Server
-        ready : function() {
-        
         },
         
         // Create room keystroke listener, throttled function
@@ -340,7 +352,7 @@
             this.model.rooms.each(this.addRoom);
             
             // Refresh model statistics
-            this.render();
+            this.statistics();
         },
         
         // Show the sidebar user list
@@ -545,7 +557,7 @@
             this.model.users.each(this.addUser);
             
             // Refresh model statistics
-            this.render();
+            this.statistics();
         },
         
         // Add a single room room to the current veiw

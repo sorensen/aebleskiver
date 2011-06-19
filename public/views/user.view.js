@@ -103,7 +103,7 @@
             this.model.posts.url = this.model.url() + ':posts';
             
             this.model.posts.bind('add', this.addPost);
-            this.model.posts.bind('refresh', this.allPosts);
+            this.model.posts.bind('reset', this.allPosts);
             this.model.posts.bind('add', this.render);
             
             this.model.view = this;

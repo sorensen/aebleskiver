@@ -93,10 +93,10 @@
                             
                                 // Current user bindings
                                 ß.user.friends.bind('add', self.view.addFriend);
-                                ß.user.friends.bind('refresh', self.view.allFriends);
+                                ß.user.friends.bind('reset', self.view.allFriends);
                                 
                                 ß.user.favorites.bind('add', self.view.addFavorite);
-                                ß.user.favorites.bind('refresh', self.view.allFavorites);
+                                ß.user.favorites.bind('reset', self.view.allFavorites);
                             
                                 ß.user.collection = self.users;
                                 ß.user.loadFriends()

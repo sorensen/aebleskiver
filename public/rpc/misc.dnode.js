@@ -4,27 +4,35 @@
     
     // Remote protocol
     ß.Protocols.Misc = function(client, con) {
-        var refresh;
+        var refresh,
+            connect = function() {
+                // Restart the socket connection
+                DNode().connect(ß.Connector);
+            };
         
         // Socket connection has been terminated
         con.on('end', function() {
             // Refresh the page after 10 seconds
-            console.log('connection ended');
-            //refresh = setTimeout('window.location.reload()', 6000);
+            console.log('misc.dnode: Connection ended:', con);
+            refresh = setTimeout(connect, 500);
+            
         });
         
         // Socket connection established
         con.on('ready', function() {
+            console.log('misc.dnode: Connection ready:', client);
             clearTimeout(refresh);
         });
         
         // Socket attempted refresh
         con.on('reconnect', function() {
+            console.log('misc.dnode: Reconnecting:', client);
             clearTimeout(refresh);
         });
         
         // Socket connection has been ended by the Server
         con.on('drop', function() {
+            console.log('misc.dnode: Connection dropped:', client);
             // Placeholder
         });
     

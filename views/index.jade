@@ -6,6 +6,9 @@ html(lang='en')
     //- CSS
     link(rel='stylesheet', href='/css/style.css')
   body
+    #fork-me
+      a.ribbon(src='https://github.com/sorensen/aebleskiver')
+        span.text Fork me on GitHub
     #application
     
     //- Main application
@@ -88,6 +91,7 @@ html(lang='en')
       #settings-dialog
       #footer
         #start-menu
+          #start-menu-icon.icon
           .button.title.submit
             | Menu
             .heart(href='/')
@@ -95,6 +99,7 @@ html(lang='en')
               .heart-right
               .heart-content
         #friend-list
+          #friends-icon.icon
           .button.title Friends
           .friend-wrapper
             .heading Your Friends
@@ -104,6 +109,7 @@ html(lang='en')
             .friends
             
         #favorite-list
+          #favorites-icon.icon
           .button.title Favorites
           .favorite-wrapper
             .heading Your Favorites
@@ -398,6 +404,7 @@ html(lang='en')
     //- Helpers
     script(src='/google.js')
     script(src='/helpers.js')
+    script(src='/icons.js')
     
     //- Remote procedure calls
     script(src='/rpc/auth.dnode.js')
