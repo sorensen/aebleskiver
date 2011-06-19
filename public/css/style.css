@@ -180,7 +180,9 @@ a:hover { color: #036; }
 #port,
 #token, 
 #version,
-#rooms .stat .title
+#rooms .stat .title,
+#sidebar-down,
+#footer .title
 { 
     display: none; 
 }
@@ -470,7 +472,44 @@ body {
     height: 100%;
     line-height: 1.6;
 }
-
+#fork-me {
+    position: absolute;
+    top: 0;
+    overflow: hidden;
+    height: 143px;
+    right: -14px;
+}
+    .ribbon {
+        font-family: Collegiate, sans-serif;
+        letter-spacing: -.1px;
+        line-height: 1.4;
+        
+        opacity: 0.95;
+        padding: 6px 0;
+        position: relative;
+        top: 50px;
+        display: block;
+        
+           -moz-box-shadow: 0 0 13px #888;
+        -webkit-box-shadow: 0 0 13px #888;
+        
+        background: -webkit-gradient(linear, left bottom, left top, from(#9A0000), to(#A90000));
+        background: -webkit-gradient(linear, left bottom, left top, from(#9A0000), to(#A90000));
+        
+           -moz-transform: rotate(45deg);
+        -webkit-transform: rotate(45deg);
+        right: -30px;
+    }
+    .ribbon, .ribbon:link, .ribbon:visited, .ribbon:hover {
+        color: white;
+        text-decoration: none;
+    }
+        .ribbon span {
+            font-size: 12px;
+            line-height: 16px;
+            padding: 4px 50px;
+            border: 1px solid #BF6060;
+        }
 #application {
     position: absolute;
     top: 0;
@@ -599,6 +638,11 @@ body {
             height: 40px;
             line-height: 40px;
             z-index: 3;
+        }
+        #footer .icon {
+            width: 40px;
+            height: 40px;
+            padding: 5px;
         }
         .favorite-wrapper,
         .friend-wrapper {
@@ -753,7 +797,7 @@ body {
 **/
 #start-menu {
     float: left;
-    width: 200px;
+    /* width: 200px; */
 }
     #start-menu .heart {
         font-size: 5px;
@@ -763,7 +807,8 @@ body {
     .menuOpen #sidebar-wrapper {
         top: 100%;
     }
-    .menuOpen #main-content {
+    .menuOpen #main-content,
+    .menuOpen #welcome-text {
         margin-left: 0;
     }
     .menuOpen #navigation {
@@ -795,7 +840,7 @@ body {
 #sidebar {
     width: 200px;
     top: 80px;
-    bottom: 201px;
+    bottom: 102px;
     margin: 0;
     left: 0;
     position: absolute;
@@ -1208,6 +1253,11 @@ body {
         clear: both;
         margin-left: 200px;
         min-width: 215px;
+        position: absolute;
+        right: 0;
+        left: 0;
+        top: 0;
+        z-index: 3;
     }
     #main-controls {
         display: none;
@@ -1400,6 +1450,10 @@ body {
     clear: both;
     margin-left: 200px;
     min-width: 215px;
+    position: absolute;
+    right: 0;
+    left: 0;
+    top: 0;
 }
     #welcome-text h1 {
         font-size: 26px;
@@ -1407,9 +1461,10 @@ body {
         font-weight: bold;
     }
     #welcome-text p {
-        font-size: 14px;
-        margin: 10px 20px;
+        font-size: 13px;
+        margin: 25px 20px;
         max-width: 400px;
+        line-height: 1.4;
     }
 /**
     Chat room message list and items

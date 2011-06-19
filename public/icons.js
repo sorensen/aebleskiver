@@ -6,8 +6,10 @@
     var current,
         
         // Dimentions and colors 
-        width  = 40,
-        height = 40,
+        width       = 40,
+        height      = 40,
+        scaleWidth  = 1,
+        scaleHeight = 1,
         fill   = {
             fill   : "#333", 
             stroke : "none"
@@ -21,8 +23,8 @@
         
         // Interaction states
         none = {
-            fill: "#000", 
-            opacity: 0
+            fill    : "#000", 
+            opacity : 0
         },
         selected = {
             fill : "90-#0050af-#002c62"
@@ -184,6 +186,8 @@
         }
         
         // Option overrides
+        options.width    || (options.width    = width);
+        options.height   || (options.height   = height);
         options.stroke   || (options.stroke   = stroke);
         options.fill     || (options.fill     = fill);
         options.none     || (options.none     = none);
@@ -191,15 +195,20 @@
     
         // Initialize canvas and draw
         var paper = Raphael(selector, width, height),
+            // Create the outline path
             path = paper
                     .path(icons[name])
                     .attr(options.stroke)
-                    .translate(4, 4),
+                    .translate(4, 4)
+                    .scale(options.width / width, options.width / width),
+            
+            // Fill the icon in
             Icon = paper
                     .path(icons[name])
                     .attr(options.fill)
-                    .translate(4, 4);
-            
+                    .translate(4, 4)
+                    .scale(options.width / width, options.width / width);
+        
         // Apply interaction events
         paper
             .rect(0, 0, 32, 32)
@@ -225,5 +234,7 @@
                         opacity: 0
                     });
             });
+        
+        return this;
     };
 })(ß);

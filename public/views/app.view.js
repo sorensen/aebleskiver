@@ -48,9 +48,9 @@
             'click #search-now' : 'searchOnEnter',
             
             // Friends
-            'click #friend-list .title'   : 'toggleFriendList',
-            'click #favorite-list .title' : 'toggleFavoriteList',
-            'click #start-menu .title'    : 'toggleSidebar'
+            'click #friend-list .icon'   : 'toggleFriendList',
+            'click #favorite-list .icon' : 'toggleFavoriteList',
+            'click #start-menu .icon'    : 'toggleSidebar'
         },
         
         // Constructor
@@ -157,15 +157,17 @@
         
         // Render template contents
         render : function() {
-            console.log('app render');
             var content = this.model.toJSON(),
                 view    = Mustache.to_html(this.template(), content);
             
             this.el.html(view);
             
-            ß.iconMaker('github', 'friends-icon', {
-                // Options for stroke/fill
-            });
+            // Create the icons for this view
+            ß
+                .iconMaker('power', 'start-menu-icon')
+                .iconMaker('users', 'friends-icon')
+                .iconMaker('bookmark', 'favorites-icon');
+            
             return this;
         },
         
@@ -203,7 +205,7 @@
             if (this.menuOpen == 'true') {
                 this.menuOpen = 'false';
                 $(this.el).removeClass('menuOpen');
-            } 
+            }
             else {
                 this.menuOpen = 'true';
                 $(this.el).addClass('menuOpen');
@@ -217,11 +219,17 @@
             if (this.friendsOpen == 'true') {
                 this.friendsOpen = 'false';
                 this.friends.removeClass('open');
-            } 
+            }
             else {
                 this.friendsOpen = 'true';
                 this.friends.addClass('open');
+                
+                if (this.favoritesOpen == 'true') {
+                    this.favoritesOpen = 'false';
+                    this.favorites.removeClass('open');
+                }
             }
+            $.cookie('favoritesOpen', this.favoritesOpen);
             $.cookie('friendsOpen', this.friendsOpen);
         },
         
@@ -248,12 +256,18 @@
             if (this.favoritesOpen == 'true') {
                 this.favoritesOpen = 'false';
                 this.favorites.removeClass('open');
-            } 
+            }
             else {
                 this.favoritesOpen = 'true';
                 this.favorites.addClass('open');
+                
+                if (this.friendsOpen == 'true') {
+                    this.friendsOpen = 'false';
+                    this.friends.removeClass('open');
+                }
             }
             $.cookie('favoritesOpen', this.favoritesOpen);
+            $.cookie('friendsOpen', this.friendsOpen);
         },
         
         // All rooms have been loaded into collection
@@ -400,6 +414,10 @@
                 model : model[0]
             }).render();
             
+            // Provide a way for the room to access this
+            // view so that it may close itself, ect..
+            this.activeRoom.view = this;
+            
             var self = this;
             this.mainContent
                 .fadeIn(75, function(){
@@ -499,6 +517,9 @@
             this.activeUser = new ß.Views.UserMainView({
                 model : model[0]
             }).render();
+            
+            // Make view accessable to inner-view
+            this.activeRoom.view = this;
             
             var self = this;
             this.mainContent

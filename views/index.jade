@@ -6,9 +6,6 @@ html(lang='en')
     //- CSS
     link(rel='stylesheet', href='/css/style.css')
   body
-    #fork-me
-      a.ribbon(src='https://github.com/sorensen/aebleskiver')
-        span.text Fork me on GitHub
     #application
     
     //- Main application
@@ -62,6 +59,10 @@ html(lang='en')
           
           #main-content
           #welcome-text
+            #fork-me
+              a.ribbon(href='https://github.com/sorensen/aebleskiver')
+                span Fork me on GitHub
+            
             h1.title Welcome to &AElig;bleskiver!
             
             p
@@ -92,15 +93,15 @@ html(lang='en')
       #footer
         #start-menu
           #start-menu-icon.icon
-          .button.title.submit
-            | Menu
-            .heart(href='/')
-              .heart-left
-              .heart-right
-              .heart-content
+          //.button.title.submit Menu
+          //  .heart(href='/')
+          //    .heart-left
+          //    .heart-right
+          //    .heart-content
+        
         #friend-list
           #friends-icon.icon
-          .button.title Friends
+          //.button.title Friends
           .friend-wrapper
             .heading Your Friends
             .controls
@@ -110,7 +111,7 @@ html(lang='en')
             
         #favorite-list
           #favorites-icon.icon
-          .button.title Favorites
+          //.button.title Favorites
           .favorite-wrapper
             .heading Your Favorites
             .controls

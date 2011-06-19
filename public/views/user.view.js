@@ -175,6 +175,11 @@
                 friends = _.without(ß.user.get('friends'), id),
                 person  = ß.user.friends.get(id);
             
+            // Make sure we have a valid user
+            if (!person) {
+                return false;
+            }
+            
             // Remove DOM element from view
             $(person.view.el).remove();
             
@@ -217,7 +222,7 @@
         // Tell the application to remove this room
         deactivate : function() {
             Backbone.history.saveLocation('/');
-            Application.deactivateUser(this.model);
+            this.view.deactivateUser(this.model);
         },
         
         // All rooms have been loaded into collection

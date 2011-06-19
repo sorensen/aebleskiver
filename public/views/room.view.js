@@ -243,7 +243,7 @@
         // Tell the application to remove this room
         deactivate : function() {
             Backbone.history.saveLocation('/');
-            Application.deactivateRoom(this.model);
+            this.view.deactivateRoom(this.model);
         },
         
         // Remove this view from the DOM, and unsubscribe from 
@@ -285,6 +285,8 @@
             
             // Check to see if the user is at the bottom of the list,
             // before scrolling, allowing them to read old msg's
+            console.log('room.view: list:',this.messageList.height());
+            console.log('room.view: scrollTop:',this.messageList.scrollTop());
             /**
             if (this.messageList.scrollTop() + 100 >= this.messageList.height()) {
                 this.messageList
