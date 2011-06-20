@@ -1,9 +1,10 @@
-﻿(function(ß) {
-  // ß.Helpers
-  // ---------
+﻿(function(_) {
+  // Helper functions
+  // ----------------
   
-  // Extend the helper object
-  _.extend(ß.Helpers, {
+  // Extend the underscore object and pass
+  // it our hash of function mixins
+  _.mixin({
   
     // ###timeFormat
     // Format a timestamp from miliseconds to a 
@@ -38,7 +39,7 @@
     // ###extractLast
     // Return the last element of a comma delimited string
     extractLast : function(term) {
-      return ß.Helpers.split(term).pop();
+      return _.split(term).pop();
     },
     
     // ###getMongoId
@@ -64,4 +65,4 @@
       return text.replace(exp,"<a href='$1'>$1</a>"); 
     }
   });
-})(ß)
+})(_)

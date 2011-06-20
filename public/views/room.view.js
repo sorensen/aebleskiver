@@ -31,12 +31,12 @@
             this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
-            this.render();
+            //this.render();
             this.loaded = 0;
-            this.statistics();
         },
         
         render : function() {
+            console.log('render');
             // Send model contents to the template
             var content = this.model.toJSON();
             
@@ -48,15 +48,23 @@
             $(this.el)
                 .html(view);
                 
+            this.statistics();
             return this;
         },
         
         // Refresh statistics
         statistics : function() {
-            var rank = this.model.get('upvotes') - this.model.get('downvotes');
-            this.$('.ranking').html(Mustache.to_html(this.rankTemplate(), {
-                rank : rank
-            }));
+            console.log('statistics', this);
+            var rank = this.model.get('upvotes') - this.model.get('downvotes'),
+                view = Mustache.to_html(this.rankTemplate(), {
+                    rank : rank
+                });
+            
+            console.log('statistics2', rank);
+            console.log('statistics3', view);
+            console.log('statistics4', this.$('.ranking'));
+            
+            this.$('.ranking').html(view);
             return this;
         },
         
@@ -145,7 +153,7 @@
             this.model.bind('remove', this.remove);
             
             this.model.messages = new ß.Models.MessageCollection();
-            this.model.messages.url = ß.Helpers.getUrl(this.model) + ':messages';
+            this.model.messages.url = _.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('reset', this.allMessages);
@@ -171,8 +179,8 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            this.title.html(ß.Helpers.linkify(self.model.escape('name')));
-            this.description.html(ß.Helpers.linkify(self.model.escape('description')));
+            this.title.html(_.linkify(self.model.escape('name')));
+            this.description.html(_.linkify(self.model.escape('description')));
             
             this.input.focus();
             
@@ -368,7 +376,7 @@
             this.model.bind('remove', this.remove);
             
             this.model.messages = new ß.Models.MessageCollection();
-            this.model.messages.url = ß.Helpers.getUrl(this.model) + ':messages';
+            this.model.messages.url = _.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('reset', this.allMessages);
@@ -393,8 +401,8 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            content.name && this.title.html(ß.Helpers.linkify(content.name));
-            content.description && this.description.html(ß.Helpers.linkify(content.description));
+            content.name && this.title.html(_.linkify(content.name));
+            content.description && this.description.html(_.linkify(content.description));
             
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({

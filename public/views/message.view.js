@@ -1,6 +1,6 @@
 ﻿(function(ß) {
     // Message view
-    // -----------------
+    // ------------
     
     // Single room message
     ß.Views.MessageView = Backbone.View.extend({
@@ -28,7 +28,7 @@
             
             // Pre-formatting 
             content.text = this.model.escape('text');
-            content.created && (content.created = ß.Helpers.timeFormat(content.created));
+            content.created && (content.created = _.timeFormat(content.created));
             
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
@@ -38,7 +38,7 @@
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
             this.$('.data')
-                .html(ß.Helpers.linkify(content.text))
+                .html(_.linkify(content.text))
                 .emoticonize({
                     //delay: 800,
                     //animate: false

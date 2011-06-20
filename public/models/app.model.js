@@ -14,15 +14,8 @@
             rooms   : []
         },
         
-        // Create a new room
-        createRoom : function(attr) {
-            if (!attr) return;
-            this.rooms.create(attr, {
-                error    : function(msg, resp, options) {},
-                finished : function(resp) {
-                }
-            });
-        },
+        // No-op sync
+        //sync : function(){},
         
         // Model constructor
         initialize : function(options) {
@@ -85,7 +78,7 @@
                             console.log('got session');
                             if (!session) return;
                             options.password && (session.password = options.password);
-                            session = ß.Helpers.getMongoId(session);
+                            session = _.getMongoId(session);
                             
                             ß.user.set(session);
                             ß.user.url = self.url() + ':users:' + session.id;
@@ -144,7 +137,17 @@
                     // re-start backbone history
                 }
             }, 5000);
-        }
+        },
+        
+        // Create a new room
+        createRoom : function(attr) {
+            if (!attr) return;
+            this.rooms.create(attr, {
+                error    : function(msg, resp, options) {},
+                finished : function(resp) {
+                }
+            });
+        },
     });
     
 })(ß)

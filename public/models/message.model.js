@@ -1,6 +1,6 @@
 ﻿(function(ß) {
     // Message model
-    // ------------------
+    // -------------
     
     // Single message model
     ß.Models.MessageModel = Backbone.Model.extend({
@@ -14,9 +14,8 @@
             avatar   : ''
         },
         
-        // Constructor
-        initialize : function(options) {
-        },
+        // DNode persistence
+        sync : _.sync,
         
         // Remove model along with the view
         clear : function() {
@@ -54,9 +53,8 @@
         url   : 'messages',
         type  : 'message',
         
-        // Constructor
-        initialize : function(options) {
-        },
+        // DNode persistence
+        sync : _.sync,
         
         // Sort by 'created' time
         comparator : function(message) {

@@ -21,6 +21,9 @@
             visits    : 0
         },
         
+        // DNode persistence
+        sync : _.sync,
+        
         initialize : function(options) {
             // Add friends list
             this.friends   = new ß.Models.UserCollection();
@@ -148,6 +151,9 @@
         model : ß.Models.UserModel,
         type  : 'user',
         url   : 'users',
+        
+        // DNode persistence
+        sync : _.sync,
         
         // Initialize
         initialize : function(options) {

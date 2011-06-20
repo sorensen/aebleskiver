@@ -4,9 +4,7 @@
     
     // Remote protocol
     ß.Protocols.Pubsub = function(client, con) {
-    
         _.extend(this, {
-        
             // New subscription received
             subscribed : function(resp, options) {
                 if (!options.channel) return;
@@ -35,7 +33,7 @@
     // Extend default Backbone functionality
     _.extend(Backbone.Model.prototype, {
         url : function() {
-            var base = ß.Helpers.getUrl(this.collection) || this.urlRoot || '';
+            var base = _.getUrl(this.collection) || this.urlRoot || '';
             if (this.isNew()) return base;
             return base + (base.charAt(base.length - 1) == ':' ? '' : ':') + encodeURIComponent(this.id);
         },
@@ -47,7 +45,7 @@
             var model = this;
             options         || (options = {});
             options.method  || (options.method = 'update');
-            options.channel || (options.channel = (model.collection) ? ß.Helpers.getUrl(model.collection) : ß.Helpers.getUrl(model));
+            options.channel || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
             ß.Server.publish(model.toJSON(), options, function(resp, options){
                 if (!options.silent) model.trigger('publish', model, options);
                 callback && callback(resp, options);
@@ -58,7 +56,7 @@
     
     // Common extention object for both models and collections
     var common = {
-        // Subscribe to the ß.Server for model changes, if 'override' is set to true
+        // Subscribe to the 'Server' for model changes, if 'override' is set to true
         // in the options, this model will replace any other models in the local 
         // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
         // for subscriptions, relabeled to 'channel' for clarity
@@ -66,10 +64,10 @@
             if (!ß.Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
-            options.channel || (options.channel = (model.collection) ? ß.Helpers.getUrl(model.collection) : ß.Helpers.getUrl(model));
+            options.channel || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
             
             // Add the model to a local object container so that other methods
-            // called from the ß.Server have access to it
+            // called from the 'Server' have access to it
             if (!ß.Store[options.channel] || options.override) {
                 ß.Store[options.channel] = model;
                 ß.Server.subscribe(model.toJSON(), options, function(resp, options) {
@@ -84,13 +82,13 @@
         },
         
         // Stop listening for published model data, removing the reference in the local
-        // subscription 'ß.Store', will trigger an unsubscribe event unless 'silent' 
+        // subscription 'Store', will trigger an unsubscribe event unless 'silent' 
         // is passed in the options
         unsubscribe : function(options, callback) {
             if (!ß.Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
-            options.channel || (options.channel = (model.collection) ? ß.Helpers.getUrl(model.collection) : ß.Helpers.getUrl(model));
+            options.channel || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
             ß.Server.unsubscribe({}, options, function(resp, options) {
                 if (!options.silent) model.trigger('unsubscribe', model, options);
                 callback && callback(resp, options);

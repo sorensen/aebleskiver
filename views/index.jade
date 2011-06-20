@@ -275,8 +275,8 @@ html(lang='en')
     //- Room rankings
     script#room-rank-template(type='text/template')
       .rank {{ rank }}
-      button.upvote: span.arrow-wrap: span.arrow &uarr;
-      button.downvote: span.arrow-wrap: span.arrow &darr;
+      .upvote: span.arrow-wrap: span.arrow &and;
+      .downvote: span.arrow-wrap: span.arrow &or;
       
     //- Room statistics
     script#room-stats-template(type='text/template')
@@ -294,7 +294,7 @@ html(lang='en')
     
     //- Notification template
     script#notification-template(type='text/template')
-      .notification
+      .notification.{{ type }}
         .destroy
         .type {{ type }}
         .message {{ message }}

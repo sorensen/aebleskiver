@@ -10,7 +10,7 @@
             // Delegate to the 'synced' event unless further extention is 
             // needed per CRUD event
             created : function(resp, options) {
-                resp = ß.Helpers.getMongoId(resp);
+                resp = _.getMongoId(resp);
                 var model = ß.Store[options.channel];
                 // Model processing
                 if (model instanceof Backbone.Model) {
@@ -23,7 +23,7 @@
             },
             
             read : function(resp, options) {
-                resp = ß.Helpers.getMongoId(resp);
+                resp = _.getMongoId(resp);
                 var model = ß.Store[options.channel];
                 // Model Processing
                 if (model instanceof Backbone.Model) {
@@ -40,7 +40,7 @@
             },
             
             updated : function(resp, options) {
-                resp = ß.Helpers.getMongoId(resp);
+                resp = _.getMongoId(resp);
                 var model = ß.Store[options.channel];
                 // Collection processing
                 if (model.get(resp.id)) {
@@ -53,7 +53,7 @@
             },
             
             destroyed : function(resp, options) {
-                resp = ß.Helpers.getMongoId(resp);
+                resp = _.getMongoId(resp);
                 ß.Store[options.channel].remove(resp) || delete ß.Store[options.channel];
                 options.finished && options.finished(resp);
             },
@@ -69,7 +69,7 @@
             // 'success' method, then the custom 'finished' method when 
             // everything has been completed
             synced : function(resp, options) {
-                resp = ß.Helpers.getMongoId(resp);
+                resp = _.getMongoId(resp);
             
                 // Call to Backbone's predefined 'success' method which 
                 // is created per each 'sync' event, then to an optional
@@ -80,7 +80,12 @@
         });
     };
     
-    _.extend(Backbone, {
+    // Add to underscore utility functions to allow optional usage
+    // This will allow other storage options easier to manage, such as
+    // 'localStorage'. This must be set on the model and collection to 
+    // be used on directly. Defaults to 'Backbone.sync' otherwise.
+    _.mixin({
+        // Set the model or collection's sync method to communicate through DNode
         sync : function(method, model, options) {
             if (!ß.Server) return (options.error && options.error(503, model, options));
             
@@ -91,8 +96,8 @@
             
             // Set the RPC options for model interaction
             options.type      || (options.type = model.type || model.collection.type);
-            options.url       || (options.url = ß.Helpers.getUrl(model));
-            options.channel   || (options.channel = (model.collection) ? ß.Helpers.getUrl(model.collection) : ß.Helpers.getUrl(model));
+            options.url       || (options.url = _.getUrl(model));
+            options.channel   || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
             options.method    || (options.method = method);
             
             // Delegate method call based on action

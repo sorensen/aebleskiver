@@ -1,4 +1,4 @@
-﻿(function(ß) {
+﻿(function(_) {
     // Raphael icon support
     // --------------------
 
@@ -170,76 +170,77 @@
             umbrella     : "M17.081,4.065V3.137c0,0,0.104-0.872-0.881-0.872c-0.928,0-0.891,0.9-0.891,0.9v0.9C4.572,3.925,2.672,15.783,2.672,15.783c1.237-2.98,4.462-2.755,4.462-2.755c4.05,0,4.481,2.681,4.481,2.681c0.984-2.953,4.547-2.662,4.547-2.662c3.769,0,4.509,2.719,4.509,2.719s0.787-2.812,4.557-2.756c3.262,0,4.443,2.7,4.443,2.7v-0.058C29.672,4.348,17.081,4.065,17.081,4.065zM15.328,24.793c0,1.744-1.8,1.801-1.8,1.801c-1.885,0-1.8-1.801-1.8-1.801s0.028-0.928-0.872-0.928c-0.9,0-0.957,0.9-0.957,0.9c0,3.628,3.6,3.572,3.6,3.572c3.6,0,3.572-3.545,3.572-3.545V13.966h-1.744V24.793z"
         };
         
-    // Create and render an icon, applying the default settings
-    // if none are provided, to a given DOM selector
-    ß.iconMaker = function(name, selector, options) {
-        options || (options = {});
-    
-        // Cannot continue without a DOM selector
-        // and a valid icon path
-        if (!selector || !name) {
-            throw new Error("Icon name and selector required.");
-            return;
-        } else if (!icons[name]) {
-            throw new Error("Invalid icon.");
-            return;
+    // Add to the existing underscore utility functions
+    _.mixin({
+        // Create and render an icon, applying the default settings
+        // if none are provided, to a given DOM selector
+        icon : function(name, selector, options) {
+            options || (options = {});
+        
+            // Cannot continue without a DOM selector
+            // and a valid icon path
+            if (!selector || !name) {
+                throw new Error("Icon name and selector required.");
+                return;
+            } else if (!icons[name]) {
+                throw new Error("Invalid icon.");
+                return;
+            }
+            
+            // Option overrides
+            options.width    || (options.width    = width);
+            options.height   || (options.height   = height);
+            options.stroke   || (options.stroke   = stroke);
+            options.fill     || (options.fill     = fill);
+            options.none     || (options.none     = none);
+            options.selected || (options.selected = selected);
+        
+            // Initialize canvas and draw
+            var paper = Raphael(selector, width, height),
+                // Create the outline path
+                path = paper
+                        .path(icons[name])
+                        .attr(options.stroke)
+                        .translate(4, 4)
+                        .scale(options.width / width, options.width / width),
+                // Fill the icon in
+                Icon = paper
+                        .path(icons[name])
+                        .attr(options.fill)
+                        .translate(4, 4)
+                        .scale(options.width / width, options.width / width);
+            
+            // Apply interaction events
+            paper
+                .rect(0, 0, 32, 32)
+                .attr(options.none)
+                .attr({
+                    // Resize the DOM attributes
+                    width  : options.width,
+                    height : options.height
+                })
+                .click(function () {
+                    // Set icon as current and restore prev
+                    // selected icon to defaults
+                    current && current.attr(fill);
+                    current = Icon.attr(selected);
+                })
+                .hover(function () {
+                    path
+                        .stop()
+                        .animate({
+                            opacity: 1
+                        }, 200);
+                
+                }, function () {
+                    path
+                        .stop()
+                        .attr({
+                            opacity: 0
+                        });
+                });
+            
+            return this;
         }
-        
-        // Option overrides
-        options.width    || (options.width    = width);
-        options.height   || (options.height   = height);
-        options.stroke   || (options.stroke   = stroke);
-        options.fill     || (options.fill     = fill);
-        options.none     || (options.none     = none);
-        options.selected || (options.selected = selected);
-    
-        // Initialize canvas and draw
-        var paper = Raphael(selector, width, height),
-            // Create the outline path
-            path = paper
-                    .path(icons[name])
-                    .attr(options.stroke)
-                    .translate(4, 4)
-                    .scale(options.width / width, options.width / width),
-            
-            // Fill the icon in
-            Icon = paper
-                    .path(icons[name])
-                    .attr(options.fill)
-                    .translate(4, 4)
-                    .scale(options.width / width, options.width / width);
-        
-        // Apply interaction events
-        paper
-            .rect(0, 0, 32, 32)
-            .attr(options.none)
-            .attr({
-                // Resize the DOM attributes
-                width  : options.width,
-                height : options.height
-            })
-            .click(function () {
-            
-                // Set icon as current and restore prev
-                // selected icon to defaults
-                current && current.attr(fill);
-                current = Icon.attr(selected);
-            })
-            .hover(function () {
-                path
-                    .stop()
-                    .animate({
-                        opacity: 1
-                    }, 200);
-            
-            }, function () {
-                path
-                    .stop()
-                    .attr({
-                        opacity: 0
-                    });
-            });
-        
-        return this;
-    };
-})(ß);
+    });
+})(_);

@@ -13,11 +13,11 @@
             upvotes   : 0,
             downvotes : 0,
             rank      : 0,
-            tags      : [
-                'general'
-            ],
             banned    : []
         },
+        
+        // DNode persistence
+        sync : _.sync,
         
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
@@ -64,6 +64,9 @@
         model : ß.Models.RoomModel,
         url   : 'rooms',
         type  : 'room',
+        
+        // DNode persistence
+        sync : _.sync,
         
         // Initialize
         initialize : function(options) {

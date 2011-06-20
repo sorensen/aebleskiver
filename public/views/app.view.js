@@ -169,22 +169,22 @@
             });
             
             // Create the icons for this view
-            ß
-                .iconMaker('home', 'home', {
+            _
+                .icon('home', 'home', {
                     width  : 20,
                     height : 20
                 })
-                .iconMaker('run', 'settings', {
+                .icon('run', 'settings', {
                     width  : 20,
                     height : 20
                 })
-                .iconMaker('power', 'start-menu-icon')
-                .iconMaker('users', 'friends-icon')
-                .iconMaker('bookmark', 'favorites-icon')
-                .iconMaker('i', 'stats-icon')
-                .iconMaker('github', 'github-icon')
-                .iconMaker('chat', 'show-rooms')
-                .iconMaker('slideshare', 'show-users');
+                .icon('power', 'start-menu-icon')
+                .icon('slideshare', 'friends-icon')
+                .icon('bookmark', 'favorites-icon')
+                .icon('i', 'stats-icon')
+                .icon('github', 'github-icon')
+                .icon('chat', 'show-rooms')
+                .icon('users', 'show-users');
             
             return this;
         },
@@ -205,7 +205,7 @@
         },
         
         // The model has been subscribed to, and is now
-        // synchronized with the ß.Server
+        // synchronized with the 'Server'
         ready : function() {
         
         },
@@ -329,7 +329,7 @@
         },
         
         // Create room keystroke listener, throttled function
-        // returned to reduce load on the ß.Server
+        // returned to reduce load on the 'Server'
         searchOnEnter : _.debounce(function() {
             var self  = this,
                 input = this.searchInput.val(),
@@ -348,7 +348,7 @@
         }, 1000),
         
         // Create room keystroke listener, throttled function
-        // returned to reduce load on the ß.Server
+        // returned to reduce load on the 'Server'
         searchOnTab : function(e) {
             if (e.keyCode === $.ui.keyCode.TAB && $(this).data('autocomplete').menu.active) {
                 event.preventDefault();
@@ -449,11 +449,11 @@
                     // Create the icons for this view, should be done 
                     // on the room view, but the app needs to load it 
                     // into view first before icons can be loaded.
-                    ß
-                        .iconMaker('view', 'add-favorite')
-                        .iconMaker('noview', 'remove-favorite')
-                        .iconMaker('cross', 'leave-room')
-                        .iconMaker('quote', 'message-submit');
+                    _
+                        .icon('view', 'add-favorite')
+                        .icon('noview', 'remove-favorite')
+                        .icon('cross', 'leave-room')
+                        .icon('quote', 'message-submit');
                     
                     delete self;
                 })
@@ -531,6 +531,7 @@
         usersReady : function() {
             // Online user test
             ß.Server.onlineUsers(function(resp) {
+                // Placeholder
             });
         },
         
@@ -577,10 +578,11 @@
                     // on the room view, but the app needs to load it 
                     // into view first before icons can be loaded.
                     ß
-                        .iconMaker('star', 'add-friend')
-                        .iconMaker('star2', 'remove-friend')
-                        .iconMaker('cross', 'leave-profile')
-                        .iconMaker('quote', 'post-submit');
+                        .icon('star', 'add-friend')
+                        .icon('star2', 'remove-friend')
+                        .icon('mail', 'send-message')
+                        .icon('cross', 'leave-profile')
+                        .icon('quote', 'post-submit');
                 })
         },
         
