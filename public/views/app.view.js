@@ -162,11 +162,29 @@
             
             this.el.html(view);
             
+            // Enable access keys
+            KeyCandy.init('#application', {
+                controlKey : 16,
+                removeKey  : 16
+            });
+            
             // Create the icons for this view
             ß
+                .iconMaker('home', 'home', {
+                    width  : 20,
+                    height : 20
+                })
+                .iconMaker('run', 'settings', {
+                    width  : 20,
+                    height : 20
+                })
                 .iconMaker('power', 'start-menu-icon')
                 .iconMaker('users', 'friends-icon')
-                .iconMaker('bookmark', 'favorites-icon');
+                .iconMaker('bookmark', 'favorites-icon')
+                .iconMaker('i', 'stats-icon')
+                .iconMaker('github', 'github-icon')
+                .iconMaker('chat', 'show-rooms')
+                .iconMaker('slideshare', 'show-users');
             
             return this;
         },
@@ -427,6 +445,16 @@
                         // Scroll to the bottom of the message window
                         self.activeRoom.messageList[0].scrollHeight
                     );
+                
+                    // Create the icons for this view, should be done 
+                    // on the room view, but the app needs to load it 
+                    // into view first before icons can be loaded.
+                    ß
+                        .iconMaker('view', 'add-favorite')
+                        .iconMaker('noview', 'remove-favorite')
+                        .iconMaker('cross', 'leave-room')
+                        .iconMaker('quote', 'message-submit');
+                    
                     delete self;
                 })
                 .find('input[name="message"]').focus();
@@ -438,9 +466,7 @@
         createRoom : function() {
             // User input
             var name        = this.$('input[name="room"]'),
-                //tags        = this.$('input[name="tags"]'),
-                //image       = this.$('input[name="image"]'),
-                //restricted  = this.$('input[name="restricted"]'),
+                restricted  = this.$('input[name="restricted"]'),
                 description = this.$('textarea[name="description"]');
             
             // Validation
@@ -449,9 +475,8 @@
             // Delegate to Backbone.sync
             this.model.createRoom({
                 name        : name.val(),
-                //tags        : tags.val(),
                 user_id     : ß.user.get('id') || ß.user.id,
-                //restricted  : restricted.val(),
+                restricted  : restricted.val(),
                 description : description.val()
             });
             
@@ -461,9 +486,7 @@
             
             // Reset fields
             name.val('');
-            //tags.val('');
-            //image.val('');
-            //restricted.val('');
+            restricted.val('');
             description.val('');
         },
         
@@ -474,11 +497,32 @@
         
         // Show the login form
         showCreateRoom : function() {
+            var self = this;
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.createRoomDialog
                 .html(Mustache.to_html(this.createRoomTemplate()))
                 .fadeIn(150, function(){
+                
+                    // Apply happy validation schema, this might be 
+                    // better placed and only accessed here, as the 
+                    // DOM elements must exist before they can be happy
+                    self.$('#create-room-form').isHappy({
+                        fields : {
+                            '#create-room-name' : {
+                                required : true,
+                                message  : 'Please name this room'
+                            },
+                            '#create-room-description' : {
+                                required : true,
+                                message  : 'Give some info about this room'
+                            }
+                        },
+                        submitButton : '#create-room-submit',
+                        unHappy : function() {
+                            alert('Create room is unhappy. :(');
+                        }
+                    });
                 })
                 .find('input[name="room"]').focus();
         },
@@ -519,7 +563,7 @@
             }).render();
             
             // Make view accessable to inner-view
-            this.activeRoom.view = this;
+            this.activeUser.view = this;
             
             var self = this;
             this.mainContent
@@ -528,16 +572,47 @@
                         .html(self.activeUser.el)
                         .find('.avatar')
                         .fadeIn(1500);
+                
+                    // Create the icons for this view, should be done 
+                    // on the room view, but the app needs to load it 
+                    // into view first before icons can be loaded.
+                    ß
+                        .iconMaker('star', 'add-friend')
+                        .iconMaker('star2', 'remove-friend')
+                        .iconMaker('cross', 'leave-profile')
+                        .iconMaker('quote', 'post-submit');
                 })
         },
         
         // Show the login form
         showSettings : function() {
+            var self = this;
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.settingsDialog
                 .html(Mustache.to_html(this.settingsTemplate(), ß.user.toJSON()))
-                .fadeIn(150, function(){
+                .fadeIn(150, function() {
+                
+                    // Apply happy validation schema, this might be 
+                    // better placed and only accessed here, as the 
+                    // DOM elements must exist before they can be happy
+                    self.$('#settings-form').isHappy({
+                        fields : {
+                            '#settings-username' : {
+                                required : true,
+                                message  : 'What should we call you?'
+                            },
+                            '#settings-email' : {
+                                required : true,
+                                message  : 'Email is required',
+                                test     : happy.email
+                            }
+                        },
+                        submitButton : '#settings-submit',
+                        unHappy : function() {
+                            alert('Settings are unhappy. :(');
+                        }
+                    });
                 })
                 .find('input[name="displayname"]').focus();
         },
@@ -598,7 +673,26 @@
             this.loginDialog
                 .html(Mustache.to_html(this.loginTemplate()))
                 .fadeIn(150, function(){
-                    
+                
+                    // Apply happy validation schema, this might be 
+                    // better placed and only accessed here, as the 
+                    // DOM elements must exist before they can be happy
+                    self.$('#login-form').isHappy({
+                        fields : {
+                            '#login-username' : {
+                                required : true,
+                                message  : 'Who are you again?'
+                            },
+                            '#login-password' : {
+                                required : true,
+                                message  : 'Password please'
+                            }
+                        },
+                        submitButton : '#login-submit',
+                        unHappy : function() {
+                            alert('Login is unhappy. :(');
+                        }
+                    });
                 })
                 .find('input[name="username"]').focus();
         },
@@ -632,11 +726,38 @@
         
         // Show the login form
         showSignup : function() {
+            var self = this;
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.signupDialog
                 .html(Mustache.to_html(this.signupTemplate()))
                 .fadeIn(150, function(){
+                
+                    // Apply happy validation schema, this might be 
+                    // better placed and only accessed here, as the 
+                    // DOM elements must exist before they can be happy
+                    self.$('#signup-form').isHappy({
+                        fields : {
+                            '#signup-username' : {
+                                required : true,
+                                message  : 'What should we call you?'
+                            },
+                            '#signup-email' : {
+                                required : true,
+                                message  : 'We need a way to reach you',
+                                test     : happy.email
+                            },
+                            '#signup-password' : {
+                                required : true,
+                                message  : 'Password required',
+                                test     : happy.minLength(7)
+                            }
+                        },
+                        submitButton : '#signup-submit',
+                        unHappy : function() {
+                            alert('Signup is unhappy. :(');
+                        }
+                    });
                 })
                 .find('input[name="username"]').focus();
         },

@@ -13,7 +13,7 @@ var express      = require('express'),
     Auth         = require('backbone-auth'),
     DNode        = require('dnode'),
     version      = '0.3.2',
-    port         = 8080,
+    port         = 3000,
     oneYear      = 31557600000,
     token        = '',
     app          = module.exports = express.createServer();

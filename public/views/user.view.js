@@ -85,11 +85,11 @@
         // Interaction events
         events : {
             'keypress .post-form input' : 'createPostOnEnter',
-            'click .post-form button'   : 'createPost',
-            'click .destroy'            : 'deactivate',
-            'click .add-friend'         : 'addToFriends',
-            'click .remove-friend'      : 'removeFromFriends',
-            'click .send-message'       : 'startConversation'
+            'click #post-submit'        : 'createPost',
+            'click #leave-profile'      : 'deactivate',
+            'click #add-friend'         : 'addToFriends',
+            'click #remove-friend'      : 'removeFromFriends',
+            'click #send-message'       : 'startConversation'
         },
     
         initialize : function(options) {

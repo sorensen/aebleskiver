@@ -10,17 +10,17 @@ Cluster('./app')
     .use(Cluster.pidfiles(__dirname + '/pids'))
     .set('workers', 4)
     .in('development')
-        .listen(8080)
+        .listen(3000)
         .use(Cluster.cli())
-        .use(Cluster.repl(8000))
+        .use(Cluster.repl(8888))
         .use(Cluster.debug())
         .use(Cluster.stats({ 
             connections   : true, 
             lightRequests : true 
         }))
         .use(Live({
-            user : 'beau',
-            pass : 'sorensen'
+            user : 'admin',
+            pass : 'aebleskiver'
         }))
     .in('production')
         .listen(80);

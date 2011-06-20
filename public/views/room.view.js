@@ -18,7 +18,6 @@
         
         // Interaction events
         events : {
-            //'click'           : 'activate',
             'click .upvote'   : 'upVote',
             'click .downvote' : 'downVote'
         },
@@ -26,12 +25,18 @@
         // Constructor
         initialize : function(options) {
             // Bind to model
-            _.bindAll(this, 'render', 'highlight', 'remove');
+            _.bindAll(this, 'render', 'highlight', 'remove', 'statistics');
             
             this.model.view = this;
-            this.model.bind('change', this.render);
+            this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
+            this.render();
+            this.loaded = 0;
+            this.statistics();
+        },
+        
+        render : function() {
             // Send model contents to the template
             var content = this.model.toJSON();
             
@@ -42,13 +47,12 @@
             var view = Mustache.to_html(this.template(), content);            
             $(this.el)
                 .html(view);
-            
-            this.loaded = 0;
-            this.render();
+                
+            return this;
         },
         
         // Refresh statistics
-        render : function() {
+        statistics : function() {
             var rank = this.model.get('upvotes') - this.model.get('downvotes');
             this.$('.ranking').html(Mustache.to_html(this.rankTemplate(), {
                 rank : rank
@@ -94,7 +98,7 @@
         },
         
         // Leave Channel
-        deactivate : function() {            
+        leave : function() {            
             $(this.el)
                 .removeClass('active')
                 .removeClass('current')
@@ -116,10 +120,10 @@
         // Interaction events
         events : {
             'keypress .message-form input' : 'createMessageOnEnter',
-            'click .message-form button'   : 'createMessage',
-            'click .destroy'               : 'deactivate',
-            'click .add-favorite'          : 'addToFavorites',
-            'click .remove-favorite'       : 'removeFromFavorites',
+            'click #message-submit'        : 'createMessage',
+            'click #leave-room'            : 'leave',
+            'click #add-favorite'          : 'addToFavorites',
+            'click #remove-favorite'       : 'removeFromFavorites',
             'click .delete-room'           : 'deleteRoom',
         },
         
@@ -132,12 +136,12 @@
             
             _.bindAll(this, 
                 'allMessages', 'addMessage', 'createMessage', 'render',
-                'remove'
+                'remove', 'statistics'
             );
             
             // Bind to model
             this.model.mainView = this;
-            this.model.bind('change', this.render);
+            this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
             this.model.messages = new ß.Models.MessageCollection();
@@ -145,7 +149,7 @@
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('reset', this.allMessages);
-            this.model.messages.bind('add', this.render);
+            this.model.messages.bind('add', this.statistics);
             
             // Send model contents to the template
             var content = this.model.toJSON(),
@@ -156,16 +160,7 @@
             content.description = this.model.escape('description');
             
             var view = Mustache.to_html(this.template(), content);            
-            $(this.el)
-                .html(view);
-            
-            this.editable = this.model.allowedToEdit(ß.user);
-            // Check if the current user is the room creator
-            if (this.editable) {
-                $(this.el).addClass('editable');
-            } else {
-                this.$('.admin-controls').remove();
-            }
+            $(this.el).html(view);
             
             // Set shortcut methods for DOM items
             this.title       = this.$('.headline');
@@ -179,6 +174,16 @@
             this.title.html(ß.Helpers.linkify(self.model.escape('name')));
             this.description.html(ß.Helpers.linkify(self.model.escape('description')));
             
+            this.input.focus();
+            
+            this.editable = this.model.allowedToEdit(ß.user);
+            // Check if the current user is the room creator
+            if (this.editable) {
+                $(this.el).addClass('editable');
+            } else {
+                this.$('.admin-controls').remove();
+            }
+            
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
                     query    : {room_id : self.model.get('id')},
@@ -187,8 +192,20 @@
                     },
                 });
             });
-            
-            this.input.focus();
+        },
+        
+        // Render view
+        render : function() {
+            return this;
+        },
+        
+        // Statistics
+        statistics : function() {
+            var totalMessages = this.model.messages.length;
+            this.$('.room-stats').html(Mustache.to_html(this.statsTemplate(), {
+                totalMessages : totalMessages
+            }));
+            return this;
         },
         
         deleteRoom : function() {
@@ -231,17 +248,8 @@
             }).save();
         },
         
-        // Refresh statistics
-        render : function() {
-            var totalMessages = this.model.messages.length;
-            this.$('.room-stats').html(Mustache.to_html(this.statsTemplate(), {
-                totalMessages : totalMessages
-            }));
-            return this;
-        },
-        
         // Tell the application to remove this room
-        deactivate : function() {
+        leave : function() {
             Backbone.history.saveLocation('/');
             this.view.deactivateRoom(this.model);
         },
@@ -249,7 +257,7 @@
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
-            this.model.view && this.model.view.deactivate();
+            this.model.view && this.model.view.leave();
             this.model && this.model.remove();
             this.model.messages.unsubscribe();
             $(this.el).remove();
@@ -265,7 +273,7 @@
             this.messageList.html('');
             //this.model.messages.each(this.concurrency);
             this.model.messages.each(this.addMessage);
-            this.render()
+            this.statistics()
                 .messageList
                 .delay(400)
                 .animate({scrollTop : this.messageList[0].scrollHeight}, 1000, 'easeInExpo');
@@ -351,12 +359,12 @@
             
             _.bindAll(this, 
                 'allMessages', 'addMessage', 'createMessage', 'render',
-                'remove'
+                'remove', 'statistics'
             );
             
             // Bind to model
             this.model.mainView = this;
-            this.model.bind('change', this.render);
+            this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
             this.model.messages = new ß.Models.MessageCollection();
@@ -364,7 +372,7 @@
             
             this.model.messages.bind('add', this.addMessage);
             this.model.messages.bind('reset', this.allMessages);
-            this.model.messages.bind('add', this.render);
+            this.model.messages.bind('add', this.statistics);
             
             // Send model contents to the template
             var content = this.model.toJSON();

@@ -212,7 +212,12 @@
         // Apply interaction events
         paper
             .rect(0, 0, 32, 32)
-            .attr(none)
+            .attr(options.none)
+            .attr({
+                // Resize the DOM attributes
+                width  : options.width,
+                height : options.height
+            })
             .click(function () {
             
                 // Set icon as current and restore prev

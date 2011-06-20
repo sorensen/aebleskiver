@@ -1,7 +1,6 @@
 @import url('aebleskiver/jquery-ui-1.8.11.aebleskiver.css');
 @import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.5.css');
 @import url('../vendor/jquery-cssemoticons/stylesheets/jquery.cssemoticons.css');
-@import url('../vendor/keycandy/keyCandy.css');
 
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -182,7 +181,8 @@ a:hover { color: #036; }
 #version,
 #rooms .stat .title,
 #sidebar-down,
-#footer .title
+#footer .title,
+#main-content
 { 
     display: none; 
 }
@@ -258,6 +258,7 @@ body .ui-dialog,
 **/
 .dialog,
 .friend-wrapper,
+.stats-wrapper,
 .favorite-wrapper,
 #footer .controls,
 #footer .heading
@@ -452,7 +453,7 @@ input[type='submit']:hover,
 }
 .message-form button:active,
 input[type='submit']:active, 
-.submit:active 
+.submit:active
 {
     background-color: #C4F074;
     background-image: -moz-linear-gradient(top, #C4F074, #a0cd4d);
@@ -517,8 +518,8 @@ body {
     bottom: 0;
     right: 0;
     overflow: hidden;
-    min-height: 300px;
-    min-width: 600px;
+    min-height: 238px;
+    min-width: 410px;
 }
 .wrapper {
     height: 100%;
@@ -601,6 +602,18 @@ body {
             background-image: linear-gradient(top, #fff, #EFEFEF);
                       filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#EFEFEF');
             }
+    #navigation a {
+        height: 30px;
+        overflow: hidden;
+        display: block;
+    }
+    #navigation a.icon {
+        padding: 0;
+    }
+        #navigation a.icon svg {
+            position: relative;
+            top: -5px;
+        }
 #footer {
     height: 50px;
     z-index: 3;
@@ -620,6 +633,8 @@ body {
         font-weight: bold;
         text-shadow: 1px 1px 3px #444;
     }
+    #github,
+    #statistics,
     #favorite-list,
     #friend-list {
         height: 50px;
@@ -644,6 +659,7 @@ body {
             height: 40px;
             padding: 5px;
         }
+        .stats-wrapper,
         .favorite-wrapper,
         .friend-wrapper {
             width: 188px;
@@ -653,6 +669,7 @@ body {
             z-index: -1;
             display: none;
         }
+            .open .stats-wrapper,
             .open .favorite-wrapper,
             .open .friend-wrapper {
                 bottom: 44px;
@@ -677,6 +694,7 @@ body {
             background-image: linear-gradient(top, #fff, #eee);
                       filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#eee');
         }
+        .stats,
         .favorites,
         .friends {
             background: white;
@@ -1249,7 +1267,7 @@ body {
     #main-content {
         background: #fafafa;
         height: 100%;
-        min-height: 300px;
+        min-height: 153px;
         clear: both;
         margin-left: 200px;
         min-width: 215px;
@@ -1293,8 +1311,6 @@ body {
 }
 .main-room .controls {
     float: right;
-    margin: -4px 40px 0 0;
-    height: 87px;
 }
     .admin-controls {
         display: none;
@@ -1419,7 +1435,9 @@ body {
             }
     .user-profile .controls {
         margin: 0 10px;
+        float: right;
     }
+        /**
         .user-profile .controls button,
         .main-room .controls button {
             padding: 0 10px;
@@ -1429,6 +1447,14 @@ body {
                -moz-border-radius: 30px;
             -webkit-border-radius: 30px;
                     border-radius: 30px;
+        }
+        **/
+        .user-profile .controls .icon,
+        .main-room .controls .icon {
+            height: 40px;
+            width: 40px;
+            padding: 5px;
+            float: left;
         }
     .wall {
     
@@ -1867,7 +1893,68 @@ body {
         .heart:hover .heart-content {
         }
 
+.keycandy:before, 
+.keycandy *[accesskey]:before {
+	position: absolute;
+	border: 1px solid #ccc;
+	z-index: 999;
+    
+	font: 16px/24px Arial,Helvetica,sans-serif;
+	text-align: center;
+	text-decoration: none;
+	text-indent:  0;
+    text-shadow: 1px 1px 1px white;
+    font-weight: bold;
+	vertical-align: middle;
+	color: #333;
+    
+	   -moz-border-radius: 8px;
+	-webkit-border-radius: 8px;
+	        border-radius: 8px;
+            
+       -moz-box-shadow: 1px 1px 1px #333;
+    -webkit-box-shadow: 1px 1px 1px #333;
+            box-shadow: 1px 1px 1px #333;
+    
+    background-color: #eee;
+    background-image: -moz-linear-gradient(top, #eee, #ddd);
+    background-image: -o-linear-gradient(top, #eee, #ddd);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eee),color-stop(1, #ddd));
+    background-image: -webkit-linear-gradient(#eee, #ddd);
+    background-image: linear-gradient(top, #eee, #ddd);
+              filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eee', EndColorStr='#ddd');
 
+}
+.keycandy:before:hover, 
+.keycandy *[accesskey]:before:hover {
+       -moz-box-shadow: 1px 1px 1px #111;
+    -webkit-box-shadow: 1px 1px 1px #111;
+            box-shadow: 1px 1px 1px #111;
+            
+    background-color: #e0e0e0;
+    background-image: -moz-linear-gradient(top, #e0e0e0, #d0d0d0);
+    background-image: -o-linear-gradient(top, #e0e0e0, #d0d0d0);
+    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #e0e0e0),color-stop(1, #d0d0d0));
+    background-image: -webkit-linear-gradient(#e0e0e0, #d0d0d0);
+    background-image: linear-gradient(top, #e0e0e0, #d0d0d0);
+              filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e0e0e0', EndColorStr='#d0d0d0');
+}
+    .keycandy:before {
+        top: 2px;
+        /*content:"Press [esc] to clear hotkey tooltips."*/
+    }
+
+    .keycandy *[accesskey] {
+        position: relative
+    }
+
+    .keycandy *[accesskey]:before {
+        right: 0px;
+        top: 0px;
+        content: attr(accesskey);
+        width: 24px;
+        height: 24px;
+    }
 /**
  * Non-semantic helper classes: please define your styles before this section.
  */
