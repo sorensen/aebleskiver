@@ -1,11 +1,18 @@
-﻿(function(ß) {
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
+
+(function(ß) {
     // Application view
     // -----------------
     
-    // Application
+    // Extend the Backbone 'view' object and add it to the 
+    // namespaced view container
     ß.Views.ApplicationView = Backbone.View.extend({
     
-        // DOM attributes
+        //##Templates
         template             : _.template($('#application-template').html()),
         statsTemplate        : _.template($('#application-stats-template').html()),
         loginTemplate        : _.template($('#login-template').html()),
@@ -14,8 +21,10 @@
         createRoomTemplate   : _.template($('#create-room-template').html()),
         notificationTemplate : _.template($('#notification-template').html()),
         
-        // Interaction events
-        events    : {
+        //##Interaction events
+        // These are all interaction events between the 
+        // user and this view's DOM interface
+        events : {
             'keyup'              : 'hideOnEscape',
             'click #show-rooms'  : 'showRooms',
             'click #show-users'  : 'showUsers',
@@ -53,7 +62,10 @@
             'click #start-menu .icon'    : 'toggleSidebar'
         },
         
-        // Constructor
+        //##Contstructor
+        // Setup the model and view interactions, unlike the 'events' 
+        // property, the event bindings below are programmatic listeners
+        // to model and collection changes
         initialize : function(options) {
             _.bindAll(this, 
                 'render', 'toggleNav', 'statistics',
@@ -65,19 +77,13 @@
                 'conversationsReady', 'allConversations', 'addConversation'
             );
 
-            // Set the application model directly, since there is a 
-            // one to one relationship between the view and model
-            this.model = new ß.Models.ApplicationModel({
-            
-                // This can be used to represent different
-                // servers, or instances of the program, since
-                // it is the base ID of every model url path
-                server : 's1'
-            });
+            // Create and bind the application model to this view,
+            // then create a circular reference for traversing
+            this.model = new ß.Models.ApplicationModel();
             this.model.view = this;
             
             // Application model event bindings
-            this.model.bind('change', this.statistics);
+            this.model.bind('change',    this.statistics);
             this.model.bind('subscribe', this.ready);
             
             // User collection event bindings
@@ -85,21 +91,21 @@
             this.model.users.bind('add',       this.addUser);
             this.model.users.bind('add',       this.statistics);
             this.model.users.bind('change',    this.statistics);
-            this.model.users.bind('reset',   this.allUsers);
-            this.model.users.bind('reset',   this.statistics);
+            this.model.users.bind('reset',     this.allUsers);
+            this.model.users.bind('reset',     this.statistics);
             
             // Room collection event bindings
             this.model.rooms.bind('subscribe', this.roomsReady);
             this.model.rooms.bind('add',       this.addRoom);
             this.model.rooms.bind('add',       this.statistics);
             this.model.rooms.bind('change',    this.statistics);
-            this.model.rooms.bind('reset',   this.allRooms);
-            this.model.rooms.bind('reset',   this.statistics);
+            this.model.rooms.bind('reset',     this.allRooms);
+            this.model.rooms.bind('reset',     this.statistics);
             
             // Conversation event bindings
             ß.user.conversations.bind('subscribe', this.coversationsReady);
             ß.user.conversations.bind('add',       this.addConversation);
-            ß.user.conversations.bind('reset',   this.allConversation);
+            ß.user.conversations.bind('reset',     this.allConversation);
             
             this.render();
             
@@ -155,41 +161,76 @@
             }
         },
         
-        // Render template contents
+        //###render
+        // Render template contents onto the DOM, adding
+        // any effects afterwards, such as icons
         render : function() {
             var content = this.model.toJSON(),
-                view    = Mustache.to_html(this.template(), content);
+                view    = Mustache.to_html(this.template(), content),
+                options = {
+                    width  : 20,
+                    height : 20,
+                    fill : {
+                        fill   : "#333", 
+                        stroke : "none"
+                    },
+                    none : {
+                        fill    : "#000", 
+                        opacity : 0
+                    }
+                },
+                highlight = {
+                    fill : {
+                        fill   : "#A90000", 
+                        stroke : "none"
+                    },
+                    none : {
+                        fill    : "#9A0000", 
+                        opacity : 0
+                    }
+                };
             
             this.el.html(view);
             
             // Enable access keys
             KeyCandy.init('#application', {
+                // Set the control key and menu key to
+                // 'SHIFT', so that it does not conflict
+                // with native accesskeys. Setting both
+                // keys to the same code will also enable 
+                // an instant toggle effect on the tooltips
                 controlKey : 16,
                 removeKey  : 16
             });
             
             // Create the icons for this view
             _
-                .icon('home', 'home', {
-                    width  : 20,
-                    height : 20
+                .icon('home', 'home', options)
+                .icon('run', 'settings', options)
+                .icon('power', 'start-menu-icon', {
+                    fill : {
+                        fill   : "#333", 
+                        stroke : "none"
+                    },
+                    none : {
+                        fill    : "#000", 
+                        opacity : 0
+                    }
                 })
-                .icon('run', 'settings', {
-                    width  : 20,
-                    height : 20
-                })
-                .icon('power', 'start-menu-icon')
                 .icon('slideshare', 'friends-icon')
-                .icon('bookmark', 'favorites-icon')
-                .icon('i', 'stats-icon')
-                .icon('github', 'github-icon')
-                .icon('chat', 'show-rooms')
-                .icon('users', 'show-users');
+                .icon('bookmark',   'favorites-icon')
+                .icon('i',          'stats-icon')
+                .icon('github',     'github-icon')
+                .icon('chat',       'show-rooms', highlight)
+                .icon('users',      'show-users', highlight);
             
             return this;
         },
         
-        // Refresh statistics
+        //###statistics
+        // Update the DOM view with the current application
+        // statistics, this method is seperated and short for use
+        // whenever child collections are updated
         statistics : function() {
             var totalOnline = this.model.online       || 0,
                 totalUsers  = this.model.users.length || 0,
@@ -204,12 +245,14 @@
             return this;
         },
         
+        //###ready
         // The model has been subscribed to, and is now
         // synchronized with the 'Server'
         ready : function() {
         
         },
         
+        //###hideOnEscape
         // Close modal keystroke listener
         hideOnEscape : function(e) {
             if (e.keyCode == 27) {
@@ -217,6 +260,7 @@
             }
         },
         
+        //###toggleSidebar
         // Open or close the sidebar menu, setting a cookie
         // to remember the setting
         toggleSidebar : function() {
@@ -231,6 +275,7 @@
             $.cookie('menuOpen', this.menuOpen);
         },
         
+        //###toggleFriendList
         // Open or close the friend list, setting a cookie
         // to remember the setting
         toggleFriendList : function() {
@@ -251,6 +296,7 @@
             $.cookie('friendsOpen', this.friendsOpen);
         },
         
+        //###allFriends
         // All rooms have been loaded into collection
         allFriends : function(friends) {
             this.friendList.html('');
@@ -260,6 +306,7 @@
             this.statistics();
         },
         
+        //###addFriend
         // Add a single friend o the current veiw
         addFriend : function(friend) {
             var view = new ß.Views.FriendView({
@@ -270,6 +317,8 @@
                 .append(view.el);
         },
         
+        //###toggleFavoriteList
+        // See: toggleFriendList for explanation
         toggleFavoriteList : function() {
             if (this.favoritesOpen == 'true') {
                 this.favoritesOpen = 'false';
@@ -288,6 +337,7 @@
             $.cookie('friendsOpen', this.friendsOpen);
         },
         
+        //###allFavorites
         // All rooms have been loaded into collection
         allFavorites : function(favorites) {
             this.favoriteList.html('');
@@ -297,6 +347,7 @@
             this.statistics();
         },
         
+        //###addFavorite
         // Add a single room room to the current veiw
         addFavorite : function(favorite) {
             var view = new ß.Views.RoomView({
@@ -307,17 +358,20 @@
                 .append(view.el);
         },
         
+        //###conversationsReady
         // Conversations have been subscribed to
         conversationsReady : function(resp) {
             // Placeholder
         },
         
+        //###allConversations
         // All rooms have been loaded into collection
         allConversations : function(friends) {
             this.conversationList.html('');
             ß.user.conversations.each(this.addConversation);
         },
         
+        //###addConversation
         // Add a single friend o the current veiw
         addConversation : function(convo) {
             var view = new ß.Views.ConversationView({
@@ -328,6 +382,7 @@
                 .append(view.el);
         },
         
+        //###searchOnEnter
         // Create room keystroke listener, throttled function
         // returned to reduce load on the 'Server'
         searchOnEnter : _.debounce(function() {
@@ -347,14 +402,7 @@
             
         }, 1000),
         
-        // Create room keystroke listener, throttled function
-        // returned to reduce load on the 'Server'
-        searchOnTab : function(e) {
-            if (e.keyCode === $.ui.keyCode.TAB && $(this).data('autocomplete').menu.active) {
-                event.preventDefault();
-            }
-        },
-        
+        //###toggleNav
         // Alternate navigation based on user authentication
         toggleNav : function() {
             this.nav.signup.fadeOut(150);
@@ -364,20 +412,20 @@
             this.nav.createRoom.fadeIn(150);
         },
         
+        //###hideDialogs
         // Remove all defined dialoges from the view
         hideDialogs : function() {
-            this.loginDialog.hide();
-            this.signupDialog.hide();
-            this.createRoomDialog.hide();
-            this.settingsDialog.hide();
+            this.$('.dialog').hide();
             this.overlay.hide();
         },
         
+        //###roomsReady
         // Room collection has been subscribed to
         roomsReady : function() {
             // Placeholder
         },
         
+        //###allRooms
         // All rooms have been loaded into collection
         allRooms : function(rooms) {
             this.roomList.html('');
@@ -387,12 +435,14 @@
             this.statistics();
         },
         
+        //###showRooms
         // Show the sidebar user list
         showRooms : function() {
             this.userList.fadeOut(150);
             this.roomList.fadeIn(150);
         },
         
+        //###addRoom
         // Add a single room room to the current veiw
         addRoom : function(room) {
             var view = new ß.Views.RoomView({
@@ -403,6 +453,9 @@
                 .append(view.el);
         },
         
+        //###deactivateRoom
+        // Remove the current active room from the view,
+        // as well as the DOM
         deactivateRoom : function() {
             this.mainContent
                 .fadeOut(50, function(){
@@ -413,6 +466,9 @@
             this.activeRoom && this.activeRoom.remove();
         },
         
+        //###activateRoom
+        // Set the target room to this view's active 
+        // room, setting it to the main DOM view
         activateRoom : function(params) {
             // Should probably hide room instead, maybe 
             // minimize it to the bottom toolbar
@@ -449,11 +505,10 @@
                     // Create the icons for this view, should be done 
                     // on the room view, but the app needs to load it 
                     // into view first before icons can be loaded.
-                    _
-                        .icon('view', 'add-favorite')
-                        .icon('noview', 'remove-favorite')
-                        .icon('cross', 'leave-room')
-                        .icon('quote', 'message-submit');
+                    _.icon('view',   'add-favorite')
+                     .icon('noview', 'remove-favorite')
+                     .icon('cross',  'leave-room')
+                     .icon('quote',  'message-submit');
                     
                     delete self;
                 })
@@ -462,6 +517,7 @@
             model[0].view && model[0].view.activate();
         },
         
+        //###createRoom
         // Create new room room
         createRoom : function() {
             // User input
@@ -490,11 +546,13 @@
             description.val('');
         },
         
+        //###createRoomOnEnter
         // Create room keystroke listener
         createRoomOnEnter : function(e) {
             if (e.keyCode == 13) this.createRoom();
         },
         
+        //###showCreateRoom
         // Show the login form
         showCreateRoom : function() {
             var self = this;
@@ -524,9 +582,11 @@
                         }
                     });
                 })
+                .draggable()
                 .find('input[name="room"]').focus();
         },
         
+        //###usersReady
         // Users collection has been subscribed to
         usersReady : function() {
             // Online user test
@@ -535,7 +595,8 @@
             });
         },
         
-        // Remove user profile from DOM
+        //###deactivateRoom
+        // Remove user profile from DOM and view
         deactivateUser : function() {
             this.mainContent
                 .fadeOut(50, function(){
@@ -545,6 +606,7 @@
             this.activeUser && this.activeUser.remove();
         },
         
+        //###activateUser
         // Show the user profile / main view
         activateUser : function(params) {
             this.deactivateUser();
@@ -577,15 +639,16 @@
                     // Create the icons for this view, should be done 
                     // on the room view, but the app needs to load it 
                     // into view first before icons can be loaded.
-                    ß
-                        .icon('star', 'add-friend')
+                    _
+                        .icon('star',  'add-friend')
                         .icon('star2', 'remove-friend')
-                        .icon('mail', 'send-message')
+                        .icon('mail',  'send-message')
                         .icon('cross', 'leave-profile')
                         .icon('quote', 'post-submit');
                 })
         },
         
+        //###showSettings
         // Show the login form
         showSettings : function() {
             var self = this;
@@ -616,9 +679,11 @@
                         }
                     });
                 })
+                .draggable()
                 .find('input[name="displayname"]').focus();
         },
         
+        //###saveSettings
         // Save updated user settings
         saveSettings : function() {
             var self = this;
@@ -638,17 +703,20 @@
             this.overlay.hide();
         },
         
+        //###saveSettingsOnEnter
         // Create room keystroke listener
         saveSettingsOnEnter: function(e) {
             if (e.keyCode == 13) this.saveSettings();
         },
         
+        //###showUsers
         // Show the sidebar user list
         showUsers : function() {
             this.roomList.fadeOut(150);
             this.userList.fadeIn(150);
         },
         
+        //###allUsers
         // All rooms have been loaded into collection
         allUsers : function(users) {
             this.userList.html('');
@@ -658,6 +726,7 @@
             this.statistics();
         },
         
+        //###addUser
         // Add a single room room to the current veiw
         addUser : function(user) {
             var view = new ß.Views.UserView({
@@ -668,6 +737,7 @@
                 .append(view.el);
         },
         
+        //###showLogin
         // Show the login form
         showLogin : function() {
             this.hideDialogs();
@@ -696,9 +766,11 @@
                         }
                     });
                 })
+                .draggable()
                 .find('input[name="username"]').focus();
         },
         
+        //###authenticate
         // Authenticate the current user, check the credentials
         // sent on the ß.Server side, which will return the client 
         // data to update the default model with
@@ -721,11 +793,13 @@
             this.overlay.hide();
         },
         
+        //###authenticateOnEnter
         // Authentication keystroke listener
         authenticateOnEnter: function(e) {
             if (e.keyCode == 13) this.authenticate();
         },
         
+        //###showSignup
         // Show the login form
         showSignup : function() {
             var self = this;
@@ -761,9 +835,11 @@
                         }
                     });
                 })
+                .draggable()
                 .find('input[name="username"]').focus();
         },
         
+        //###register
         // Authenticate the current user, check the credentials
         // sent on the ß.Server side, which will return the client 
         // data to update the default model with
@@ -788,11 +864,13 @@
             this.overlay.hide();
         },
         
+        //###registerOnEnter
         // Registration keystroke listener
         registerOnEnter: function(e) {
             if (e.keyCode == 13) this.register();
         },
         
+        //###logout
         // Destroy the current user object and restore original
         // navigation display
         logout : function() {
@@ -811,7 +889,6 @@
             this.nav.login.fadeIn(150);
             this.nav.settings.fadeOut(150);
             this.nav.logout.fadeOut(150);
-            this.nav.createRoom.fadeOut(150);
         },
         
     });

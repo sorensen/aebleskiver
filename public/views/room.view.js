@@ -1,4 +1,10 @@
-﻿(function(ß) {
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
+
+(function(ß) {
     // Room room Views
     // -----------------
     
@@ -30,13 +36,10 @@
             this.model.view = this;
             this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
-            
-            //this.render();
             this.loaded = 0;
         },
         
         render : function() {
-            console.log('render');
             // Send model contents to the template
             var content = this.model.toJSON();
             
@@ -45,9 +48,7 @@
             content.description = this.model.escape('description');
             
             var view = Mustache.to_html(this.template(), content);            
-            $(this.el)
-                .html(view);
-                
+            $(this.el).html(view);
             this.statistics();
             return this;
         },
@@ -59,10 +60,6 @@
                 view = Mustache.to_html(this.rankTemplate(), {
                     rank : rank
                 });
-            
-            console.log('statistics2', rank);
-            console.log('statistics3', view);
-            console.log('statistics4', this.$('.ranking'));
             
             this.$('.ranking').html(view);
             return this;
@@ -155,9 +152,9 @@
             this.model.messages = new ß.Models.MessageCollection();
             this.model.messages.url = _.getUrl(this.model) + ':messages';
             
-            this.model.messages.bind('add', this.addMessage);
+            this.model.messages.bind('add',   this.addMessage);
             this.model.messages.bind('reset', this.allMessages);
-            this.model.messages.bind('add', this.statistics);
+            this.model.messages.bind('add',   this.statistics);
             
             // Send model contents to the template
             var content = this.model.toJSON(),
@@ -325,15 +322,16 @@
         
         // Generate the attributes
         newAttributes : function() {
-            var username = ß.user.get('username'),
-                id = ß.user.get('id') || ß.user.id;
+            var username    = ß.user.get('username'),
+                displayName = ß.user.get('displayName') || ß.user.get('username'),
+                id          = ß.user.get('id') || ß.user.id;
             
             return {
                 text        : this.input.val(),
                 room_id     : this.model.get('id'),
                 user_id     : id,
-                username    : (username == ß.Models.UserModel.defaults) ? id : ß.user.get('username'),
-                displayName : ß.user.get('displayName') || ß.user.get('username'),
+                username    : username,
+                displayName : displayName,
                 avatar      : ß.user.get('avatar')
             };
         },
@@ -378,9 +376,9 @@
             this.model.messages = new ß.Models.MessageCollection();
             this.model.messages.url = _.getUrl(this.model) + ':messages';
             
-            this.model.messages.bind('add', this.addMessage);
+            this.model.messages.bind('add',   this.addMessage);
             this.model.messages.bind('reset', this.allMessages);
-            this.model.messages.bind('add', this.statistics);
+            this.model.messages.bind('add',   this.statistics);
             
             // Send model contents to the template
             var content = this.model.toJSON();
@@ -401,7 +399,7 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            content.name && this.title.html(_.linkify(content.name));
+            content.name        && this.title.html(_.linkify(content.name));
             content.description && this.description.html(_.linkify(content.description));
             
             this.model.messages.subscribe({}, function() {
@@ -449,22 +447,6 @@
         
         toggleOpen : function() {
             $(this.el).toggleClass('open');
-        },
-        
-        // Generate the attributes
-        newAttributes : function() {
-            var username = ß.user.get('username'),
-                id = ß.user.get('id') || ß.user.id;
-            
-            return {
-                text        : this.input.val(),
-                room_id     : this.model.get('id'),
-                user_id     : id,
-                username    : (username == ß.Models.UserModel.defaults) ? id : ß.user.get('username'),
-                displayName : ß.user.get('displayName') || ß.user.get('username'),
-                avatar      : ß.user.get('avatar'),
-                type        : 'private'
-            };
         },
     
     });

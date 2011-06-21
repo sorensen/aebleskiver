@@ -1,4 +1,10 @@
-﻿(function(ß) {
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
+
+(function(ß) {
     // Message view
     // ------------
     
@@ -26,6 +32,15 @@
         render : function() {
             var content = this.model.toJSON();
             
+            // Switch name and ID for an anonymous user, they can only be 
+            // looked up via session id, instead of username
+            console.log('render', content.username);
+            if (content.username === 'anonymous') {
+            console.log('anonymous', content);
+                content.displayName || (content.displayName = content.username);
+                content.username = content.user_id;
+            }
+            
             // Pre-formatting 
             content.text = this.model.escape('text');
             content.created && (content.created = _.timeFormat(content.created));
@@ -40,11 +55,12 @@
             this.$('.data')
                 .html(_.linkify(content.text))
                 .emoticonize({
-                    //delay: 800,
-                    //animate: false
-                    //exclude: 'pre, code, .no-emoticons'
+                    //delay   : 800,
+                    //animate : false
+                    //exclude : 'pre, code, .no-emoticons'
                 });
             
+            // Make this a localStorage setting
             //this.$('.timeago').timeago();
             return this;
         }

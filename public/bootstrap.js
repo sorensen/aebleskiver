@@ -1,4 +1,10 @@
-﻿(function(document, window) {
+//  Aebleskiver
+//  (c) 2011 Beau Sorensen
+//  Backbone may be freely distributed under the MIT license.
+//  For all details and documentation:
+//  https://github.com/sorensen/aebleskiver
+
+(function(document, window) {
     // Bootstrap
     // ---------
     

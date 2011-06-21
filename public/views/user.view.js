@@ -1,4 +1,10 @@
-﻿(function(ß) {
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
+
+(function(ß) {
     // User views
     // -----------------
     
@@ -47,8 +53,8 @@
                 .addClass('current')
                 .removeClass('inactive')
                 .siblings()
-                .addClass('inactive')
-                .removeClass('current');
+                    .addClass('inactive')
+                    .removeClass('current');
         },
     });
     
@@ -102,9 +108,9 @@
             this.model.posts     = new ß.Models.MessageCollection();
             this.model.posts.url = this.model.url() + ':posts';
             
-            this.model.posts.bind('add', this.addPost);
+            this.model.posts.bind('add',   this.addPost);
             this.model.posts.bind('reset', this.allPosts);
-            this.model.posts.bind('add', this.render);
+            this.model.posts.bind('add',   this.render);
             
             this.model.view = this;
             
@@ -151,7 +157,6 @@
                 || this.model.get('id') == ß.user.id) {
                 return;
             }
-            
             var friends = ß.user.get('friends') || [],
                 find    = _.indexOf(friends, this.model.get('id'));
             
@@ -215,8 +220,8 @@
                 .addClass('current')
                 .removeClass('inactive')
                 .siblings()
-                .addClass('inactive')
-                .removeClass('current');
+                    .addClass('inactive')
+                    .removeClass('current');
         },
         
         // Tell the application to remove this room
@@ -256,15 +261,16 @@
         
         // Generate the attributes
         newAttributes : function() {
-            var username = ß.user.get('username'),
-                id       = ß.user.get('id') || ß.user.id;
+            var username    = ß.user.get('username'),
+                displayName = ß.user.get('displayName') || ß.user.get('username'),
+                id          = ß.user.get('id') || ß.user.id;
             
             return {
                 text        : this.input.val(),
                 room_id     : this.model.get('id'),
                 user_id     : id,
-                username    : (username == ß.Models.UserModel.defaults) ? id : ß.user.get('username'),
-                displayName : ß.user.get('displayName') || ß.user.get('username'),
+                username    : username,
+                displayName : displayName,
                 avatar      : ß.user.get('avatar')
             };
         },

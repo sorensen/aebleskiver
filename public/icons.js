@@ -1,9 +1,21 @@
-﻿(function(_) {
+//  Aebleskiver
+//  (c) 2011 Beau Sorensen
+//  Backbone may be freely distributed under the MIT license.
+//  For all details and documentation:
+//  https://github.com/sorensen/aebleskiver
+
+(function(_) {
     // Raphael icon support
     // --------------------
+    
+    // Icon paths are taken from http://raphaeljs.com/icons/ 
+    // and are licensed under MIT, http://raphaeljs.com/license.html
 
-    // Default settings
+    // ###Defaults
+    // These are the default settings that every icon
+    // have applied, unless overriden in the options
     var current,
+        cache = {},
         
         // Dimentions and colors 
         width       = 40,
@@ -11,7 +23,7 @@
         scaleWidth  = 1,
         scaleHeight = 1,
         fill   = {
-            fill   : "#333", 
+            fill   : "#777", 
             stroke : "none"
         },
         stroke = {
@@ -23,14 +35,15 @@
         
         // Interaction states
         none = {
-            fill    : "#000", 
+            fill    : "#444", 
             opacity : 0
         },
         selected = {
             fill : "90-#0050af-#002c62"
         },
         
-        // Rendering paths
+        // ###Icon definitions
+        // Raphael rendering paths
         icons = {
             "?"          : "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z",
             i            : "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M14.757,8h2.42v2.574h-2.42V8z M18.762,23.622H16.1c-1.034,0-1.475-0.44-1.475-1.496v-6.865c0-0.33-0.176-0.484-0.484-0.484h-0.88V12.4h2.662c1.035,0,1.474,0.462,1.474,1.496v6.887c0,0.309,0.176,0.484,0.484,0.484h0.88V23.622z",
@@ -172,6 +185,7 @@
         
     // Add to the existing underscore utility functions
     _.mixin({
+        // ###icon
         // Create and render an icon, applying the default settings
         // if none are provided, to a given DOM selector
         icon : function(name, selector, options) {
@@ -214,11 +228,6 @@
             paper
                 .rect(0, 0, 32, 32)
                 .attr(options.none)
-                .attr({
-                    // Resize the DOM attributes
-                    width  : options.width,
-                    height : options.height
-                })
                 .click(function () {
                     // Set icon as current and restore prev
                     // selected icon to defaults

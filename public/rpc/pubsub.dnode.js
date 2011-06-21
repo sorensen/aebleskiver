@@ -1,23 +1,49 @@
-﻿(function(ß) {
-    // Backbone dnode sync
-    // -------------------
+//  Aebleskiver
+//  (c) 2011 Beau Sorensen
+//  Backbone may be freely distributed under the MIT license.
+//  For all details and documentation:
+//  https://github.com/sorensen/aebleskiver
+
+(function(ß) {
+    // Backbone DNode PubSub
+    // ---------------------
     
-    // Remote protocol
+    // This protocol is to be used as DNode middleware to provide
+    // built-in pub/sub support to all Backbone models and collections,
+    // as well as the client side counterpart to the server version
+    // of this same RPC protocol. The naming of methods in the past
+    // tense is to signal that the process has already happened on the 
+    // server, this is a common naming pattern found throughout the app.
+    
+    
+    // ß.Protocols.Pubsub
+    // ------------------
     ß.Protocols.Pubsub = function(client, con) {
         _.extend(this, {
-            // New subscription received
+            //###subscribed
+            // Someone has subscribed to a channel
+            // Note: This method is not required to run the 
+            // application, it may prove as a useful way to 
+            // update clients, and it may prove to be an added
+            // security risk, when private channels are involved
             subscribed : function(resp, options) {
                 if (!options.channel) return;
                 options.finished && options.finished(resp);
             },
         
-            // Someone has unsubscribed
+            //###unsubscribed
+            // Someone has unsubscribed from a channel, see the
+            // note above, as it applies to this method as well
             unsubscribed : function(resp, options) {
                 if (!options.channel) return;
                 options.finished && options.finished(resp);
             },
             
-            // Published from the ß.Server
+            //###published
+            // Data has been published by another client, this serves
+            // as the main entry point for server to client communication.
+            // Events are delegated based on the original method passed, 
+            // and are sent to 'crud.dnode.js' for completion
             published : function(resp, options) {
                 if (!options.channel) return;
                 switch (options.method) {
@@ -32,14 +58,20 @@
     
     // Extend default Backbone functionality
     _.extend(Backbone.Model.prototype, {
+        //###url
+        // This should probably be overriden with the underscore mixins
+        // from the helpers.js methods
         url : function() {
             var base = _.getUrl(this.collection) || this.urlRoot || '';
             if (this.isNew()) return base;
             return base + (base.charAt(base.length - 1) == ':' ? '' : ':') + encodeURIComponent(this.id);
         },
         
-        // Publish the model's data to everyone that 
-        // has subscribed to it
+        //###publish
+        // Publish model data to the server for processing, this serves as 
+        // the main entry point for client to server communications.  If no 
+        // method is provided, it defaults to an 'update', which is the least 
+        // conflicting method when returned to the client for processing
         publish : function(options, callback) {
             if (!ß.Server) return (options.error && options.error(503, model, options));
             var model = this;
@@ -56,6 +88,7 @@
     
     // Common extention object for both models and collections
     var common = {
+        //###subscribe
         // Subscribe to the 'Server' for model changes, if 'override' is set to true
         // in the options, this model will replace any other models in the local 
         // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
@@ -81,6 +114,7 @@
             return this;
         },
         
+        //###unsubscribe
         // Stop listening for published model data, removing the reference in the local
         // subscription 'Store', will trigger an unsubscribe event unless 'silent' 
         // is passed in the options
@@ -101,6 +135,8 @@
             return this;
         }
     };
+    
+    // Extend both model and collection with the pub/sub mechanics
     _.extend(Backbone.Model.prototype, common);
     _.extend(Backbone.Collection.prototype, common);
 })(ß)
