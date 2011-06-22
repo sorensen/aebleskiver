@@ -8,6 +8,7 @@
     // Message view
     // ------------
     
+    //##MessageView
     // Single room message
     ß.Views.MessageView = Backbone.View.extend({
         
@@ -16,27 +17,29 @@
         className : 'message',
         template  : _.template($('#message-template').html()),
     
-        // Constructor
+        //###initialize
+        // View constructor
         initialize : function(options) {
             _.bindAll(this, 'render');
             this.model.bind('change', this.render);
             this.model.view = this;
         },
         
+        //###remove
         // Remove this view from the DOM.
         remove : function() {
             $(this.el).remove();
         },
     
-        // Render contents
+        //###render
+        // Create the DOM element to represent the view, passing 
+        // data through mustache, and applying all UI formatting
         render : function() {
             var content = this.model.toJSON();
             
             // Switch name and ID for an anonymous user, they can only be 
             // looked up via session id, instead of username
-            console.log('render', content.username);
-            if (content.username === 'anonymous') {
-            console.log('anonymous', content);
+            if (content.username === 'anonymous') {console.log('anonymous', content);
                 content.displayName || (content.displayName = content.username);
                 content.username = content.user_id;
             }
@@ -65,5 +68,4 @@
             return this;
         }
     });
-
 })(ß)

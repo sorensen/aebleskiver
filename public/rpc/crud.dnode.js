@@ -1,20 +1,22 @@
-//  Aebleskiver
-//  (c) 2011 Beau Sorensen
-//  Backbone may be freely distributed under the MIT license.
-//  For all details and documentation:
-//  https://github.com/sorensen/aebleskiver
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
 
 (function(ß) {
     // Backbone DNode CRUD
     // -------------------
     
-    // Backbone CRUD routines to be called from the ß.Server 
-    // or delegated through the pub/sub protocol
+    // Add to the main namespace with the CRUD middleware
+    // for DNode, accepts a socket client and connection
     ß.Protocols.CRUD = function(client, con) {
         
         _.extend(this, {
-            // Delegate to the 'synced' event unless further extention is 
-            // needed per CRUD event
+            //###created
+            // A model has been created on the server,
+            // get the model or collection based on channel 
+            // name or url to set or add the new data
             created : function(resp, options) {
                 resp = _.getMongoId(resp);
                 var model = ß.Store[options.channel];
@@ -28,6 +30,10 @@
                 options.finished && options.finished(resp);
             },
             
+            //###read
+            // The server has responded with data from a 
+            // model or collection read event, set or add 
+            // the data to the model based on channel
             read : function(resp, options) {
                 resp = _.getMongoId(resp);
                 var model = ß.Store[options.channel];
@@ -45,6 +51,9 @@
                 options.finished && options.finished(resp);
             },
             
+            //###updated
+            // A model has been updated with new data from the
+            // server, set the appropriate model or collection
             updated : function(resp, options) {
                 resp = _.getMongoId(resp);
                 var model = ß.Store[options.channel];
@@ -58,6 +67,8 @@
                 options.finished && options.finished(resp);
             },
             
+            //###destroyed
+            // A model has been destroyed 
             destroyed : function(resp, options) {
                 resp = _.getMongoId(resp);
                 ß.Store[options.channel].remove(resp) || delete ß.Store[options.channel];
@@ -71,6 +82,7 @@
             selfUpdated   : function(resp, options) { this.synced(resp, options) },
             selfDestroyed : function(resp, options) { this.synced(resp, options) },
             
+            //###synced
             // Default synchronization event, call to Backbones internal
             // 'success' method, then the custom 'finished' method when 
             // everything has been completed
@@ -91,6 +103,7 @@
     // 'localStorage'. This must be set on the model and collection to 
     // be used on directly. Defaults to 'Backbone.sync' otherwise.
     _.mixin({
+        //###sync
         // Set the model or collection's sync method to communicate through DNode
         sync : function(method, model, options) {
             if (!ß.Server) return (options.error && options.error(503, model, options));

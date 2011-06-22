@@ -1,42 +1,43 @@
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
+
 (function(ß) {
     // Notification model
     // ------------------
     
-    // Single message model
+    //##NotificationModel
+    // Default model for any generic user notifications
+    // the application may need to send, used for consistancy
     ß.Models.NotificationModel = Backbone.Model.extend({
     
-        type  : 'notification',
+        // Server communication settings
+        type : 'notification',
+        sync : function() {},
         
         // Default model attributes
         defaults : {
             type : 'notice'
-        },
-        
-        // Constructor
-        initialize : function(options) {
-        },
-        
-        // No persistance
-        sync : function() {
-        
         }
     });
     
-    // Message Collection
+    //##NotificationCollection
+    // Container to store or group notification models, 
+    // as well as propegate events
     ß.Models.NotificationCollection = Backbone.Collection.extend({
         
+        // Server communication settings
         model : ß.Models.NotificationModel,
         url   : 'messages',
         type  : 'message',
+        sync  : function() {},
         
-        // Sort by 'created' time
+        //###comparator
+        // Sort based on 'created' time
         comparator : function(message) {
             return new Date(message.get('created')).getTime();
-        },
-        
-        // No persistance
-        sync : function() {
-        
         }
     });
 

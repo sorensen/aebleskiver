@@ -62,7 +62,7 @@
             'click #start-menu .icon'    : 'toggleSidebar'
         },
         
-        //##Contstructor
+        //##Constructor
         // Setup the model and view interactions, unlike the 'events' 
         // property, the event bindings below are programmatic listeners
         // to model and collection changes

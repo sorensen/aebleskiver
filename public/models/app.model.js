@@ -1,18 +1,22 @@
-//  Aebleskiver
-//  (c) 2011 Beau Sorensen
-//  Backbone may be freely distributed under the MIT license.
-//  For all details and documentation:
-//  https://github.com/sorensen/aebleskiver
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
 
 (function(ß) {
     // Application model
     // -----------------
     
+    // Extend the Backbone 'model' object and add it to the 
+    // namespaced model container
     ß.Models.ApplicationModel = Backbone.Model.extend({
     
+        // Server communication settings
         type     : 'application',
         urlRoot  : 'app',
         
+        // Model defaults
         defaults : {
             server  : 's1',
             visits  : 0,
@@ -20,9 +24,7 @@
             rooms   : []
         },
         
-        // No-op sync
-        //sync : function(){},
-        
+        //###initialize
         // Model constructor
         initialize : function(options) {
             
@@ -145,6 +147,7 @@
             }, 5000);
         },
         
+        //###createRoom
         // Create a new room
         createRoom : function(attr) {
             if (!attr) return;

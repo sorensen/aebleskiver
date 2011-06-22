@@ -16,22 +16,25 @@
         className : 'notification',
         template  : _.template($('#notification-template').html()),
         
-        
+        // User interaction events
         events : {
             'click #remove-modal' : 'remove'
         },
     
-        // Constructor
+        //###initialize
+        // View constructor
         initialize : function(options) {
             _.bindAll(this, 'render');
             this.model.view = this;
         },
         
+        //###remove
         // Remove this view from the DOM.
         remove : function() {
             $(this.el).remove();
         },
-    
+        
+        //###render
         // Render contents
         render : function() {
             var content = this.model.toJSON(),
@@ -47,5 +50,4 @@
             return this;
         }
     });
-
 })(ß)

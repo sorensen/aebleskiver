@@ -1,8 +1,8 @@
-//  Aebleskiver
-//  (c) 2011 Beau Sorensen
-//  Backbone may be freely distributed under the MIT license.
-//  For all details and documentation:
-//  https://github.com/sorensen/aebleskiver
+//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
 
 (function(_) {
     // Raphael icon support
@@ -11,7 +11,6 @@
     // Icon paths are taken from http://raphaeljs.com/icons/ 
     // and are licensed under MIT, http://raphaeljs.com/license.html
 
-    // ###Defaults
     // These are the default settings that every icon
     // have applied, unless overriden in the options
     var current,

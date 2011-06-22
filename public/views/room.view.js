@@ -13,7 +13,9 @@
     // being that the 'Room' view does not hold a message
     // collection, and provides different updates
     
-    // Room room
+    //##RoomView
+    // View element for the basic room model, primarily used to 
+    // represent a list element version of the model
     ß.Views.RoomView = Backbone.View.extend({
     
         // DOM attributes
@@ -22,13 +24,14 @@
         template       : _.template($('#room-list-template').html()),
         rankTemplate   : _.template($('#room-rank-template').html()),
         
-        // Interaction events
+        // User interaction events
         events : {
             'click .upvote'   : 'upVote',
             'click .downvote' : 'downVote'
         },
         
-        // Constructor
+        //###initialize
+        // Default constructor
         initialize : function(options) {
             // Bind to model
             _.bindAll(this, 'render', 'highlight', 'remove', 'statistics');
@@ -39,6 +42,9 @@
             this.loaded = 0;
         },
         
+        //###render
+        // Create the DOM element to represent this view, 
+        // apply all UI and formatting as well
         render : function() {
             // Send model contents to the template
             var content = this.model.toJSON();
@@ -53,7 +59,8 @@
             return this;
         },
         
-        // Refresh statistics
+        //###statistics
+        // Refresh view with new statistics
         statistics : function() {
             console.log('statistics', this);
             var rank = this.model.get('upvotes') - this.model.get('downvotes'),
@@ -65,6 +72,9 @@
             return this;
         },
         
+        //###highlight
+        // Create a 'flash' effect for the view, an attempt
+        // to notify the user that a new message has been made
         highlight : _.debounce(function() {
             if (this.loaded) {
                 $(this.el).effect('highlight', {
@@ -74,23 +84,27 @@
             this.loaded = 1;
         }, 1200),
         
+        //###remove
         // Remove this view from the DOM.
         remove : function() {
             $(this.el).remove();
         },
         
+        //###upvote
         // Increment the room ranking
         upVote : _.debounce(function() {
             this.model.save({upvotes : this.model.get('upvotes') + 1});
             this.model.collection.sort();
         }, 500),
         
+        //###downVote
         // Decrement the room ranking
         downVote : _.debounce(function() {
             this.model.save({downvotes : this.model.get('downvotes') + 1});
             this.model.collection.sort();
         }, 500),
         
+        //###activate
         // Join Channel
         activate : function() {            
             $(this.el)
@@ -111,7 +125,9 @@
         },
     });
     
-    // Room room
+    //##RoomMainView
+    // View representation of an activated room, which has the methods
+    // and views for messages, expanded view with all of the trimmings
     ß.Views.RoomMainView = Backbone.View.extend({
     
         // DOM attributes
@@ -120,9 +136,10 @@
         template       : _.template($('#room-template').html()),
         statsTemplate  : _.template($('#room-stats-template').html()),
         
+        // Internal memory of the last client to create a message
         lastPoster : '',
         
-        // Interaction events
+        // User interaction events
         events : {
             'keypress .message-form input' : 'createMessageOnEnter',
             'click #message-submit'        : 'createMessage',
@@ -132,7 +149,8 @@
             'click .delete-room'           : 'deleteRoom',
         },
         
-        // Constructor
+        //###initialize
+        // View constructor
         initialize : function(options) {
             this.viewable = this.model.allowedToView(ß.user);
             if (!this.viewable) {
@@ -156,16 +174,8 @@
             this.model.messages.bind('reset', this.allMessages);
             this.model.messages.bind('add',   this.statistics);
             
-            // Send model contents to the template
-            var content = this.model.toJSON(),
-                self    = this;
-            
-            // Pre-formatting to prevent XSS
-            content.name = this.model.escape('name');
-            content.description = this.model.escape('description');
-            
-            var view = Mustache.to_html(this.template(), content);            
-            $(this.el).html(view);
+            // Create the DOM element
+            this.render();
             
             // Set shortcut methods for DOM items
             this.title       = this.$('.headline');
@@ -189,6 +199,7 @@
                 this.$('.admin-controls').remove();
             }
             
+            // Subscribe to the server for all model changes
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
                     query    : {room_id : self.model.get('id')},
@@ -199,12 +210,24 @@
             });
         },
         
-        // Render view
+        //###render
+        // Create the DOM representation of this view
         render : function() {
+            // Send model contents to the template
+            var content = this.model.toJSON(),
+                self    = this;
+            
+            // Pre-formatting to prevent XSS
+            content.name = this.model.escape('name');
+            content.description = this.model.escape('description');
+            
+            var view = Mustache.to_html(this.template(), content);            
+            $(this.el).html(view);
             return this;
         },
         
-        // Statistics
+        //###statistics
+        // Refresh the view with new statistical values
         statistics : function() {
             var totalMessages = this.model.messages.length;
             this.$('.room-stats').html(Mustache.to_html(this.statsTemplate(), {
@@ -213,16 +236,20 @@
             return this;
         },
         
+        //###deleteRoom
+        // Delegate to the server to destroy this model
         deleteRoom : function() {
             this.model.destroy();
         },
         
+        //###addToFavorites
+        // Add this room to the current users favorite list, 
+        // for easy lookups in the future
         addToFavorites : function() {
             if (this.model.get('id') == ß.user.get('id')
                 || this.model.get('id') == ß.user.id) {
                 return;
             }
-            
             var favorites = ß.user.get('favorites') || [],          
                 find = _.indexOf(favorites, this.model.get('id'));
             
@@ -238,6 +265,8 @@
             ß.user.favorites.add(this.model);
         },
         
+        //###removeFromFavorites
+        // Remove the model from the current users favorites
         removeFromFavorites : function() {
             var id = this.model.get('id'),
                 favorites = _.without(ß.user.get('favorites'), id);
@@ -253,12 +282,14 @@
             }).save();
         },
         
+        //###leave
         // Tell the application to remove this room
         leave : function() {
             Backbone.history.saveLocation('/');
             this.view.deactivateRoom(this.model);
         },
         
+        //###remove
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
@@ -268,11 +299,15 @@
             $(this.el).remove();
         },
         
+        //###concurrency
+        // Check through each sorted message to see which messages 
+        // were made by the same user in a row
         concurrency : function(message) {
             message.concurrent = (message.get('user_id') === this.lastPoster) ? true : false;
             this.lastPoster = message.get('user_id');
         },
         
+        //###allMessages
         // All rooms have been loaded into collection
         allMessages : function(messages) {
             this.messageList.html('');
@@ -285,6 +320,8 @@
                 //.scrollTop(this.messageList[0].scrollHeight);
         },
         
+        //###addMessage
+        // Add a given model to the view
         addMessage : function(message) {
             //this.concurrency(message);
             
@@ -308,19 +345,24 @@
             **/
         },
         
-        // Send a message to the ß.Server
+        //###createMessage
+        // Delegate to the model to create a new message on the 
+        // server, pulling the values from the DOM
         createMessage : function() {
             if (!this.input.val()) return;
             this.model.messages.create(this.newAttributes());
             this.input.val('');
         },
         
+        //###createMessageOnEnter
         // Create message keystroke listener
         createMessageOnEnter : function(e) {
             if (e.keyCode == 13) this.createMessage();
         },
         
-        // Generate the attributes
+        //###newAttributes
+        // Retrieve new attributes for the model based on user 
+        // input collected from the DOM
         newAttributes : function() {
             var username    = ß.user.get('username'),
                 displayName = ß.user.get('displayName') || ß.user.get('username'),
@@ -337,6 +379,8 @@
         },
     });
     
+    //##ConversationView
+    // Representation of a user to user conversation (room)
     ß.Views.ConversationView = ß.Views.RoomMainView.extend({
     
         // DOM attributes
@@ -345,7 +389,7 @@
         template       : _.template($('#conversation-template').html()),
         statsTemplate  : _.template($('#room-stats-template').html()),
         
-        // Interaction events
+        // User interaction events
         events    : {
             'click .heading'               : 'toggleOpen',
             'keypress .message-form input' : 'createMessageOnEnter',
@@ -356,6 +400,7 @@
             'click .delete-room'           : 'deleteRoom',
         },
         
+        //###initialize
         // Constructor
         initialize : function(options) {
             this.viewable = this.model.allowedToView(ß.user);
@@ -380,21 +425,7 @@
             this.model.messages.bind('reset', this.allMessages);
             this.model.messages.bind('add',   this.statistics);
             
-            // Send model contents to the template
-            var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);            
-            $(this.el)
-                .html(view)
-                .find('[title]')
-                .wijtooltip();
-            
-            // Set shortcut methods for DOM items
-            this.title       = this.$('.headline');
-            this.controls    = this.$('.controls');
-            this.description = this.$('.description');
-            this.input       = this.$('.create-message');
-            this.messageList = this.$('.messages');
-            
+            this.render();
             var self = this;
             
             // Post-formatting, done here as to prevent conflict
@@ -412,9 +443,32 @@
             });
             
             this.input.focus();
-            console.log('room.view:', this);
         },
         
+        //###render
+        // Create the DOM representation of this view
+        render : function() {
+            // Send model contents to the template
+            var content = this.model.toJSON();
+            var view = Mustache.to_html(this.template(), content);            
+            $(this.el)
+                .html(view)
+                .find('[title]')
+                .wijtooltip();
+            
+            // Set shortcut methods for DOM items
+            this.title       = this.$('.headline');
+            this.controls    = this.$('.controls');
+            this.description = this.$('.description');
+            this.input       = this.$('.create-message');
+            this.messageList = this.$('.messages');
+            
+            return this;
+        },
+        
+        //###startConversation
+        // Initialize a new conversation with another room, 
+        // delegate to the server to send that user a notice
         startConversation : _.debounce(function() {
             var self = this;
             ß.Server.startConversation(ß.user.toJSON(), {
@@ -425,14 +479,7 @@
             });
         }, 1000),
         
-        // Send a message to the ß.Server
-        createMessage : function() {
-            if (!this.input.val()) return;
-            this.startConversation();
-            this.model.messages.create(this.newAttributes());
-            this.input.val('');
-        },
-        
+        //###remove
         // Remove this view from the DOM, and unsubscribe from 
         // all future updates to the message collection
         remove : function() {
@@ -445,6 +492,7 @@
             delete this;
         },
         
+        //###toggleOpen
         toggleOpen : function() {
             $(this.el).toggleClass('open');
         },
