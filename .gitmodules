@@ -12,7 +12,7 @@
 	url = git://github.com/andyet/Happy.js.git
 [submodule "public/vendor/keycandy"]
 	path = public/vendor/keycandy
-	url = git://github.com/andyet/KeyCandy.git
+	url = git://github.com/sorensen/KeyCandy.git
 [submodule "public/vendor/jquery-cookie"]
 	path = public/vendor/jquery-cookie
 	url = git://github.com/carhartl/jquery-cookie.git

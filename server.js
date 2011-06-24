@@ -10,6 +10,8 @@
 var Cluster = require('cluster'),
     Live    = require('cluster-live');
 
+Mongoose.connect('mongodb://localhost/aebleskiver');
+    
 // Start the cluster
 Cluster('./app')
     .use(Cluster.logger(__dirname + '/logs'))
