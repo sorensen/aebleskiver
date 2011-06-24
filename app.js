@@ -19,7 +19,7 @@ var express      = require('express'),
     Auth         = require('backbone-auth'),
     DNode        = require('dnode'),
     version      = '0.3.2',
-    port         = 3000,
+    port         = 8080,
     oneYear      = 31557600000,
     token        = '',
     app          = module.exports = express.createServer();
@@ -66,9 +66,6 @@ app.configure('production', function() {
     app.use(express.errorHandler());
 });
 
-// Connect to the database
-Mongoose.connect('mongodb://localhost/aebleskiver');
-
 // Main application
 app.get('/', function(req, res) {
     token = req.session.id;
@@ -87,6 +84,8 @@ app.get('/', function(req, res) {
 
 // Start application if not clustered
 if (!module.parent) {
+    // Connect to the database
+    Mongoose.connect('mongodb://localhost/aebleskiver');
     app.listen(port);
 }
 
@@ -97,4 +96,4 @@ DNode()
     .use(CRUD)      // Backbone integration
     .use(Gravatar)  // Gravatar integration
     .use(Misc)      // Misc. resources
-    .listen(app) // Start your engines!
+    .listen(app)    // Start your engines!

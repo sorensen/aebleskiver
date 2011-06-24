@@ -1,21 +1,3 @@
-[submodule "lib/socket.io"]
-	path = lib/socket.io
-	url = git://github.com/LearnBoost/Socket.IO.git
-[submodule "lib/fugue"]
-	path = lib/fugue
-	url = git://github.com/pgte/fugue.git
-[submodule "lib/carrier"]
-	path = lib/carrier
-	url = git://github.com/pgte/carrier.git
-[submodule "lib/backbone-redis"]
-	path = lib/backbone-redis
-	url = git@github.com:sorensen/backbone-redis.git
-[submodule "lib/dnode"]
-	path = lib/dnode
-	url = git://github.com/substack/dnode.git
-[submodule "lib/formidadable"]
-	path = lib/formidadable
-	url = git://github.com/felixge/node-formidable.git
 [submodule "public/vendor/storejs"]
 	path = public/vendor/storejs
 	url = git://github.com/marcuswestin/store.js.git

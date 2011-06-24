@@ -177,20 +177,6 @@
             // Create the DOM element
             this.render();
             
-            // Set shortcut methods for DOM items
-            this.title       = this.$('.headline');
-            this.controls    = this.$('.controls');
-            this.description = this.$('.description');
-            this.input       = this.$('.create-message');
-            this.messageList = this.$('.messages');
-            
-            // Post-formatting, done here as to prevent conflict
-            // with Mustache HTML entity escapement
-            this.title.html(_.linkify(self.model.escape('name')));
-            this.description.html(_.linkify(self.model.escape('description')));
-            
-            this.input.focus();
-            
             this.editable = this.model.allowedToEdit(ß.user);
             // Check if the current user is the room creator
             if (this.editable) {
@@ -199,6 +185,7 @@
                 this.$('.admin-controls').remove();
             }
             
+            var self = this;
             // Subscribe to the server for all model changes
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
@@ -223,6 +210,20 @@
             
             var view = Mustache.to_html(this.template(), content);            
             $(this.el).html(view);
+            
+            // Set shortcut methods for DOM items
+            this.title       = this.$('.headline');
+            this.controls    = this.$('.controls');
+            this.description = this.$('.description');
+            this.input       = this.$('.create-message');
+            this.messageList = this.$('.messages');
+            
+            // Post-formatting, done here as to prevent conflict
+            // with Mustache HTML entity escapement
+            this.title.html(_.linkify(self.model.escape('name')));
+            this.description.html(_.linkify(self.model.escape('description')));
+            
+            this.input.focus();
             return this;
         },
         
