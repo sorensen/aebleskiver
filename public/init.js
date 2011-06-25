@@ -36,7 +36,6 @@
         .use(ß.Protocols.CRUD)
         .use(ß.Protocols.Misc)
         .use(ß.Protocols.Pubsub)
-        .use(ß.Protocols.Upload)
         .use(ß.Protocols.Gravatar)
         .connect(ß.Connector);
 })(ß)
