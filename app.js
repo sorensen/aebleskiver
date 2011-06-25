@@ -24,6 +24,9 @@ var express      = require('express'),
     token        = '',
     app          = module.exports = express.createServer();
 
+// Connect to the database
+Mongoose.connect('mongodb://localhost/aebleskiver');
+
 // Server configuration
 app.configure(function() {
     // View settings
@@ -84,8 +87,6 @@ app.get('/', function(req, res) {
 
 // Start application if not clustered
 if (!module.parent) {
-    // Connect to the database
-    Mongoose.connect('mongodb://localhost/aebleskiver');
     app.listen(port);
 }
 
