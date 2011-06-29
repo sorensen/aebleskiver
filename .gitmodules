@@ -10,9 +10,6 @@
 [submodule "public/vendor/happyjs"]
 	path = public/vendor/happyjs
 	url = git://github.com/andyet/Happy.js.git
-[submodule "public/vendor/keycandy"]
-	path = public/vendor/keycandy
-	url = git://github.com/sorensen/KeyCandy.git
 [submodule "public/vendor/jquery-cookie"]
 	path = public/vendor/jquery-cookie
 	url = git://github.com/carhartl/jquery-cookie.git
@@ -28,3 +25,9 @@
 [submodule "public/vendor/backbone"]
 	path = public/vendor/backbone
 	url = git://github.com/documentcloud/backbone.git
+[submodule "public/vendor/keycandy"]
+	path = public/vendor/keycandy
+	url = git@github.com:sorensen/KeyCandy.git
+[submodule "public/vendor/meow"]
+	path = public/vendor/meow
+	url = git://github.com/zacstewart/Meow.git
