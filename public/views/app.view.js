@@ -62,7 +62,7 @@
             'click #start-menu .icon'    : 'toggleSidebar'
         },
         
-        //##Constructor
+        //##initialize
         // Setup the model and view interactions, unlike the 'events' 
         // property, the event bindings below are programmatic listeners
         // to model and collection changes
@@ -458,9 +458,11 @@
         // as well as the DOM
         deactivateRoom : function() {
             this.mainContent
-                .fadeOut(50, function(){
-                    $(this).html('');
-                });
+                //.fadeOut(50, function(){
+                //    $(this).html('');
+                //});
+                .hide()
+                .html('');
             
             // Join Channel
             this.activeRoom && this.activeRoom.remove();
@@ -486,7 +488,7 @@
             // Create a new main room view
             this.activeRoom = new ß.Views.RoomMainView({
                 model : model[0]
-            }).render();
+            });
             
             // Provide a way for the room to access this
             // view so that it may close itself, ect..
@@ -494,25 +496,17 @@
             
             var self = this;
             this.mainContent
-                .fadeIn(75, function(){
-                    $(this).html(self.activeRoom.el);
-                    self.activeRoom.messageList.scrollTop(
-                    
-                        // Scroll to the bottom of the message window
-                        self.activeRoom.messageList[0].scrollHeight
-                    );
-                
-                    // Create the icons for this view, should be done 
-                    // on the room view, but the app needs to load it 
-                    // into view first before icons can be loaded.
-                    _.icon('view',   'add-favorite')
-                     .icon('noview', 'remove-favorite')
-                     .icon('cross',  'leave-room')
-                     .icon('quote',  'message-submit');
-                    
-                    delete self;
-                })
-                .find('input[name="message"]').focus();
+                .html(self.activeRoom.el)
+                .show();
+            
+            // Create the icons for this view, should be done 
+            // on the room view, but the app needs to load it 
+            // into view first before icons can be loaded.
+            _
+                .icon('view',   'add-favorite')
+                .icon('noview', 'remove-favorite')
+                .icon('cross',  'leave-room')
+                .icon('quote',  'message-submit');
             
             model[0].view && model[0].view.activate();
         },
@@ -616,36 +610,34 @@
                 return room.get('username') === params
                     || room.get('id') === params;
             });
-            if (!model) {
+            if (!model || !model[0]) {
                 Backbone.history.saveLocation('/');
                 return;
             }
             
             this.activeUser = new ß.Views.UserMainView({
                 model : model[0]
-            }).render();
+            });
             
             // Make view accessable to inner-view
             this.activeUser.view = this;
             
             var self = this;
             this.mainContent
-                .fadeIn(75, function(){
-                    $(this)
-                        .html(self.activeUser.el)
-                        .find('.avatar')
-                        .fadeIn(1500);
+                .html(self.activeUser.el)
+                .show()
+                .find('.avatar')
+                .fadeIn(1500);
                 
-                    // Create the icons for this view, should be done 
-                    // on the room view, but the app needs to load it 
-                    // into view first before icons can be loaded.
-                    _
-                        .icon('star',  'add-friend')
-                        .icon('star2', 'remove-friend')
-                        .icon('mail',  'send-message')
-                        .icon('cross', 'leave-profile')
-                        .icon('quote', 'post-submit');
-                })
+            // Create the icons for this view, should be done 
+            // on the room view, but the app needs to load it 
+            // into view first before icons can be loaded.
+            _
+                .icon('star',  'add-friend')
+                .icon('star2', 'remove-friend')
+                .icon('mail',  'send-message')
+                .icon('cross', 'leave-profile')
+                .icon('quote', 'post-submit');
         },
         
         //###showSettings
@@ -889,7 +881,6 @@
             this.nav.login.fadeIn(150);
             this.nav.settings.fadeOut(150);
             this.nav.logout.fadeOut(150);
-        },
-        
+        }
     });
 })(ß)

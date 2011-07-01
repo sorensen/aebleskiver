@@ -20,7 +20,7 @@ var express      = require('express'),
     DNode        = require('dnode'),
     version      = '0.3.2',
     port         = 8080,
-    oneYear      = 31557600000,
+    secret       = 'abcdefghijklmnopqrstuvwxyz',
     token        = '',
     app          = module.exports = express.createServer();
 
@@ -38,8 +38,8 @@ app.configure(function() {
     
     // Session settings
     app.use(express.session({
-        cookie : {maxAge : 60000 * 60 * 1},    // 1 Hour
-        secret : 'abcdefghijklmnopqrstuvwxyz', // Hashing salt
+        cookie : {maxAge : 60000 * 60 * 1},
+        secret : secret,
         store  : new SessionStore({
             dbname   : 'db',
             username : '',
@@ -63,8 +63,8 @@ app.configure('development', function(){
 app.configure('production', function() {
     port = 80;
     app.use(express.static(__dirname + '/public', {
-        // Set the caching lifetime
-        maxAge: oneYear 
+        // Set the caching lifetime to one year
+        maxAge: 60000 * 60 *  24 * 365
     }));
     app.use(express.errorHandler());
 });
@@ -90,7 +90,7 @@ if (!module.parent) {
     app.listen(port);
 }
 
-// Configure DNode socket abstraction
+// Configure DNode middleware
 DNode()
     .use(Auth)      // Authentication support
     .use(PubSub)    // Pub/sub channel support

@@ -5,9 +5,9 @@
     From: Omaha, Nebraska
 
 /* SITE */
-	Language: English
-	Doctype: HTML5
-	IDE: Notepad++
+    Language: English
+    Doctype: HTML5
+    IDE: Notepad++
     
 
            ` 

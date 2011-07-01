@@ -13,7 +13,15 @@ server, I find it benefitial to use seperate packages for each.
 
 [Mmmm...](http://en.wikipedia.org/wiki/%C3%86bleskiver)
 
+## Documentation
+
+Documentation can be found at http://sorensen.github.com/aebleskiver , as 
+well as the annotated source code.
+
 ## Installation
+
+Brief aside on how to install the project, this will soon be put into a full 
+installation guide, but until then, you know the drill.
 
     * [Install node.js](http://github.com/joyent/node)
     * [Install NPM](http://github.com/joyent/npm)

@@ -8,7 +8,7 @@
     // Room models
     // -----------
     
-    //##RoomModel
+    //##Room
     // Basic and default room of the application
     ß.Models.RoomModel = Backbone.Model.extend({
     
@@ -50,7 +50,7 @@
         }
     });
     
-    //##PrivateRoomModel
+    //##PrivateRoom
     // To be used when a room has been set to 'restricted', changes
     // in default behavior and admin abilities
     ß.Models.PrivateRoomModel = ß.Models.RoomModel.extend({
@@ -70,10 +70,9 @@
             return _.indexOf(this.get('allowed'), user.get('id')) !== -1
                 || user.get('id') === this.get('user_id');
         }
-        
     });
     
-    //##RoomCollection
+    //##Collection
     // Container for all models, mainly used for the listing of 
     // many models, providing server communication and events
     ß.Models.RoomCollection = Backbone.Collection.extend({
@@ -97,22 +96,27 @@
         }
     });
     
-    //##ConversationModel
+    // Conversations
+    // -------------
+    
+    // Extentions of the basic room type, to be used for user to user
+    // 'conversations', seperated out for further admin controls
+    
+    //##Conversation
     // Override the basic room model to change the attributes, 
     // marking the room as a user to user conversation
     ß.Models.ConversationModel = ß.Models.RoomModel.extend({
         defaults : {},
-        type     : 'conversation',
+        type     : 'conversation'
     });
     
-    //##ConversationCollection
+    //##Collection
     // Main container, server, and event propegator for all rooms
     ß.Models.ConversationCollection = ß.Models.RoomCollection.extend({
         
         // Server communication settings
         model : ß.Models.ConversationModel,
         url   : 'conversations',
-        type  : 'conversation',
-        
+        type  : 'conversation'
     });
 })(ß)

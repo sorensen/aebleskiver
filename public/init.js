@@ -19,23 +19,25 @@
     
     // Seperate the connection function in case
     // we need to use it for reconnecting
-    ß.Connector = function(remote) {
-        console.log('init: Connecting...', remote);
+    ß.Initialize = function() {
     
-        // Save the remote connection for persistance, start 
-        // the application, and enable hash url history
-        ß.Server = remote;
-        delete remote;
-        routing();
+        // Setup our dnode listeners for Server callbacks
+        // as well as model bindings on connection
+        DNode()
+            .use(ß.Protocols.Auth)
+            .use(ß.Protocols.CRUD)
+            .use(ß.Protocols.Misc)
+            .use(ß.Protocols.Pubsub)
+            .use(ß.Protocols.Gravatar)
+            .connect(function(remote) {
+                console.log('init: Connecting...', remote);
+            
+                // Save the remote connection for persistance, start 
+                // the application, and enable hash url history
+                ß.Server = remote;
+                routing();
+                delete remote;
+            });
     };
-    
-    // Setup our dnode listeners for ß.Server callbacks
-    // as well as model bindings on connection
-    DNode()
-        .use(ß.Protocols.Auth)
-        .use(ß.Protocols.CRUD)
-        .use(ß.Protocols.Misc)
-        .use(ß.Protocols.Pubsub)
-        .use(ß.Protocols.Gravatar)
-        .connect(ß.Connector);
+    ß.Initialize();
 })(ß)

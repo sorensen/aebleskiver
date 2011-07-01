@@ -198,9 +198,10 @@
         },
         
         //###render
-        // Create the DOM representation of this view
+        // Create the DOM representation of this view, sending 
+        // model contents to the template, creating DOM shortcuts, 
+        // and applying all style effects to the view
         render : function() {
-            // Send model contents to the template
             var content = this.model.toJSON(),
                 self    = this;
             
@@ -209,7 +210,10 @@
             content.description = this.model.escape('description');
             
             var view = Mustache.to_html(this.template(), content);            
-            $(this.el).html(view);
+            $(this.el)
+                .html(view)
+                .find('[title]')
+                .wijtooltip();
             
             // Set shortcut methods for DOM items
             this.title       = this.$('.headline');
@@ -225,6 +229,16 @@
             
             this.input.focus();
             return this;
+        },
+        
+        //###remove
+        // Remove this view from the DOM, and unsubscribe from 
+        // all future updates to the message collection
+        remove : function() {
+            this.model.view && this.model.view.leave();
+            this.model && this.model.remove();
+            this.model.messages.unsubscribe();
+            $(this.el).remove();
         },
         
         //###statistics
@@ -269,18 +283,27 @@
         //###removeFromFavorites
         // Remove the model from the current users favorites
         removeFromFavorites : function() {
-            var id = this.model.get('id'),
+            var id        = this.model.get('id'),
                 favorites = _.without(ß.user.get('favorites'), id);
+                room      = ß.user.favorites.get(id);
             
-            var person = ß.user.favorites.get(id);
-            $(person.view.el).remove();
+            // Make sure we have a valid room
+            if (!room) {
+                return false;
+            }
+                
+            // Remove DOM element from view
+            $(room.view.el).remove();
             
-            ß.user.favorites.remove(this.model, {
-                silent : true
-            });
-            ß.user.set({
-                favorites : favorites
-            }).save();
+            // Remove from model and save to server
+            ß.user.favorites
+                .remove(this.model, {
+                    silent : true
+                })
+                .set({
+                    favorites : favorites
+                })
+                .save();
         },
         
         //###leave
@@ -288,16 +311,6 @@
         leave : function() {
             Backbone.history.saveLocation('/');
             this.view.deactivateRoom(this.model);
-        },
-        
-        //###remove
-        // Remove this view from the DOM, and unsubscribe from 
-        // all future updates to the message collection
-        remove : function() {
-            this.model.view && this.model.view.leave();
-            this.model && this.model.remove();
-            this.model.messages.unsubscribe();
-            $(this.el).remove();
         },
         
         //###concurrency
@@ -312,38 +325,37 @@
         // All rooms have been loaded into collection
         allMessages : function(messages) {
             this.messageList.html('');
-            //this.model.messages.each(this.concurrency);
+            this.model.messages.each(this.concurrency);
             this.model.messages.each(this.addMessage);
             this.statistics()
                 .messageList
                 .delay(400)
+                .stop()
                 .animate({scrollTop : this.messageList[0].scrollHeight}, 1000, 'easeInExpo');
-                //.scrollTop(this.messageList[0].scrollHeight);
         },
         
         //###addMessage
         // Add a given model to the view
         addMessage : function(message) {
-            //this.concurrency(message);
-            
+            this.concurrency(message);
             var view = new ß.Views.MessageView({
                 model : message
             }).render();
             
             this.model.view && this.model.view.highlight();
-            this.messageList.append(view.el)
-                .scrollTop(this.messageList[0].scrollHeight);
+            this.messageList.append(view.el);
+            
+            var position = this.messageList.height() + this.messageList.scrollTop(),
+                buffer   = 300,
+                height   = this.messageList[0].scrollHeight;
             
             // Check to see if the user is at the bottom of the list,
             // before scrolling, allowing them to read old msg's
-            console.log('room.view: list:',this.messageList.height());
-            console.log('room.view: scrollTop:',this.messageList.scrollTop());
-            /**
-            if (this.messageList.scrollTop() + 100 >= this.messageList.height()) {
+            if (position + buffer >= height) {
                 this.messageList
-                    .animate({scrollTop : this.messageList[0].scrollHeight});
+                    .stop()
+                    .animate({scrollTop : height}, 500, 'easeInExpo');
             }
-            **/
         },
         
         //###createMessage
@@ -428,12 +440,6 @@
             
             this.render();
             var self = this;
-            
-            // Post-formatting, done here as to prevent conflict
-            // with Mustache HTML entity escapement
-            content.name        && this.title.html(_.linkify(content.name));
-            content.description && this.description.html(_.linkify(content.description));
-            
             this.model.messages.subscribe({}, function() {
                 self.model.messages.fetch({
                     query    : {room_id : self.model.get('id')},
@@ -451,11 +457,17 @@
         render : function() {
             // Send model contents to the template
             var content = this.model.toJSON();
-            var view = Mustache.to_html(this.template(), content);            
+                view    = Mustache.to_html(this.template(), content);
+            
             $(this.el)
                 .html(view)
                 .find('[title]')
                 .wijtooltip();
+            
+            // Post-formatting, done here as to prevent conflict
+            // with Mustache HTML entity escapement
+            content.name        && this.title.html(_.linkify(content.name));
+            content.description && this.description.html(_.linkify(content.description));
             
             // Set shortcut methods for DOM items
             this.title       = this.$('.headline');
@@ -488,8 +500,6 @@
             this.model.unsubscribe();
             this.model.messages.unsubscribe();
             $(this.el).remove();
-            
-            delete this.model;
             delete this;
         },
         

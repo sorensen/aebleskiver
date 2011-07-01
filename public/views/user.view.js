@@ -6,9 +6,11 @@
 
 (function(ß) {
     // User views
-    // -----------------
+    // ----------
     
-    // User
+    //##User
+    // Basic user view, used primarily for the list view 
+    // representation, basic view to build upon
     ß.Views.UserView = Backbone.View.extend({
     
         // DOM attributes
@@ -16,21 +18,25 @@
         className : 'user inactive',
         template  : _.template($('#user-list-template').html()),
         
-        // Interaction events
+        // User interaction events
         events : {
             'click' : 'activate'
         },
-    
+        
+        //###initialize
+        // View constructor
         initialize : function(options) {
             _.bindAll(this, 'render');
-            
             this.model.bind('change', this.render);
             this.model.bind('remove', this.clear);
             this.model.view = this;
             this.render();
         },
     
-        // Re-render contents
+        //###render
+        // Create the DOM representation of this view, sending 
+        // model contents to the template, creating DOM shortcuts, 
+        // and applying all style effects to the view
         render : function() {
             var content = this.model.toJSON();
             if (content.username === 'anonymous') {
@@ -42,11 +48,13 @@
             return this;
         },
         
+        //###remove
         // Remove this view from the DOM.
         remove : function() {
             this.el.remove();
         },
         
+        //###activate
         // Join Channel
         activate : function() {            
             $(this.el)
@@ -55,10 +63,12 @@
                 .siblings()
                     .addClass('inactive')
                     .removeClass('current');
-        },
+        }
     });
     
-    // Friend
+    //##Friend
+    // Specific view of a user representing a 'friend', 
+    // seperated to apply different styles
     ß.Views.FriendView = ß.Views.UserView.extend({
     
         // DOM attributes
@@ -66,19 +76,20 @@
         className : 'user friend',
         template  : _.template($('#friend-list-template').html()),
         
-        // Interaction events
+        // User interaction events
         events : {
             'click' : 'startConversation',
         },
         
+        //###startConversation
         // Force the 'friend' user into a conversation
         // with current user through RPC delegation
         startConversation : function() {
             this.model.startConversation();
-        },
-        
+        }
     });
     
+    //##
     // User profile and wall
     ß.Views.UserMainView = Backbone.View.extend({
     
@@ -88,7 +99,7 @@
         template       : _.template($('#user-template').html()),
         statsTemplate  : _.template($('#user-stats-template').html()),
         
-        // Interaction events
+        // User interaction events
         events : {
             'keypress .post-form input' : 'createPostOnEnter',
             'click #post-submit'        : 'createPost',
@@ -98,11 +109,15 @@
             'click #send-message'       : 'startConversation'
         },
     
+        //##initialize
+        // Setup the model and view interactions, unlike the 'events' 
+        // property, the event bindings below are programmatic listeners
+        // to model and collection changes
         initialize : function(options) {
             _.bindAll(this, 
-                'render', 'allPosts', 'addPost', 'createPost'
+                'statistics', 'allPosts', 'addPost', 'createPost'
             );
-            this.model.bind('change', this.render);
+            this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
             this.model.posts     = new ß.Models.MessageCollection();
@@ -110,7 +125,7 @@
             
             this.model.posts.bind('add',   this.addPost);
             this.model.posts.bind('reset', this.allPosts);
-            this.model.posts.bind('add',   this.render);
+            this.model.posts.bind('add',   this.statistics);
             
             this.model.view = this;
             
@@ -124,14 +139,7 @@
                 self.model.set({ avatar : resp });
             });
             
-            var content = this.model.toJSON(),
-                view = Mustache.to_html(this.template(), content);   
-            $(this.el).html(view);
-            
-            // Set shortcut methods for DOM items
-            this.input    = this.$('.create-post');
-            this.postList = this.$('.posts');
-            this.input.focus();
+            this.render();
             
             // Subscribe to the user's message wall for 
             // changes and new messages
@@ -145,12 +153,51 @@
             return this;
         },
         
+        //###render
+        // Create the DOM representation of this view, sending 
+        // model contents to the template, creating DOM shortcuts, 
+        // and applying all style effects to the view
+        render : function() {
+            var content = this.model.toJSON(),
+                view    = Mustache.to_html(this.template(), content);   
+            
+            $(this.el)
+                .html(view)
+                .find('[title]')
+                .wijtooltip();
+            
+            // Set shortcut methods for DOM items
+            this.input    = this.$('.create-post');
+            this.postList = this.$('.posts');
+            this.input.focus();
+        },
+        
+        //###remove
+        // Remove this view from the DOM, and unsubscribe from 
+        // all future updates to the message collection
+        remove : function() {
+            this.model && this.model.remove();
+            $(this.el).remove();
+        },
+    
+        //###statistics
+        // Refresh the view with new statistical values
+        statistics : function() {
+            var totalPosts = this.model.posts.length;
+            this.$('.user-stats').html(Mustache.to_html(this.statsTemplate(), {
+                totalPosts : totalPosts
+            }));
+            return this;
+        },
+        
+        //###startConversation
         // Force the 'friend' user into a conversation
         // with current user through RPC delegation
         startConversation : function() {
             this.model.startConversation();
         },
         
+        //###addToFriends
         // Add user to current user's friend list
         addToFriends : function() {
             if (this.model.get('id') == ß.user.get('id')
@@ -174,6 +221,7 @@
             ß.user.friends.add(this.model);
         },
         
+        //###removeFromFriends
         // Delete user from current user's friend list
         removeFromFriends : function() {
             var id      = this.model.get('id'),
@@ -198,22 +246,8 @@
                 })
                 .save();
         },
-    
-        // Render contents
-        render : function() {
-            var totalPosts = this.model.posts.length;
-            this.$('.user-stats').html(Mustache.to_html(this.statsTemplate(), {
-                totalPosts : totalPosts
-            }));
-            return this;
-        },
         
-        // Remove this view from the DOM.
-        remove : function() {
-            this.model && this.model.remove();
-            $(this.el).remove();
-        },
-        
+        //###activate
         // Join Channel
         activate : function() {            
             $(this.el)
@@ -224,19 +258,22 @@
                     .removeClass('current');
         },
         
+        //###deactivate
         // Tell the application to remove this room
         deactivate : function() {
             Backbone.history.saveLocation('/');
             this.view.deactivateUser(this.model);
         },
         
+        //###allPosts
         // All rooms have been loaded into collection
         allPosts : function(posts) {
             this.postList.html('');
             this.model.posts.each(this.addPost);
-            this.render();
         },
         
+        //###addPost
+        // Add a single post (message) to the user's wall
         addPost : function(post) {
             var view = new ß.Views.MessageView({
                 model : post
@@ -247,19 +284,22 @@
                 .scrollTop(this.postList[0].scrollHeight);
         },
         
-        // Send a post to the ß.Server
+        //###createPost
+        // Send a post to the Server
         createPost : function() {
             if (!this.input.val()) return;
             this.model.posts.create(this.newAttributes());
             this.input.val('');
         },
         
+        //###createPostOnEnter
         // Create post keystroke listener
         createPostOnEnter : function(e) {
             if (e.keyCode == 13) this.createPost();
         },
         
-        // Generate the attributes
+        //###newAttributes
+        // Generate the attributes for creating a post
         newAttributes : function() {
             var username    = ß.user.get('username'),
                 displayName = ß.user.get('displayName') || ß.user.get('username'),
@@ -273,6 +313,6 @@
                 displayName : displayName,
                 avatar      : ß.user.get('avatar')
             };
-        },
+        }
     });
 })(ß)

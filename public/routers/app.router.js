@@ -26,7 +26,7 @@
             // Attach the application
             this.view = new ß.Views.ApplicationView({
                 // Use existing DOM element
-                el : $("#application")
+                el : $('#application')
             });
             
             // Circular reference
