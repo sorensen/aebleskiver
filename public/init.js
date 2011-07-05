@@ -4,40 +4,70 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // App Initialization
     // ------------------
 
-    // Create the application router, this will only
-    // need to be created once, even if we reconnect
-    routing = _.once(function() {
-        // Wait for the DOM to render
-        $(function() {
-            new ß.Routers.Application();
+    // Predefined storage containers and connection
+    // related placeholders
+    var Store = this.Store = {},
+        initialize,
+        refresh,
+        connected = false,
+        
+        // Create the application router, this will only
+        // need to be created once, even if we reconnect
+        routing = _.once(function() {
+            // Wait for the DOM to render
+            $(function() {
+                new Routers.Application();
+            });
+        }),
+        connect   = function() {
+            // Restart the socket connection
+            initialize();
+            if (!connected) {
+                clearTimeout(refresh);
+                refresh = setTimeout(connect, 20000);
+            }
+        };
+    
+    // Setup the reconnection handler for re-establishing the 
+    // DNode socket connection in case of disconnect
+    var reconnect = function(client, con) {
+    
+        // Socket connection has been terminated
+        con.on('end', function() {
+            connected = false;
+            refresh = setTimeout(connect, 500);
         });
-    });
+        
+        // Socket connection established
+        con.on('ready', function() {
+            connected = true;
+            clearTimeout(refresh);
+        });
+    };
     
     // Seperate the connection function in case
     // we need to use it for reconnecting
-    ß.Initialize = function() {
+    initialize = function() {
     
         // Setup our dnode listeners for Server callbacks
-        // as well as model bindings on connection
+        // as well as model bindings on connection, save
+        // the remote connection for persistance, start 
+        // the application, and enable hash url history
         DNode()
-            .use(ß.Protocols.Auth)
-            .use(ß.Protocols.CRUD)
-            .use(ß.Protocols.Misc)
-            .use(ß.Protocols.Pubsub)
-            .use(ß.Protocols.Gravatar)
+            .use(reconnect)
+            .use(Auth)
+            .use(CRUD)
+            .use(Misc)
+            .use(Pubsub)
+            .use(Gravatar)
             .connect(function(remote) {
-                console.log('init: Connecting...', remote);
-            
-                // Save the remote connection for persistance, start 
-                // the application, and enable hash url history
-                ß.Server = remote;
+                Server = remote;
                 routing();
-                delete remote;
             });
     };
-    ß.Initialize();
-})(ß)
+    initialize();
+})()

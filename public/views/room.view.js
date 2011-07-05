@@ -4,9 +4,18 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Room room Views
     // -----------------
+    
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Views;
+    if (typeof exports !== 'undefined') {
+        Views = exports;
+    } else {
+        Views = this.Views || (this.Views = {});
+    }
     
     // Both the simple 'Room' view and the full 'MainRoom'
     // view share the same room model, with the main difference
@@ -16,7 +25,7 @@
     //##RoomView
     // View element for the basic room model, primarily used to 
     // represent a list element version of the model
-    ß.Views.RoomView = Backbone.View.extend({
+    Views.RoomView = Backbone.View.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -128,7 +137,7 @@
     //##RoomMainView
     // View representation of an activated room, which has the methods
     // and views for messages, expanded view with all of the trimmings
-    ß.Views.RoomMainView = Backbone.View.extend({
+    Views.RoomMainView = Backbone.View.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -152,7 +161,7 @@
         //###initialize
         // View constructor
         initialize : function(options) {
-            this.viewable = this.model.allowedToView(ß.user);
+            this.viewable = this.model.allowedToView(user);
             if (!this.viewable) {
                 return;
             }
@@ -167,7 +176,7 @@
             this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
-            this.model.messages = new ß.Models.MessageCollection();
+            this.model.messages = new Models.MessageCollection();
             this.model.messages.url = _.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add',   this.addMessage);
@@ -177,7 +186,7 @@
             // Create the DOM element
             this.render();
             
-            this.editable = this.model.allowedToEdit(ß.user);
+            this.editable = this.model.allowedToEdit(user);
             // Check if the current user is the room creator
             if (this.editable) {
                 $(this.el).addClass('editable');
@@ -261,11 +270,11 @@
         // Add this room to the current users favorite list, 
         // for easy lookups in the future
         addToFavorites : function() {
-            if (this.model.get('id') == ß.user.get('id')
-                || this.model.get('id') == ß.user.id) {
+            if (this.model.get('id') == user.get('id')
+                || this.model.get('id') == user.id) {
                 return;
             }
-            var favorites = ß.user.get('favorites') || [],          
+            var favorites = user.get('favorites') || [],          
                 find = _.indexOf(favorites, this.model.get('id'));
             
             if (find !== -1) {
@@ -273,19 +282,19 @@
             }
             favorites.push(this.model.get('id'));
             
-            ß.user.set({
+            user.set({
                 favorites : _.unique(favorites)
             }).save();
             
-            ß.user.favorites.add(this.model);
+            user.favorites.add(this.model);
         },
         
         //###removeFromFavorites
         // Remove the model from the current users favorites
         removeFromFavorites : function() {
             var id        = this.model.get('id'),
-                favorites = _.without(ß.user.get('favorites'), id);
-                room      = ß.user.favorites.get(id);
+                favorites = _.without(user.get('favorites'), id);
+                room      = user.favorites.get(id);
             
             // Make sure we have a valid room
             if (!room) {
@@ -296,7 +305,7 @@
             $(room.view.el).remove();
             
             // Remove from model and save to server
-            ß.user.favorites
+            user.favorites
                 .remove(this.model, {
                     silent : true
                 })
@@ -338,7 +347,7 @@
         // Add a given model to the view
         addMessage : function(message) {
             this.concurrency(message);
-            var view = new ß.Views.MessageView({
+            var view = new Views.MessageView({
                 model : message
             }).render();
             
@@ -377,9 +386,9 @@
         // Retrieve new attributes for the model based on user 
         // input collected from the DOM
         newAttributes : function() {
-            var username    = ß.user.get('username'),
-                displayName = ß.user.get('displayName') || ß.user.get('username'),
-                id          = ß.user.get('id') || ß.user.id;
+            var username    = user.get('username'),
+                displayName = user.get('displayName') || user.get('username'),
+                id          = user.get('id') || user.id;
             
             return {
                 text        : this.input.val(),
@@ -387,14 +396,14 @@
                 user_id     : id,
                 username    : username,
                 displayName : displayName,
-                avatar      : ß.user.get('avatar')
+                avatar      : user.get('avatar')
             };
         },
     });
     
     //##ConversationView
     // Representation of a user to user conversation (room)
-    ß.Views.ConversationView = ß.Views.RoomMainView.extend({
+    Views.ConversationView = Views.RoomMainView.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -416,7 +425,7 @@
         //###initialize
         // Constructor
         initialize : function(options) {
-            this.viewable = this.model.allowedToView(ß.user);
+            this.viewable = this.model.allowedToView(user);
             if (!this.viewable) {
                 return;
             }
@@ -431,7 +440,7 @@
             this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
-            this.model.messages = new ß.Models.MessageCollection();
+            this.model.messages = new Models.MessageCollection();
             this.model.messages.url = _.getUrl(this.model) + ':messages';
             
             this.model.messages.bind('add',   this.addMessage);
@@ -484,7 +493,7 @@
         // delegate to the server to send that user a notice
         startConversation : _.debounce(function() {
             var self = this;
-            ß.Server.startConversation(ß.user.toJSON(), {
+            Server.startConversation(user.toJSON(), {
                 channel : self.model.url,
                 id      : self.model.get('to')
             }, function(resp, options) {
@@ -510,4 +519,4 @@
     
     });
     
-})(ß)
+})()

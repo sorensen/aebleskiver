@@ -4,14 +4,23 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // User views
     // ----------
+    
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Views;
+    if (typeof exports !== 'undefined') {
+        Views = exports;
+    } else {
+        Views = this.Views || (this.Views = {});
+    }
     
     //##User
     // Basic user view, used primarily for the list view 
     // representation, basic view to build upon
-    ß.Views.UserView = Backbone.View.extend({
+    Views.UserView = Backbone.View.extend({
     
         // DOM attributes
         tagName   : 'div',
@@ -69,7 +78,7 @@
     //##Friend
     // Specific view of a user representing a 'friend', 
     // seperated to apply different styles
-    ß.Views.FriendView = ß.Views.UserView.extend({
+    Views.FriendView = Views.UserView.extend({
     
         // DOM attributes
         tagName   : 'div',
@@ -91,7 +100,7 @@
     
     //##
     // User profile and wall
-    ß.Views.UserMainView = Backbone.View.extend({
+    Views.UserMainView = Backbone.View.extend({
     
         // DOM attributes
         tagName        : 'div',
@@ -120,7 +129,7 @@
             this.model.bind('change', this.statistics);
             this.model.bind('remove', this.remove);
             
-            this.model.posts     = new ß.Models.MessageCollection();
+            this.model.posts     = new Models.MessageCollection();
             this.model.posts.url = this.model.url() + ':posts';
             
             this.model.posts.bind('add',   this.addPost);
@@ -132,7 +141,7 @@
             var self = this;
             // Request a gravatar image for the current 
             // user based on email address
-            ß.Server.gravatar({
+            Server.gravatar({
                 email : self.model.get('email'),
                 size  : 100
             }, function(resp) {
@@ -200,11 +209,11 @@
         //###addToFriends
         // Add user to current user's friend list
         addToFriends : function() {
-            if (this.model.get('id') == ß.user.get('id')
-                || this.model.get('id') == ß.user.id) {
+            if (this.model.get('id') == user.get('id')
+                || this.model.get('id') == user.id) {
                 return;
             }
-            var friends = ß.user.get('friends') || [],
+            var friends = user.get('friends') || [],
                 find    = _.indexOf(friends, this.model.get('id'));
             
             if (find !== -1) {
@@ -214,19 +223,19 @@
             
             // Make sure we are not duplicating any friends by 
             // ensuring that the array of keys is unique
-            ß.user.set({
+            user.set({
                 friends : _.unique(friends)
             }).save();
             
-            ß.user.friends.add(this.model);
+            user.friends.add(this.model);
         },
         
         //###removeFromFriends
         // Delete user from current user's friend list
         removeFromFriends : function() {
             var id      = this.model.get('id'),
-                friends = _.without(ß.user.get('friends'), id),
-                person  = ß.user.friends.get(id);
+                friends = _.without(user.get('friends'), id),
+                person  = user.friends.get(id);
             
             // Make sure we have a valid user
             if (!person) {
@@ -237,7 +246,7 @@
             $(person.view.el).remove();
             
             // Remove from model and save to server
-            ß.user.friends
+            user.friends
                 .remove(this.model, {
                     silent : true
                 })
@@ -275,7 +284,7 @@
         //###addPost
         // Add a single post (message) to the user's wall
         addPost : function(post) {
-            var view = new ß.Views.MessageView({
+            var view = new Views.MessageView({
                 model : post
             }).render();
             
@@ -301,9 +310,9 @@
         //###newAttributes
         // Generate the attributes for creating a post
         newAttributes : function() {
-            var username    = ß.user.get('username'),
-                displayName = ß.user.get('displayName') || ß.user.get('username'),
-                id          = ß.user.get('id') || ß.user.id;
+            var username    = user.get('username'),
+                displayName = user.get('displayName') || user.get('username'),
+                id          = user.get('id') || user.id;
             
             return {
                 text        : this.input.val(),
@@ -311,8 +320,8 @@
                 user_id     : id,
                 username    : username,
                 displayName : displayName,
-                avatar      : ß.user.get('avatar')
+                avatar      : user.get('avatar')
             };
         }
     });
-})(ß)
+})()

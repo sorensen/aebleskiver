@@ -4,12 +4,21 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // User model
-    // ------------------
+    // ----------
+    
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Models;
+    if (typeof exports !== 'undefined') {
+        Models = exports;
+    } else {
+        Models = this.Models || (this.Models = {});
+    }
     
     // User
-    ß.Models.UserModel = Backbone.Model.extend({
+    Models.UserModel = Backbone.Model.extend({
         
         type     : 'user',
         defaults : {
@@ -32,14 +41,14 @@
         
         initialize : function(options) {
             // Add friends list
-            this.friends   = new ß.Models.UserCollection();
-            this.favorites = new ß.Models.RoomCollection();
+            this.friends   = new Models.UserCollection();
+            this.favorites = new Models.RoomCollection();
             
             // Request a gravatar image for the current 
             // user based on email address if not default
             if (this.get('avatar') === this.defaults.avatar) {
                 var self = this;
-                ß.Server.gravatar({
+                Server.gravatar({
                     email : self.get('email'),
                     size  : 30
                 }, function(resp) {
@@ -77,7 +86,7 @@
         },
         
         logout : function(options) {
-            ß.Server.logout(this.toJSON(), options);
+            Server.logout(this.toJSON(), options);
             this.trigger('logout');
         },
         
@@ -88,7 +97,7 @@
             
             // Update the current model with the returned data, 
             // increase total visits, and chage the status to 'online'
-            ß.Server.authenticate(data, options, function(resp) {
+            Server.authenticate(data, options, function(resp) {
                 self.set(resp);
                 self.save({
                     visits : self.get('visits') + 1,
@@ -99,14 +108,14 @@
             });
         },
         
-        // Register model with the ß.Server
+        // Register model with the Server
         register : function(data, options, next) {
             var self = this;
             options.type = this.type;
             
             // Update the current model with the returned data, 
             // increase total visits, and chage the status to 'online'
-            ß.Server.register(data, options, function(resp) {
+            Server.register(data, options, function(resp) {
                 self.set(resp);
                 self.save({
                     visits : self.get('visits') + 1,
@@ -126,35 +135,35 @@
         
         startConversation : function() {
             var to = this.get('id');
-            var from = ß.user.get('id') || ß.user.get('_id');
+            var from = user.get('id') || user.get('_id');
             var key = (to > from) 
                     ? to + ':' + from
                     : from + ':' + to;
             
-            if (!ß.user.conversations.get(key)) {
+            if (!window.user.conversations.get(key)) {
             
-                var convo = new ß.Models.ConversationModel({
+                var convo = new Models.ConversationModel({
                     to   : to,
                     id   : key,
                     name : this.get('displayName') || this.get('username')
                 });
                 convo.url = 'pm:' + key;
                 
-                ß.Server.startConversation(ß.user.toJSON(), {
+                Server.startConversation(user.toJSON(), {
                     channel : convo.url,
                     id      : to
                 }, function(resp, options) {
                     // Conversation started
-                    ß.user.conversations.add(convo);
+                    window.user.conversations.add(convo);
                 });
             }
         },
     });
     
     // User Collection
-    ß.Models.UserCollection = Backbone.Collection.extend({
+    Models.UserCollection = Backbone.Collection.extend({
         
-        model : ß.Models.UserModel,
+        model : Models.UserModel,
         type  : 'user',
         url   : 'users',
         
@@ -165,4 +174,4 @@
         initialize : function(options) {
         }
     });
-})(ß)
+})()

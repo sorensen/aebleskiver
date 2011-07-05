@@ -1,37 +1,22 @@
-﻿(function(ß) {
-    // Miscellanious Protocols
-    // -----------------------
+﻿//    Aebleskiver
+//    (c) 2011 Beau Sorensen
+//    Aebleskiver may be freely distributed under the MIT license.
+//    For all details and documentation:
+//    https://github.com/sorensen/aebleskiver
+
+(function() {
+    // Miscellaneous middleware
+    // ------------------------
     
-    var refresh,
-        connected = false,
-        connect   = function() {
-            // Restart the socket connection
-            ß.Initialize();
-            if (!connected) {
-                console.log('try again?', connected);
-                clearTimeout(refresh);
-                refresh = setTimeout(connect, 20000);
-            }
-        };
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Misc;
+    if (typeof exports !== 'undefined') {
+        Misc = exports;
+    }
     
     // Remote protocol
-    ß.Protocols.Misc = function(client, con) {
-        
-        // Socket connection has been terminated
-        con.on('end', function() {
-            console.log('misc.dnode: Connection ended:', con);
-            // Refresh the page after 10 seconds
-            connected = false;
-            refresh = setTimeout(connect, 500);
-            
-        });
-        
-        // Socket connection established
-        con.on('ready', function() {
-            connected = true;
-            clearTimeout(refresh);
-            console.log('misc.dnode: Connection ready:', connected);
-        });
+    Misc = function(client, con) {
     
         _.extend(this, {
             // Personal conversation initialization, 
@@ -40,21 +25,26 @@
             // message collection between the two users
             startedConversation : function(resp, options) {
                 var to = resp.id || resp._id,
-                    from = ß.user.get('id'),
+                    from = window.user.get('id'),
                     key = (to > from) 
                         ? to + ':' + from
                         : from + ':' + to;
                 
-                if (!ß.user.conversations.get(key)) {
-                    var convo = new ß.Models.ConversationModel({
+                if (!window.window.user.conversations.get(key)) {
+                    var convo = new Models.ConversationModel({
                         to   : to,
                         id   : key,
                         name : resp.displayName || resp.username
                     });
                     convo.url = 'pm:' + key;
-                    ß.user.conversations.add(convo);
+                    window.window.user.conversations.add(convo);
                 }
             }
         });
     };
-})(ß)
+    
+    // CommonJS browser export
+    if (typeof exports === 'undefined') {
+        this.Misc = Misc;
+    }
+})()

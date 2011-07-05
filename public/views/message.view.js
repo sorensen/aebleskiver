@@ -4,17 +4,29 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Message view
     // ------------
     
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Views;
+    if (typeof exports !== 'undefined') {
+        Views = exports;
+    } else {
+        Views = this.Views || (this.Views = {});
+    }
+    
     //##MessageView
     // Single room message
-    ß.Views.MessageView = Backbone.View.extend({
+    Views.MessageView = Backbone.View.extend({
         
         // DOM attributes
         tagName   : 'li',
         className : 'message',
+        
+        //###Templates
+        // Predefined markdown templates for dynamic rendering
         template  : _.template($('#message-template').html()),
     
         //###initialize
@@ -68,4 +80,4 @@
             return this;
         }
     });
-})(ß)
+})()

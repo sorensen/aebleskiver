@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(_) {
+(function() {
     // Raphael icon support
     // --------------------
     
@@ -224,6 +224,7 @@
                         .scale(options.width / width, options.width / width);
             
             // Apply interaction events
+            /**
             paper
                 .rect(0, 0, 32, 32)
                 .attr(options.none)
@@ -247,8 +248,8 @@
                             opacity: 0
                         });
                 });
-            
+            **/
             return this;
         }
     });
-})(_);
+})();

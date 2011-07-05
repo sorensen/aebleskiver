@@ -4,12 +4,21 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Notification view
     // -----------------
     
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Views;
+    if (typeof exports !== 'undefined') {
+        Views = exports;
+    } else {
+        Views = this.Views || (this.Views = {});
+    }
+    
     // Single room message
-    ß.Views.NotificationView = Backbone.View.extend({
+    Views.NotificationView = Backbone.View.extend({
         
         // DOM attributes
         tagName   : 'div',
@@ -45,9 +54,9 @@
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
             this.$('.message')
-                .html(ß.Helpers.linkify(content.text));
+                .html(Helpers.linkify(content.text));
             
             return this;
         }
     });
-})(ß)
+})()

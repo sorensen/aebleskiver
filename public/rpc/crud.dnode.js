@@ -4,13 +4,20 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
-    // Backbone DNode CRUD
-    // -------------------
+(function() {
+    // CRUD Middleware
+    // ---------------
+    
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var CRUD;
+    if (typeof exports !== 'undefined') {
+        CRUD = exports;
+    }
     
     // Add to the main namespace with the CRUD middleware
     // for DNode, accepts a socket client and connection
-    ß.Protocols.CRUD = function(client, con) {
+    CRUD = function(client, con) {
         
         _.extend(this, {
             //###created
@@ -19,7 +26,7 @@
             // name or url to set or add the new data
             created : function(resp, options) {
                 resp = _.getMongoId(resp);
-                var model = ß.Store[options.channel];
+                var model = Store[options.channel];
                 // Model processing
                 if (model instanceof Backbone.Model) {
                     model.set(model.parse(resp));
@@ -36,7 +43,7 @@
             // the data to the model based on channel
             read : function(resp, options) {
                 resp = _.getMongoId(resp);
-                var model = ß.Store[options.channel];
+                var model = Store[options.channel];
                 // Model Processing
                 if (model instanceof Backbone.Model) {
                     model.set(model.parse(resp));
@@ -56,7 +63,7 @@
             // server, set the appropriate model or collection
             updated : function(resp, options) {
                 resp = _.getMongoId(resp);
-                var model = ß.Store[options.channel];
+                var model = Store[options.channel];
                 // Collection processing
                 if (model.get(resp.id)) {
                     model.get(resp.id).set(model.parse(resp));
@@ -71,7 +78,7 @@
             // A model has been destroyed 
             destroyed : function(resp, options) {
                 resp = _.getMongoId(resp);
-                ß.Store[options.channel].remove(resp) || delete ß.Store[options.channel];
+                Store[options.channel].remove(resp) || delete Store[options.channel];
                 options.finished && options.finished(resp);
             },
         
@@ -106,7 +113,7 @@
         //###sync
         // Set the model or collection's sync method to communicate through DNode
         sync : function(method, model, options) {
-            if (!ß.Server) return (options.error && options.error(503, model, options));
+            if (!Server) return (options.error && options.error(503, model, options));
             
             // Remove the Backbone id from the model as not to conflict with 
             // Mongoose schemas, it will be re-assigned when the model returns
@@ -121,12 +128,16 @@
             
             // Delegate method call based on action
             switch (method) {
-                case 'read'   : ß.Server.read({}, options); break;
-                case 'create' : ß.Server.create(model.toJSON(), options); break;
-                case 'update' : ß.Server.update(model.toJSON(), options); break;
-                case 'delete' : ß.Server.destroy(model.toJSON(), options); break;
+                case 'read'   : Server.read({}, options); break;
+                case 'create' : Server.create(model.toJSON(), options); break;
+                case 'update' : Server.update(model.toJSON(), options); break;
+                case 'delete' : Server.destroy(model.toJSON(), options); break;
             };
         }
     });
     
-})(ß)
+    // CommonJS browser export
+    if (typeof exports === 'undefined') {
+        this.CRUD = CRUD;
+    }
+})()

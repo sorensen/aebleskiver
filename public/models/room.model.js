@@ -4,13 +4,22 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Room models
     // -----------
     
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Models;
+    if (typeof exports !== 'undefined') {
+        Models = exports;
+    } else {
+        Models = this.Models || (this.Models = {});
+    }
+    
     //##Room
     // Basic and default room of the application
-    ß.Models.RoomModel = Backbone.Model.extend({
+    Models.RoomModel = Backbone.Model.extend({
     
         // Server communication settings
         type : 'room',
@@ -53,7 +62,7 @@
     //##PrivateRoom
     // To be used when a room has been set to 'restricted', changes
     // in default behavior and admin abilities
-    ß.Models.PrivateRoomModel = ß.Models.RoomModel.extend({
+    Models.PrivateRoomModel = Models.RoomModel.extend({
     
         // Default attributes
         defaults : {
@@ -75,10 +84,10 @@
     //##Collection
     // Container for all models, mainly used for the listing of 
     // many models, providing server communication and events
-    ß.Models.RoomCollection = Backbone.Collection.extend({
+    Models.RoomCollection = Backbone.Collection.extend({
         
         // Server communication settings
-        model : ß.Models.RoomModel,
+        model : Models.RoomModel,
         url   : 'rooms',
         type  : 'room',
         sync  : _.sync,
@@ -105,18 +114,18 @@
     //##Conversation
     // Override the basic room model to change the attributes, 
     // marking the room as a user to user conversation
-    ß.Models.ConversationModel = ß.Models.RoomModel.extend({
+    Models.ConversationModel = Models.RoomModel.extend({
         defaults : {},
         type     : 'conversation'
     });
     
     //##Collection
     // Main container, server, and event propegator for all rooms
-    ß.Models.ConversationCollection = ß.Models.RoomCollection.extend({
+    Models.ConversationCollection = Models.RoomCollection.extend({
         
         // Server communication settings
-        model : ß.Models.ConversationModel,
+        model : Models.ConversationModel,
         url   : 'conversations',
         type  : 'conversation'
     });
-})(ß)
+})()

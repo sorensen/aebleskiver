@@ -1950,16 +1950,6 @@ body {
     background-image: -webkit-linear-gradient(#dffca9, #b9e567);
     background-image: linear-gradient(top, #dffca9, #b9e567);
             filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#dffca9', EndColorStr='#b9e567');
-
-    /**
-    background-color: #eee;
-    background-image: -moz-linear-gradient(top, #eee, #ddd);
-    background-image: -o-linear-gradient(top, #eee, #ddd);
-    background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eee),color-stop(1, #ddd));
-    background-image: -webkit-linear-gradient(#eee, #ddd);
-    background-image: linear-gradient(top, #eee, #ddd);
-              filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eee', EndColorStr='#ddd');
-    **/
 }
     .keycandy:before {
         top: 2px;

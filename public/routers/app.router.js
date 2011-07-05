@@ -4,12 +4,21 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Application
     // ----------
     
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Routers;
+    if (typeof exports !== 'undefined') {
+        Routers = exports;
+    } else {
+        Routers = this.Routers || (this.Routers = {});
+    }
+    
     // Main controller and router
-    ß.Routers.Application = Backbone.Router.extend({
+    Routers.Application = Backbone.Router.extend({
     
         // Definitions
         routes : {
@@ -24,7 +33,7 @@
         initialize : function(options) {
             
             // Attach the application
-            this.view = new ß.Views.ApplicationView({
+            this.view = new Views.ApplicationView({
                 // Use existing DOM element
                 el : $('#application')
             });
@@ -70,5 +79,4 @@
             this.view.showSignup();
         },
     });
-    
-})(ß)
+})()

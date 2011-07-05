@@ -4,17 +4,23 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Message models
     // --------------
     
-    // Extend the Backbone 'model' object and add it to the 
-    // namespaced model container with each message model
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Models;
+    if (typeof exports !== 'undefined') {
+        Models = exports;
+    } else {
+        Models = this.Models || (this.Models = {});
+    }
     
     //##MessageModel
     // Basic message type used for every generic room
     // and user profile, also serving as a 'base' model
-    ß.Models.MessageModel = Backbone.Model.extend({
+    Models.MessageModel = Backbone.Model.extend({
     
         // Server communication settings
         type : 'message',
@@ -51,7 +57,7 @@
     //##PrivateMessageModel
     // Extention of the base message type, used in private
     // conversations between users
-    ß.Models.PrivateMessageModel = ß.Models.MessageModel.extend({
+    Models.PrivateMessageModel = Models.MessageModel.extend({
     
         //###allowedToView
         // Client side validation, only allowed to view message
@@ -66,10 +72,10 @@
     //##MessageCollection
     // Main container for all message based models to be stored
     // in, provides server transport settings and events
-    ß.Models.MessageCollection = Backbone.Collection.extend({
+    Models.MessageCollection = Backbone.Collection.extend({
         
         // Server communication settings
-        model : ß.Models.MessageModel,
+        model : Models.MessageModel,
         url   : 'messages',
         type  : 'message',
         sync  : _.sync,
@@ -81,4 +87,4 @@
         }
     });
 
-})(ß)
+})()

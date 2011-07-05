@@ -4,14 +4,23 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Notification model
     // ------------------
+    
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Models;
+    if (typeof exports !== 'undefined') {
+        Models = exports;
+    } else {
+        Models = this.Models || (this.Models = {});
+    }
     
     //##NotificationModel
     // Default model for any generic user notifications
     // the application may need to send, used for consistancy
-    ß.Models.NotificationModel = Backbone.Model.extend({
+    Models.NotificationModel = Backbone.Model.extend({
     
         // Server communication settings
         type : 'notification',
@@ -26,10 +35,10 @@
     //##NotificationCollection
     // Container to store or group notification models, 
     // as well as propegate events
-    ß.Models.NotificationCollection = Backbone.Collection.extend({
+    Models.NotificationCollection = Backbone.Collection.extend({
         
         // Server communication settings
-        model : ß.Models.NotificationModel,
+        model : Models.NotificationModel,
         url   : 'messages',
         type  : 'message',
         sync  : function() {},
@@ -41,4 +50,4 @@
         }
     });
 
-})(ß)
+})()

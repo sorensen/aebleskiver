@@ -1,4 +1,4 @@
-# &aelig;bleskiver
+# &AElig;bleskiver
 
 Real-time multi-channel chat application. Project built with Express, Backbone and DNode,
 and of course, Node.
@@ -23,9 +23,19 @@ well as the annotated source code.
 Brief aside on how to install the project, this will soon be put into a full 
 installation guide, but until then, you know the drill.
 
-    * [Install node.js](http://github.com/joyent/node)
-    * [Install NPM](http://github.com/joyent/npm)
-    * Install all project dependancies below with NPM
+* [Install node.js](http://github.com/joyent/node)
+* [Install NPM](http://github.com/joyent/npm)
+* Install all project dependancies below with NPM
+
+## Running the project
+
+Starting the application will require MongoDB to be running in the background,
+you can run it as a daemon to avoid starting it up each time, then start the app
+by either running `server.js` which is the Clustered version, or just `app.js` for
+the single process.
+
+    sudo mongod --dbpath=./mongodb/data/aebleskiver --fork --logpath./aebleskiver/logs/mongodb.log --logappend
+    node server.js
 
 ### Project dependancies (npm)
 

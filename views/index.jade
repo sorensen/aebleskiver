@@ -425,7 +425,7 @@ html(lang='en')
     script(src='/dnode.js')
     
     //- Application core
-    script(src='/bootstrap.js')
+    //script(src='/bootstrap.js')
     
     //- Helpers
     script(src='/google.js')
@@ -457,7 +457,8 @@ html(lang='en')
     //- Start application
     script(src='/init.js')
     
+    //- Bootstrapped server settings
     script(type='text/javascript')
-      ß.port    = '!{locals.port}';
-      ß.token   = '!{locals.token}';
-      ß.version = '!{locals.version}';
+      port    = '!{locals.port}';
+      token   = '!{locals.token}';
+      version = '!{locals.version}';

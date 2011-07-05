@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Backbone DNode PubSub
     // ---------------------
     
@@ -15,10 +15,16 @@
     // tense is to signal that the process has already happened on the 
     // server, this is a common naming pattern found throughout the app.
     
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Pubsub;
+    if (typeof exports !== 'undefined') {
+        Pubsub = exports;
+    }
     
-    // ß.Protocols.Pubsub
-    // ------------------
-    ß.Protocols.Pubsub = function(client, con) {
+    // Protocols.Pubsub
+    // ----------------
+    Pubsub = function(client, con) {
         _.extend(this, {
             //###subscribed
             // Someone has subscribed to a channel
@@ -73,12 +79,12 @@
         // method is provided, it defaults to an 'update', which is the least 
         // conflicting method when returned to the client for processing
         publish : function(options, callback) {
-            if (!ß.Server) return (options.error && options.error(503, model, options));
+            if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
             options.method  || (options.method = 'update');
             options.channel || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
-            ß.Server.publish(model.toJSON(), options, function(resp, options){
+            Server.publish(model.toJSON(), options, function(resp, options){
                 if (!options.silent) model.trigger('publish', model, options);
                 callback && callback(resp, options);
             });
@@ -88,22 +94,23 @@
     
     // Common extention object for both models and collections
     var common = {
+    
         //###subscribe
         // Subscribe to the 'Server' for model changes, if 'override' is set to true
         // in the options, this model will replace any other models in the local 
         // 'Store' which holds the reference for future updates. Uses Backbone 'url' 
         // for subscriptions, relabeled to 'channel' for clarity
         subscribe : function(options, callback) {
-            if (!ß.Server) return (options.error && options.error(503, model, options));
+            if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
             
             // Add the model to a local object container so that other methods
             // called from the 'Server' have access to it
-            if (!ß.Store[options.channel] || options.override) {
-                ß.Store[options.channel] = model;
-                ß.Server.subscribe(model.toJSON(), options, function(resp, options) {
+            if (!Store[options.channel] || options.override) {
+                Store[options.channel] = model;
+                Server.subscribe(model.toJSON(), options, function(resp, options) {
                     if (!options.silent) model.trigger('subscribe', model, options);
                     callback && callback(resp, options);
                 });
@@ -119,11 +126,11 @@
         // subscription 'Store', will trigger an unsubscribe event unless 'silent' 
         // is passed in the options
         unsubscribe : function(options, callback) {
-            if (!ß.Server) return (options.error && options.error(503, model, options));
+            if (!Server) return (options.error && options.error(503, model, options));
             var model = this;
             options         || (options = {});
             options.channel || (options.channel = (model.collection) ? _.getUrl(model.collection) : _.getUrl(model));
-            ß.Server.unsubscribe({}, options, function(resp, options) {
+            Server.unsubscribe({}, options, function(resp, options) {
                 if (!options.silent) model.trigger('unsubscribe', model, options);
                 callback && callback(resp, options);
             });
@@ -131,7 +138,7 @@
             // The object must be deleted, or a new subscription with the same 
             // channel name will not be correctly 'synced', unless a 'override' 
             // option is sent upon subscription
-            delete ß.Store[options.channel];
+            delete Store[options.channel];
             return this;
         }
     };
@@ -139,4 +146,9 @@
     // Extend both model and collection with the pub/sub mechanics
     _.extend(Backbone.Model.prototype, common);
     _.extend(Backbone.Collection.prototype, common);
-})(ß)
+    
+    // CommonJS browser export
+    if (typeof exports === 'undefined') {
+        this.Pubsub = Pubsub;
+    }
+})()

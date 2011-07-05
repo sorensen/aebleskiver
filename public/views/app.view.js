@@ -4,15 +4,25 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(ß) {
+(function() {
     // Application view
     // -----------------
     
+    // The top-level namespace. All public classes and modules will
+    // be attached to this. Exported for both CommonJS and the browser.
+    var Views;
+    if (typeof exports !== 'undefined') {
+        Views = exports;
+    } else {
+        Views = this.Views || (this.Views = {});
+    }
+    
     // Extend the Backbone 'view' object and add it to the 
     // namespaced view container
-    ß.Views.ApplicationView = Backbone.View.extend({
+    Views.ApplicationView = Backbone.View.extend({
     
-        //##Templates
+        //###Templates
+        // Predefined markdown templates for dynamic rendering
         template             : _.template($('#application-template').html()),
         statsTemplate        : _.template($('#application-stats-template').html()),
         loginTemplate        : _.template($('#login-template').html()),
@@ -79,7 +89,7 @@
 
             // Create and bind the application model to this view,
             // then create a circular reference for traversing
-            this.model = new ß.Models.ApplicationModel();
+            this.model = new Models.ApplicationModel();
             this.model.view = this;
             
             // Application model event bindings
@@ -103,16 +113,18 @@
             this.model.rooms.bind('reset',     this.statistics);
             
             // Conversation event bindings
-            ß.user.conversations.bind('subscribe', this.coversationsReady);
-            ß.user.conversations.bind('add',       this.addConversation);
-            ß.user.conversations.bind('reset',     this.allConversation);
+            window.user.conversations.bind('subscribe', this.coversationsReady);
+            window.user.conversations.bind('add',       this.addConversation);
+            window.user.conversations.bind('reset',     this.allConversation);
             
             this.render();
             
             // Assign pre-pouplated locals from Express
-            this.sid              = ß.token;
-            this.port             = ß.port;
-            this.version          = ß.version;
+            this.sid              = token;
+            this.port             = port;
+            this.version          = version;
+            
+            delete token, port, version;
             
             // Set shortcuts to collection DOM
             this.searchInput      = this.$('#search');
@@ -300,7 +312,7 @@
         // All rooms have been loaded into collection
         allFriends : function(friends) {
             this.friendList.html('');
-            ß.user.friends.each(this.addFriend);
+            user.friends.each(this.addFriend);
             
             // Refresh model statistics
             this.statistics();
@@ -309,7 +321,7 @@
         //###addFriend
         // Add a single friend o the current veiw
         addFriend : function(friend) {
-            var view = new ß.Views.FriendView({
+            var view = new Views.FriendView({
                 model : friend
             }).render();
             
@@ -341,7 +353,7 @@
         // All rooms have been loaded into collection
         allFavorites : function(favorites) {
             this.favoriteList.html('');
-            ß.user.favorites.each(this.addFavorite);
+            user.favorites.each(this.addFavorite);
             
             // Refresh model statistics
             this.statistics();
@@ -350,7 +362,7 @@
         //###addFavorite
         // Add a single room room to the current veiw
         addFavorite : function(favorite) {
-            var view = new ß.Views.RoomView({
+            var view = new Views.RoomView({
                 model : favorite
             }).render();
             
@@ -368,13 +380,13 @@
         // All rooms have been loaded into collection
         allConversations : function(friends) {
             this.conversationList.html('');
-            ß.user.conversations.each(this.addConversation);
+            window.user.conversations.each(this.addConversation);
         },
         
         //###addConversation
         // Add a single friend o the current veiw
         addConversation : function(convo) {
-            var view = new ß.Views.ConversationView({
+            var view = new Views.ConversationView({
                 model : convo
             }).render();
             
@@ -445,7 +457,7 @@
         //###addRoom
         // Add a single room room to the current veiw
         addRoom : function(room) {
-            var view = new ß.Views.RoomView({
+            var view = new Views.RoomView({
                 model : room
             }).render();
             
@@ -486,7 +498,7 @@
             }
             
             // Create a new main room view
-            this.activeRoom = new ß.Views.RoomMainView({
+            this.activeRoom = new Views.RoomMainView({
                 model : model[0]
             });
             
@@ -525,7 +537,7 @@
             // Delegate to Backbone.sync
             this.model.createRoom({
                 name        : name.val(),
-                user_id     : ß.user.get('id') || ß.user.id,
+                user_id     : user.get('id') || user.id,
                 restricted  : restricted.val(),
                 description : description.val()
             });
@@ -584,7 +596,7 @@
         // Users collection has been subscribed to
         usersReady : function() {
             // Online user test
-            ß.Server.onlineUsers(function(resp) {
+            Server.onlineUsers(function(resp) {
                 // Placeholder
             });
         },
@@ -615,7 +627,7 @@
                 return;
             }
             
-            this.activeUser = new ß.Views.UserMainView({
+            this.activeUser = new Views.UserMainView({
                 model : model[0]
             });
             
@@ -647,7 +659,7 @@
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.settingsDialog
-                .html(Mustache.to_html(this.settingsTemplate(), ß.user.toJSON()))
+                .html(Mustache.to_html(this.settingsTemplate(), user.toJSON()))
                 .fadeIn(150, function() {
                 
                     // Apply happy validation schema, this might be 
@@ -686,7 +698,7 @@
                     displayName : this.$('input[name="displayname"]').val()
                 };
             
-            ß.user.save(data, {
+            user.save(data, {
                 channel  : 'app:users',
                 finished : function(resp) {
                 }
@@ -721,7 +733,7 @@
         //###addUser
         // Add a single room room to the current veiw
         addUser : function(user) {
-            var view = new ß.Views.UserView({
+            var view = new Views.UserView({
                 model : user
             }).render();
             
@@ -764,7 +776,7 @@
         
         //###authenticate
         // Authenticate the current user, check the credentials
-        // sent on the ß.Server side, which will return the client 
+        // sent on the Server side, which will return the client 
         // data to update the default model with
         authenticate : function() {
             var self = this,
@@ -778,7 +790,7 @@
                     },
                 };
             
-            ß.user.authenticate(data, options, function(resp) {
+            user.authenticate(data, options, function(resp) {
                 self.toggleNav();
             });
             this.loginDialog.hide();
@@ -833,7 +845,7 @@
         
         //###register
         // Authenticate the current user, check the credentials
-        // sent on the ß.Server side, which will return the client 
+        // sent on the Server side, which will return the client 
         // data to update the default model with
         register : function() {
             var self = this,
@@ -849,7 +861,7 @@
                     }
                 };
             
-            ß.user.register(data, options, function(resp) {
+            user.register(data, options, function(resp) {
                 self.toggleNav();
             });
             this.signupDialog.hide();
@@ -866,16 +878,16 @@
         // Destroy the current user object and restore original
         // navigation display
         logout : function() {
-            ß.user.logout({
+            user.logout({
                 token : this.sid
             });
             
             this.friendList.html('');
             this.favoriteList.html('');
-            ß.user = new ß.Models.UserModel();
+            user = new Models.UserModel();
             
             this.conversationList.html('');
-            ß.user.conversations = new ß.Models.ConversationCollection();
+            window.user.conversations = new Models.ConversationCollection();
             
             this.nav.signup.fadeIn(150);
             this.nav.login.fadeIn(150);
@@ -883,4 +895,4 @@
             this.nav.logout.fadeOut(150);
         }
     });
-})(ß)
+})()
