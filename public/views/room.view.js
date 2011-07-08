@@ -71,7 +71,6 @@
         //###statistics
         // Refresh view with new statistics
         statistics : function() {
-            console.log('statistics', this);
             var rank = this.model.get('upvotes') - this.model.get('downvotes'),
                 view = Mustache.to_html(this.rankTemplate(), {
                     rank : rank
@@ -334,7 +333,7 @@
         // All rooms have been loaded into collection
         allMessages : function(messages) {
             this.messageList.html('');
-            this.model.messages.each(this.concurrency);
+            //this.model.messages.each(this.concurrency);
             this.model.messages.each(this.addMessage);
             this.statistics()
                 .messageList
@@ -346,7 +345,7 @@
         //###addMessage
         // Add a given model to the view
         addMessage : function(message) {
-            this.concurrency(message);
+            //this.concurrency(message);
             var view = new Views.MessageView({
                 model : message
             }).render();

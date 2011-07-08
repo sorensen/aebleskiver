@@ -30,11 +30,10 @@ installation guide, but until then, you know the drill.
 ## Running the project
 
 Starting the application will require MongoDB to be running in the background,
-you can run it as a daemon to avoid starting it up each time, then start the app
-by either running `server.js` which is the Clustered version, or just `app.js` for
-the single process.
+start the app by either running `server.js` which is the Clustered version, 
+or just `app.js` for the single process.
 
-    sudo mongod --dbpath=./mongodb/data/aebleskiver --fork --logpath./aebleskiver/logs/mongodb.log --logappend
+    mongod --dbpath=./mongodb/data/aebleskiver --logpath./aebleskiver/logs/mongodb.log --logappend
     node server.js
 
 ### Project dependancies (npm)

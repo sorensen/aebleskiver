@@ -27,6 +27,7 @@
             // Restart the socket connection
             initialize();
             if (!connected) {
+                console.log('Connected.');
                 clearTimeout(refresh);
                 refresh = setTimeout(connect, 20000);
             }
@@ -38,6 +39,7 @@
     
         // Socket connection has been terminated
         con.on('end', function() {
+            console.log('Disconnected.');
             connected = false;
             refresh = setTimeout(connect, 500);
         });
@@ -63,7 +65,7 @@
             .use(CRUD)
             .use(Misc)
             .use(Pubsub)
-            .use(Gravatar)
+            .use(Avatar)
             .connect(function(remote) {
                 Server = remote;
                 routing();

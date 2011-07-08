@@ -30,14 +30,14 @@
                         ? to + ':' + from
                         : from + ':' + to;
                 
-                if (!window.window.user.conversations.get(key)) {
+                if (!window.user.conversations.get(key)) {
                     var convo = new Models.ConversationModel({
                         to   : to,
                         id   : key,
                         name : resp.displayName || resp.username
                     });
                     convo.url = 'pm:' + key;
-                    window.window.user.conversations.add(convo);
+                    window.user.conversations.add(convo);
                 }
             }
         });

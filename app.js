@@ -12,21 +12,21 @@ require.paths.unshift(__dirname + '/lib');
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
     Mongoose     = require('mongoose');
+    
     Misc         = require('backbone-misc'),
-    PubSub       = require('backbone-pubsub'),
-    CRUD         = require('backbone-crud'),
-    Avatar       = require('backbone-gravatar'),
     Auth         = require('backbone-auth'),
+    
+    PubSub       = require('backbone-dnode').pubsub,
+    CRUD         = require('backbone-dnode').crud,
+    Avatar       = require('backbone-dnode').avatar,
+    
     DNode        = require('dnode'),
     version      = '0.3.2',
     port         = 8080,
     secret       = 'abcdefghijklmnopqrstuvwxyz',
     token        = '',
     database     = 'aebleskiver',
-    app          = module.exports = express.createServer();
-
-// Connect to the database
-Mongoose.connect('mongodb://localhost/' + database);
+    app          = express.createServer();
 
 // Server configuration
 app.configure(function() {
@@ -34,6 +34,11 @@ app.configure(function() {
     app.use(express.bodyParser());
     app.use(express.cookieParser());
     app.use(express.methodOverride());
+    app.use(connect.logger());         // Log responses to the terminal using Common Log Format.
+    app.use(connect.responseTime());   // Add a special header with timing information.
+    app.use(connect.conditionalGet()); // Add HTTP 304 responses to save even more bandwidth.
+    app.use(connect.cache());          // Add a short-term ram-cache to improve performance.
+    app.use(connect.gzip());           // Gzip the output stream when the browser wants it.
     app.set('view engine', 'jade');
     app.set('view options', {layout : false});
     
@@ -72,22 +77,23 @@ app.configure('production', function() {
 
 // Main application
 app.get('/', function(req, res) {
-    token = req.session.id;
-    //req.session.regenerate(function () {
-        //token = req.session.id;
-    //});
-    
-    res.render('index.jade', {
-        locals : {
-            port    : port,
-            version : version,
-            token   : token,
-        }
+    req.session.regenerate(function () {
+        token = req.session.id;
+        
+        res.render('index.jade', {
+            locals : {
+                port    : port,
+                version : version,
+                token   : token,
+            }
+        });
     });
 });
 
 // Start application if not clustered
 if (!module.parent) {
+    // Connect to the database
+    Mongoose.connect('mongodb://localhost/' + database);
     app.listen(port);
 }
 
@@ -99,3 +105,5 @@ DNode()
     .use(Avatar)    // Gravatar integration
     .use(Misc)      // Misc. resources
     .listen(app)    // Start your engines!
+
+module.exports = app;

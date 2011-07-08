@@ -51,7 +51,7 @@
             
             // Switch name and ID for an anonymous user, they can only be 
             // looked up via session id, instead of username
-            if (content.username === 'anonymous') {console.log('anonymous', content);
+            if (content.username === 'anonymous') {
                 content.displayName || (content.displayName = content.username);
                 content.username = content.user_id;
             }
@@ -75,7 +75,7 @@
                     //exclude : 'pre, code, .no-emoticons'
                 });
             
-            // Make this a localStorage setting
+            // Set this as a preference
             //this.$('.timeago').timeago();
             return this;
         }

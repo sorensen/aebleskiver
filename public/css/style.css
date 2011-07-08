@@ -480,6 +480,7 @@ body {
     height: 100%;
     line-height: 1.6;
 }
+
 #fork-me {
     position: absolute;
     top: 0;
@@ -1694,6 +1695,7 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
+    display: none;
 }
 .dialog {
     outline: 0px;
