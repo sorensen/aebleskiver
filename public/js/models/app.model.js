@@ -8,13 +8,16 @@
     // Application model
     // -----------------
     
+    // Save a reference to the global object.
+    var root = this;
+  
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
     var Models;
     if (typeof exports !== 'undefined') {
-        Models = exports;
+        module.exports = Models;
     } else {
-        Models = this.Models || (this.Models = {});
+        Models = root.Models || (root.Models = {});
     }
     
     // Extend the Backbone 'model' object and add it to the 
@@ -51,12 +54,13 @@
             window.user = new Models.UserModel();
             
             // Conversations collections
-            window.window.user.conversations     = new Models.ConversationCollection();
-            window.window.user.conversations.url = this.url() + ':conversations';
+            window.user.conversations     = new Models.ConversationCollection();
+            window.user.conversations.url = this.url() + ':conversations';
             
             // Wait for three executions of history() before
             // starting, ensuring that rooms and users are loaded before
             // trying to execute the current hash location
+            
             var history = _.after(3, function() {
                 Backbone.history.start();
             });
@@ -82,7 +86,6 @@
                     query    : {},
                     error    : function(code, msg, opt) {},
                     finished : function(resp) {
-                        console.log('users fetched');
                         history();
                         
                         var params = {
@@ -92,7 +95,6 @@
                         };
                         Server.getSession({}, params, function(session, options) {
                         
-                            console.log('got session');
                             if (!session) return;
                             options.password && (session.password = options.password);
                             session = _.getMongoId(session);
@@ -167,4 +169,4 @@
             });
         },
     });
-})()
+}).call(this)

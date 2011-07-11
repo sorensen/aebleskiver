@@ -8,13 +8,16 @@
     // Message models
     // --------------
     
+    // Save a reference to the global object.
+    var root = this;
+  
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
     var Models;
     if (typeof exports !== 'undefined') {
-        Models = exports;
+        module.exports = Models;
     } else {
-        Models = this.Models || (this.Models = {});
+        Models = root.Models || (root.Models = {});
     }
     
     //##MessageModel

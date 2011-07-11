@@ -12,21 +12,54 @@ require.paths.unshift(__dirname + '/lib');
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
     Mongoose     = require('mongoose');
-    
+    Schemas      = require('./lib/schemas');
     Misc         = require('backbone-misc'),
     Auth         = require('backbone-auth'),
-    
-    PubSub       = require('backbone-dnode').pubsub,
-    CRUD         = require('backbone-dnode').crud,
-    Avatar       = require('backbone-dnode').avatar,
-    
+    middleware   = require('backbone-dnode'),
     DNode        = require('dnode'),
+    browserify   = require('browserify'),
     version      = '0.3.2',
-    port         = 8080,
+    port         = 3000,
+    production   = 80,
+    cookieAge    = 60000 * 60 * 1,
+    cacheAge     = 60000 * 60 * 24 * 365,
     secret       = 'abcdefghijklmnopqrstuvwxyz',
     token        = '',
-    database     = 'aebleskiver',
-    app          = express.createServer();
+    database     = 'mongodb://localhost/aebleskiver',
+    staticViews  = __dirname + '/public',
+    bundle       = browserify({
+        require : [
+            'backbone-dnode',
+            __dirname + '/public/js/rpc/auth.dnode.js',
+            __dirname + '/public/js/rpc/misc.dnode.js',
+        ],
+        mount   : '/bundle.js',
+    }),
+    models = browserify({
+        require : [
+            __dirname + '/public/js/models/message.model.js',
+            __dirname + '/public/js/models/room.model.js',
+            __dirname + '/public/js/models/user.model.js',
+            __dirname + '/public/js/models/app.model.js'
+        ],
+        mount   : '/models.js',
+    }),
+    views = browserify({
+        require : [
+            __dirname + '/public/js/views/message.view.js',
+            __dirname + '/public/js/views/room.view.js',
+            __dirname + '/public/js/views/user.view.js',
+            __dirname + '/public/js/views/app.view.js'
+        ],
+        mount   : '/views.js',
+    }),
+    routers = browserify({
+        require : [
+            __dirname + '/public/js/routers/app.router.js'
+        ],
+        mount   : '/routers.js',
+    }),
+    app = module.exports = express.createServer();
 
 // Server configuration
 app.configure(function() {
@@ -34,17 +67,11 @@ app.configure(function() {
     app.use(express.bodyParser());
     app.use(express.cookieParser());
     app.use(express.methodOverride());
-    app.use(connect.logger());         // Log responses to the terminal using Common Log Format.
-    app.use(connect.responseTime());   // Add a special header with timing information.
-    app.use(connect.conditionalGet()); // Add HTTP 304 responses to save even more bandwidth.
-    app.use(connect.cache());          // Add a short-term ram-cache to improve performance.
-    app.use(connect.gzip());           // Gzip the output stream when the browser wants it.
     app.set('view engine', 'jade');
-    app.set('view options', {layout : false});
     
     // Session settings
     app.use(express.session({
-        cookie : {maxAge : 60000 * 60 * 1},
+        cookie : {maxAge : cookieAge},
         secret : secret,
         store  : new SessionStore({
             dbname   : database,
@@ -52,11 +79,19 @@ app.configure(function() {
             password : ''
         })
     }));
+    
+    // Make the backbone-dnode client side available for 
+    // the browser using browserify
+    app.use(bundle);
+    app.use(models);
+    app.use(views);
+    app.use(routers);
 });
     
 // Development specific configurations
 app.configure('development', function(){
-    app.use(express.static(__dirname + '/public'));
+    app.use(express.static(staticViews));
+    //app.use(express.logger());
     app.use(express.errorHandler({
         // Make sure we can see our errors
         // and stack traces for debugging
@@ -67,10 +102,10 @@ app.configure('development', function(){
 
 // Production specific configurations
 app.configure('production', function() {
-    port = 80;
-    app.use(express.static(__dirname + '/public', {
+    port = production;
+    app.use(express.static(staticViews, {
         // Set the caching lifetime to one year
-        maxAge: 60000 * 60 *  24 * 365
+        maxAge: cacheAge
     }));
     app.use(express.errorHandler());
 });
@@ -90,20 +125,32 @@ app.get('/', function(req, res) {
     });
 });
 
-// Start application if not clustered
+// Start up the application and connect to the mongo 
+// database if not part of another module or clustered
 if (!module.parent) {
-    // Connect to the database
-    Mongoose.connect('mongodb://localhost/' + database);
+    // Set models to mongoose
+    Schemas.defineModels(Mongoose, function() {
+        app.User         = Mongoose.model('user');
+        app.Room         = Mongoose.model('room');
+        app.User         = Mongoose.model('token');
+        app.Token        = Mongoose.model('message');
+        app.Session      = Mongoose.model('session');
+        app.Application  = Mongoose.model('application');
+        app.Conversation = Mongoose.model('conversation');
+        
+        database = Mongoose.connect(database);
+        middleware.crud.config(database, function() {
+        
+        });
+    });
     app.listen(port);
 }
 
 // Configure DNode middleware
 DNode()
-    .use(Auth)      // Authentication support
-    .use(PubSub)    // Pub/sub channel support
-    .use(CRUD)      // Backbone integration
-    .use(Avatar)    // Gravatar integration
-    .use(Misc)      // Misc. resources
-    .listen(app)    // Start your engines!
-
-module.exports = app;
+    .use(middleware.pubsub)    // Pub/sub channel support
+    .use(middleware.crud)      // Backbone integration
+    .use(middleware.avatar)    // Gravatar integration
+    .use(Auth)                 // Authentication support
+    .use(Misc)                 // Misc. resources
+    .listen(app)               // Start your engines!

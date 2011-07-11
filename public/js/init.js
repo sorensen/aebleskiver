@@ -7,7 +7,7 @@
 (function() {
     // App Initialization
     // ------------------
-
+    
     // Predefined storage containers and connection
     // related placeholders
     var Store = this.Store = {},
@@ -18,6 +18,7 @@
         // Create the application router, this will only
         // need to be created once, even if we reconnect
         routing = _.once(function() {
+        
             // Wait for the DOM to render
             $(function() {
                 new Routers.Application();
@@ -27,7 +28,6 @@
             // Restart the socket connection
             initialize();
             if (!connected) {
-                console.log('Connected.');
                 clearTimeout(refresh);
                 refresh = setTimeout(connect, 20000);
             }
@@ -46,6 +46,7 @@
         
         // Socket connection established
         con.on('ready', function() {
+            console.log('Connected.');
             connected = true;
             clearTimeout(refresh);
         });
@@ -61,11 +62,11 @@
         // the application, and enable hash url history
         DNode()
             .use(reconnect)
+            .use(middleware.crud)
+            .use(middleware.pubsub)
+            .use(middleware.avatar)
             .use(Auth)
-            .use(CRUD)
             .use(Misc)
-            .use(Pubsub)
-            .use(Avatar)
             .connect(function(remote) {
                 Server = remote;
                 routing();
