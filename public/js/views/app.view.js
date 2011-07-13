@@ -81,10 +81,10 @@
         // to model and collection changes
         initialize : function(options) {
             _.bindAll(this, 
-                'render', 'toggleNav', 'statistics',
-                'addRoom', 'showCreateRoom', 'createRoom', 'allRooms', 'roomsReady',
-                'addUser', 'allUsers', 'usersReady', 'authenticate', 'register', 'logout',
-                'toggleSidebar',
+                'render', 'toggleNav', 'statistics', 'addRoom', 
+                'showCreateRoom', 'createRoom', 'allRooms', 
+                'roomsReady', 'addUser', 'allUsers', 'usersReady', 
+                'authenticate', 'register', 'logout', 'toggleSidebar',
                 'toggleFriendList', 'allFriends', 'addFriend',
                 'toggleFavoriteList', 'allFavorites', 'addFavorite',
                 'conversationsReady', 'allConversations', 'addConversation'
@@ -102,23 +102,19 @@
             // User collection event bindings
             this.model.users.bind('subscribe', this.usersReady);
             this.model.users.bind('add',       this.addUser);
-            this.model.users.bind('add',       this.statistics);
             this.model.users.bind('change',    this.statistics);
             this.model.users.bind('reset',     this.allUsers);
-            this.model.users.bind('reset',     this.statistics);
             
             // Room collection event bindings
             this.model.rooms.bind('subscribe', this.roomsReady);
             this.model.rooms.bind('add',       this.addRoom);
-            this.model.rooms.bind('add',       this.statistics);
             this.model.rooms.bind('change',    this.statistics);
             this.model.rooms.bind('reset',     this.allRooms);
-            this.model.rooms.bind('reset',     this.statistics);
             
             // Conversation event bindings
-            window.user.conversations.bind('subscribe', this.coversationsReady);
-            window.user.conversations.bind('add',       this.addConversation);
-            window.user.conversations.bind('reset',     this.allConversation);
+            root.user.conversations.bind('subscribe', this.coversationsReady);
+            root.user.conversations.bind('add',       this.addConversation);
+            root.user.conversations.bind('reset',     this.allConversation);
             
             this.render();
             
@@ -384,7 +380,7 @@
         // All rooms have been loaded into collection
         allConversations : function(friends) {
             this.conversationList.html('');
-            window.user.conversations.each(this.addConversation);
+            root.user.conversations.each(this.addConversation);
         },
         
         //###addConversation
@@ -467,6 +463,9 @@
             
             this.roomList
                 .append(view.el);
+            
+            // Refresh model statistics
+            this.statistics();
         },
         
         //###deactivateRoom
@@ -743,6 +742,9 @@
             
             this.userList
                 .append(view.el);
+            
+            // Refresh model statistics
+            this.statistics();
         },
         
         //###showLogin
@@ -891,7 +893,7 @@
             user = new Models.UserModel();
             
             this.conversationList.html('');
-            window.user.conversations = new Models.ConversationCollection();
+            root.user.conversations = new Models.ConversationCollection();
             
             this.nav.signup.fadeIn(150);
             this.nav.login.fadeIn(150);
@@ -899,5 +901,4 @@
             this.nav.logout.fadeOut(150);
         }
     });
-            console.log('app.view', Views);
 })()

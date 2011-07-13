@@ -51,11 +51,11 @@
             // Create a new user for the current client, only the 
             // defaults will be used until the client authenticates
             // with valid credentials
-            window.user = new Models.UserModel();
+            root.user = new Models.UserModel();
             
             // Conversations collections
-            window.user.conversations     = new Models.ConversationCollection();
-            window.user.conversations.url = this.url() + ':conversations';
+            root.user.conversations     = new Models.ConversationCollection();
+            root.user.conversations.url = this.url() + ':conversations';
             
             // Wait for three executions of history() before
             // starting, ensuring that rooms and users are loaded before
@@ -99,20 +99,20 @@
                             options.password && (session.password = options.password);
                             session = _.getMongoId(session);
                             
-                            window.user.set(session);
-                            window.user.url = self.url() + ':users:' + session.id;
-                            window.user.subscribe({}, function(resp) {
+                            root.user.set(session);
+                            root.user.url = self.url() + ':users:' + session.id;
+                            root.user.subscribe({}, function(resp) {
                             
                                 // Current user bindings
-                                window.user.friends.bind('add', self.view.addFriend);
-                                window.user.friends.bind('reset', self.view.allFriends);
+                                root.user.friends.bind('add', self.view.addFriend);
+                                root.user.friends.bind('reset', self.view.allFriends);
                                 
-                                window.user.favorites.bind('add', self.view.addFavorite);
-                                window.user.favorites.bind('reset', self.view.allFavorites);
+                                root.user.favorites.bind('add', self.view.addFavorite);
+                                root.user.favorites.bind('reset', self.view.allFavorites);
                             
-                                window.user.collection = self.users;
-                                window.user.loadFriends()
-                                window.user.loadFavorites();
+                                root.user.collection = self.users;
+                                root.user.loadFriends()
+                                root.user.loadFavorites();
                             });
                             
                             history();
@@ -121,9 +121,9 @@
                             // Sync up with the Server through DNode, Backbone will
                             // supply the channel url if one is not supplied
                             /**
-                            window.user.conversations.subscribe({}, function(resp) {
+                            root.user.conversations.subscribe({}, function(resp) {
                                 console.log('Conversation subbed', resp);
-                                window.user.conversations.fetch({
+                                root.user.conversations.fetch({
                                     query    : {},
                                     error    : function(code, msg, opt) {},
                                     finished : function(resp) {

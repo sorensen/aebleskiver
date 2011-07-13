@@ -101,7 +101,7 @@
         }
     });
     
-    //##
+    //##User Profile
     // User profile and wall
     Views.UserMainView = Backbone.View.extend({
     
@@ -142,13 +142,17 @@
             this.model.view = this;
             
             var self = this;
+            
             // Request a gravatar image for the current 
             // user based on email address
             Server.gravatar({
-                email : self.model.get('email'),
-                size  : 100
+                email    : self.model.get('email'),
+                size     : 100,
+                finished : function(resp) {
+                    self.model.set({ avatar : resp });
+                }
             }, function(resp) {
-                self.model.set({ avatar : resp });
+                // Placeholder
             });
             
             this.render();

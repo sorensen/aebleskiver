@@ -11,21 +11,34 @@ require.paths.unshift(__dirname + '/lib');
 // Dependencies
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
-    Mongoose     = require('mongoose');
-    Schemas      = require('./lib/schemas');
+    Mongoose     = require('mongoose'),
+    Redis        = require('redis'),
+    Schemas      = require('schemas'),
     Misc         = require('backbone-misc'),
     Auth         = require('backbone-auth'),
     middleware   = require('backbone-dnode'),
+    
+    crud = require('backbone-crud'),
+    pubsub = require('backbone-pubsub'),
+    avatar = require('backbone-avatar'),
+    
     DNode        = require('dnode'),
     browserify   = require('browserify'),
-    version      = '0.3.2',
-    port         = 3000,
-    production   = 80,
     cookieAge    = 60000 * 60 * 1,
     cacheAge     = 60000 * 60 * 24 * 365,
     secret       = 'abcdefghijklmnopqrstuvwxyz',
     token        = '',
+    port         = 3000,
+    production   = 80,
     database     = 'mongodb://localhost/aebleskiver',
+    redisConfig  = {
+        port     : 6379,
+        host     : '127.0.0.1',
+        options  : {
+            parser        : 'javascript',
+            return_buffer : false
+        },
+    },
     staticViews  = __dirname + '/public',
     bundle       = browserify({
         require : [
@@ -59,6 +72,7 @@ var express      = require('express'),
         ],
         mount   : '/routers.js',
     }),
+    version = '0.3.2',
     app = module.exports = express.createServer();
 
 // Server configuration
@@ -138,19 +152,32 @@ if (!module.parent) {
         app.Application  = Mongoose.model('application');
         app.Conversation = Mongoose.model('conversation');
         
-        database = Mongoose.connect(database);
-        middleware.crud.config(database, function() {
-        
+        db = Mongoose.connect(database);
+        crud.config(db, function() {
+            // Placeholder
         });
     });
+    
+    // Configure the pubsub middleware
+    pubsub.config(Redis, {
+        port     : redisConfig.port,
+        host     : redisConfig.host,
+        options  : redisConfig.options,
+        password : redisConfig.password,
+        authcb   : function(){}
+    }, function() {
+        // Placeholder
+    });
+    
+    // Start the application
     app.listen(port);
 }
 
 // Configure DNode middleware
 DNode()
-    .use(middleware.pubsub)    // Pub/sub channel support
-    .use(middleware.crud)      // Backbone integration
-    .use(middleware.avatar)    // Gravatar integration
+    .use(pubsub)    // Pub/sub channel support
+    .use(crud)      // Backbone integration
+    .use(avatar)    // Gravatar integration
     .use(Auth)                 // Authentication support
     .use(Misc)                 // Misc. resources
     .listen(app)               // Start your engines!

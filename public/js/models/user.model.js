@@ -23,7 +23,11 @@
     // User
     Models.UserModel = Backbone.Model.extend({
         
-        type     : 'user',
+        // Server communication settings
+        type : 'user',
+        sync : _.sync,
+        
+        // Model defaults
         defaults : {
             username  : 'anonymous',
             avatar    : '/images/undefined.png',
@@ -39,9 +43,6 @@
             visits    : 0
         },
         
-        // DNode persistence
-        sync : _.sync,
-        
         initialize : function(options) {
             // Add friends list
             this.friends   = new Models.UserCollection();
@@ -49,13 +50,16 @@
             
             // Request a gravatar image for the current 
             // user based on email address if not default
-            if (this.get('avatar') === this.defaults.avatar) {
+            if (this.get('avatar') !== this.defaults.avatar) {
                 var self = this;
                 Server.gravatar({
-                    email : self.get('email'),
-                    size  : 30
+                    email    : self.get('email'),
+                    size     : 30,
+                    finished : function(resp) {
+                        self.set({ avatar : resp });
+                    }
                 }, function(resp) {
-                    self.set({ avatar : resp });
+                    // Placeholder
                 });
             }
         },
@@ -135,7 +139,6 @@
             this.posts && this.posts.unsubscribe();
         },
         
-        
         startConversation : function() {
             var to = this.get('id');
             var from = user.get('id') || user.get('_id');
@@ -143,7 +146,7 @@
                     ? to + ':' + from
                     : from + ':' + to;
             
-            if (!window.user.conversations.get(key)) {
+            if (!root.user.conversations.get(key)) {
             
                 var convo = new Models.ConversationModel({
                     to   : to,
@@ -157,7 +160,7 @@
                     id      : to
                 }, function(resp, options) {
                     // Conversation started
-                    window.user.conversations.add(convo);
+                    root.user.conversations.add(convo);
                 });
             }
         },
@@ -167,14 +170,10 @@
     Models.UserCollection = Backbone.Collection.extend({
         
         model : Models.UserModel,
-        type  : 'user',
-        url   : 'users',
         
-        // DNode persistence
-        sync : _.sync,
-        
-        // Initialize
-        initialize : function(options) {
-        }
+        // Server communication settings
+        type : 'user',
+        url  : 'users',
+        sync : _.sync
     });
 })()

@@ -272,11 +272,11 @@
         // Add this room to the current users favorite list, 
         // for easy lookups in the future
         addToFavorites : function() {
-            if (this.model.get('id') == user.get('id')
-                || this.model.get('id') == user.id) {
+            if (this.model.get('id') == root.user.get('id')
+                || this.model.get('id') == root.user.id) {
                 return;
             }
-            var favorites = user.get('favorites') || [],          
+            var favorites = root.user.get('favorites') || [],          
                 find = _.indexOf(favorites, this.model.get('id'));
             
             if (find !== -1) {
@@ -284,19 +284,19 @@
             }
             favorites.push(this.model.get('id'));
             
-            user.set({
+            root.user.set({
                 favorites : _.unique(favorites)
             }).save();
             
-            user.favorites.add(this.model);
+            root.user.favorites.add(this.model);
         },
         
         //###removeFromFavorites
         // Remove the model from the current users favorites
         removeFromFavorites : function() {
             var id        = this.model.get('id'),
-                favorites = _.without(user.get('favorites'), id);
-                room      = user.favorites.get(id);
+                favorites = _.without(root.user.get('favorites'), id);
+                room      = root.user.favorites.get(id);
             
             // Make sure we have a valid room
             if (!room) {
@@ -307,7 +307,7 @@
             $(room.view.el).remove();
             
             // Remove from model and save to server
-            user.favorites
+            root.user.favorites
                 .remove(this.model, {
                     silent : true
                 })
@@ -388,9 +388,9 @@
         // Retrieve new attributes for the model based on user 
         // input collected from the DOM
         newAttributes : function() {
-            var username    = user.get('username'),
-                displayName = user.get('displayName') || user.get('username'),
-                id          = user.get('id') || user.id;
+            var username    = root.user.get('username'),
+                displayName = root.user.get('displayName') || root.user.get('username'),
+                id          = root.user.get('id') || root.user.id;
             
             return {
                 text        : this.input.val(),
@@ -398,7 +398,7 @@
                 user_id     : id,
                 username    : username,
                 displayName : displayName,
-                avatar      : user.get('avatar')
+                avatar      : root.user.get('avatar')
             };
         },
     });
@@ -495,7 +495,7 @@
         // delegate to the server to send that user a notice
         startConversation : _.debounce(function() {
             var self = this;
-            Server.startConversation(user.toJSON(), {
+            Server.startConversation(root.user.toJSON(), {
                 channel : self.model.url,
                 id      : self.model.get('to')
             }, function(resp, options) {
