@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Application view
     // -----------------
     
@@ -13,12 +13,9 @@
   
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
-    var Views;
-    if (typeof exports !== 'undefined') {
-        module.exports = Views;
-    } else {
-        Views = root.Views || (root.Views = {});
-    }
+    var Views = root.Views;
+    if (typeof Views === 'undefined') Views = root.Views = {};
+    if (typeof exports !== 'undefined') module.exports = Views;
     
     // Extend the Backbone 'view' object and add it to the 
     // namespaced view container
@@ -80,6 +77,8 @@
         // property, the event bindings below are programmatic listeners
         // to model and collection changes
         initialize : function(options) {
+            this.server = options.server;
+        
             _.bindAll(this, 
                 'render', 'toggleNav', 'statistics', 'addRoom', 
                 'showCreateRoom', 'createRoom', 'allRooms', 
@@ -92,7 +91,9 @@
 
             // Create and bind the application model to this view,
             // then create a circular reference for traversing
-            this.model = new Models.ApplicationModel();
+            this.model = new Models.ApplicationModel({
+                server : this.server
+            });
             this.model.view = this;
             
             // Application model event bindings
@@ -170,16 +171,13 @@
             if (this.favoritesOpen === 'true') {
                 this.favorites.addClass('open');
             }
-            console.log('app.view init', this);
         },
         
         //###render
         // Render template contents onto the DOM, adding
         // any effects afterwards, such as icons
         render : function() {
-            var content = this.model.toJSON(),
-                view    = Mustache.to_html(this.template(), content),
-                options = {
+            var options = {
                     width  : 20,
                     height : 20,
                     fill : {
@@ -202,8 +200,6 @@
                     }
                 };
             
-            this.el.html(view);
-            
             // Enable access keys
             KeyCandy.init('#application', {
                 // Set the control key and menu key to
@@ -215,26 +211,29 @@
                 removeKey  : 16
             });
             
+            _.icon('home', 'map', {
+                width : 500,
+                height : 500
+            });
             // Create the icons for this view
-            _
-                .icon('home', 'home', options)
-                .icon('run', 'settings', options)
-                .icon('power', 'start-menu-icon', {
-                    fill : {
-                        fill   : "#333", 
-                        stroke : "none"
-                    },
-                    none : {
-                        fill    : "#000", 
-                        opacity : 0
-                    }
-                })
-                .icon('slideshare', 'friends-icon')
-                .icon('bookmark',   'favorites-icon')
-                .icon('i',          'stats-icon')
-                .icon('github',     'github-icon')
-                .icon('chat',       'show-rooms', highlight)
-                .icon('users',      'show-users', highlight);
+            _.icon('home', 'home', options);
+            _.icon('run', 'settings', options);
+            _.icon('power', 'start-menu-icon', {
+                fill : {
+                    fill   : "#333", 
+                    stroke : "none"
+                },
+                none : {
+                    fill    : "#000", 
+                    opacity : 0
+                }
+            });
+            _.icon('slideshare', 'friends-icon');
+            _.icon('bookmark',   'favorites-icon');
+            _.icon('i',          'stats-icon');
+            _.icon('github',     'github-icon');
+            _.icon('chat',       'show-rooms', highlight);
+            _.icon('users',      'show-users', highlight);
             
             return this;
         },
@@ -517,11 +516,10 @@
             // Create the icons for this view, should be done 
             // on the room view, but the app needs to load it 
             // into view first before icons can be loaded.
-            _
-                .icon('view',   'add-favorite')
-                .icon('noview', 'remove-favorite')
-                .icon('cross',  'leave-room')
-                .icon('quote',  'message-submit');
+            _.icon('view',   'add-favorite')
+            _.icon('noview', 'remove-favorite')
+            _.icon('cross',  'leave-room')
+            _.icon('quote',  'message-submit');
             
             model[0].view && model[0].view.activate();
         },
@@ -599,7 +597,7 @@
         // Users collection has been subscribed to
         usersReady : function() {
             // Online user test
-            Server.onlineUsers(function(resp) {
+            this.server.onlineUsers(function(resp) {
                 // Placeholder
             });
         },
@@ -621,18 +619,20 @@
             this.deactivateUser();
             
             // Get model by ID
-            var model = this.model.users.filter(function(room) {
-                return room.get('username') === params
-                    || room.get('id') === params;
+            var model = this.model.users.filter(function(user) {
+                return user.get('username') === params
+                    || user.get('_id') === params;
             });
+            console.log('activateUser', model);
             if (!model || !model[0]) {
-                Backbone.history.saveLocation('/');
+                this.router.invalid();
                 return;
             }
             
             this.activeUser = new Views.UserMainView({
                 model : model[0]
             });
+            console.log('activateUser', this.activeUser);
             
             // Make view accessable to inner-view
             this.activeUser.view = this;
@@ -647,12 +647,11 @@
             // Create the icons for this view, should be done 
             // on the room view, but the app needs to load it 
             // into view first before icons can be loaded.
-            _
-                .icon('star',  'add-friend')
-                .icon('star2', 'remove-friend')
-                .icon('mail',  'send-message')
-                .icon('cross', 'leave-profile')
-                .icon('quote', 'post-submit');
+            _.icon('star',  'add-friend')
+            _.icon('star2', 'remove-friend')
+            _.icon('mail',  'send-message')
+            _.icon('cross', 'leave-profile')
+            _.icon('quote', 'post-submit');
         },
         
         //###showSettings
@@ -901,4 +900,4 @@
             this.nav.logout.fadeOut(150);
         }
     });
-})()
+//})()

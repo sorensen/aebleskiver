@@ -8,29 +8,27 @@
 // ------------------
 require.paths.unshift(__dirname + '/lib');
 
-// Dependencies
+// Project dependencies
 var express      = require('express'),
     SessionStore = require('connect-mongodb'),
     Mongoose     = require('mongoose'),
     Redis        = require('redis'),
     Schemas      = require('schemas'),
-    Misc         = require('backbone-misc'),
-    Auth         = require('backbone-auth'),
     middleware   = require('backbone-dnode'),
-    
-    crud = require('backbone-crud'),
-    pubsub = require('backbone-pubsub'),
-    avatar = require('backbone-avatar'),
-    
     DNode        = require('dnode'),
-    browserify   = require('browserify'),
-    cookieAge    = 60000 * 60 * 1,
+    browserify   = require('browserify');
+    
+// Project configuration settings
+var cookieAge    = 60000 * 60 * 1,
     cacheAge     = 60000 * 60 * 24 * 365,
     secret       = 'abcdefghijklmnopqrstuvwxyz',
     token        = '',
-    port         = 3000,
+    port         = 8000,
     production   = 80,
-    database     = 'mongodb://localhost/aebleskiver',
+    staticViews  = __dirname + '/public',
+    dbpath       = 'mongodb://localhost/aebleskiver',
+    version      = '0.3.2',
+    app          = module.exports = express.createServer(),
     redisConfig  = {
         port     : 6379,
         host     : '127.0.0.1',
@@ -38,87 +36,88 @@ var express      = require('express'),
             parser        : 'javascript',
             return_buffer : false
         },
-    },
-    staticViews  = __dirname + '/public',
-    bundle       = browserify({
+    };
+
+// Create the publish and subscribe clients for redis to 
+// send to the DNode pubsub middleware
+var pub = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.options),
+    sub = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.options)
+
+// Add the custom DNode middleware packages
+middleware.avatar = require('backbone-avatar');
+middleware.misc   = require('backbone-misc');
+middleware.auth   = require('backbone-auth');
+
+// Configure our browserified bundles, seperating them out to 
+// related packages for ease of development and debugging
+var core = browserify({
         require : [
-            'backbone-dnode',
-            __dirname + '/public/js/rpc/auth.dnode.js',
-            __dirname + '/public/js/rpc/misc.dnode.js',
+            'underscore',
+            'backbone',
+            'dnode',
+            'backbone-dnode'
         ],
-        mount   : '/bundle.js',
-    }),
-    models = browserify({
-        require : [
+        entry : [
             __dirname + '/public/js/models/message.model.js',
             __dirname + '/public/js/models/room.model.js',
             __dirname + '/public/js/models/user.model.js',
-            __dirname + '/public/js/models/app.model.js'
-        ],
-        mount   : '/models.js',
-    }),
-    views = browserify({
-        require : [
+            __dirname + '/public/js/models/app.model.js',
             __dirname + '/public/js/views/message.view.js',
             __dirname + '/public/js/views/room.view.js',
             __dirname + '/public/js/views/user.view.js',
-            __dirname + '/public/js/views/app.view.js'
+            __dirname + '/public/js/views/app.view.js',
+            __dirname + '/public/js/routers/app.router.js',
+            __dirname + '/public/js/rpc/auth.dnode.js',
+            __dirname + '/public/js/rpc/avatar.dnode.js',
+            __dirname + '/public/js/rpc/misc.dnode.js',
+            __dirname + '/public/js/google.js',
+            __dirname + '/public/js/helpers.js',
+            __dirname + '/public/js/icons.js',
+            __dirname + '/public/js/init.js'
         ],
-        mount   : '/views.js',
-    }),
-    routers = browserify({
-        require : [
-            __dirname + '/public/js/routers/app.router.js'
-        ],
-        mount   : '/routers.js',
-    }),
-    version = '0.3.2',
-    app = module.exports = express.createServer();
+        mount   : '/core.js'
+    });
 
-// Server configuration
+// Create the mongo session store for express and 
+// authentication middleware
+var session = new SessionStore({
+    dbname   : dbpath,
+    username : '',
+    password : ''
+});
+
+// Server configuration, set the server view settings to 
+// render in jade, set the session middleware and attatch 
+// the browserified bundles to the app on the client side.
 app.configure(function() {
-    // View settings
     app.use(express.bodyParser());
     app.use(express.cookieParser());
     app.use(express.methodOverride());
     app.set('view engine', 'jade');
-    
-    // Session settings
     app.use(express.session({
         cookie : {maxAge : cookieAge},
         secret : secret,
-        store  : new SessionStore({
-            dbname   : database,
-            username : '',
-            password : ''
-        })
+        store  : session
     }));
-    
-    // Make the backbone-dnode client side available for 
-    // the browser using browserify
-    app.use(bundle);
-    app.use(models);
-    app.use(views);
-    app.use(routers);
+    app.use(core);
 });
-    
-// Development specific configurations
+
+// Development specific configurations, make sure we can 
+// see our errors and stack traces for debugging
 app.configure('development', function(){
     app.use(express.static(staticViews));
-    //app.use(express.logger());
     app.use(express.errorHandler({
-        // Make sure we can see our errors
-        // and stack traces for debugging
         dumpExceptions : true, 
         showStack      : true 
     }));
 });
 
-// Production specific configurations
+// Production specific configurations, set the caching life
+// for all public served files, change the port to production, 
+// (joyent uses port 80), and add the error handlers.
 app.configure('production', function() {
     port = production;
     app.use(express.static(staticViews, {
-        // Set the caching lifetime to one year
         maxAge: cacheAge
     }));
     app.use(express.errorHandler());
@@ -128,7 +127,6 @@ app.configure('production', function() {
 app.get('/', function(req, res) {
     req.session.regenerate(function () {
         token = req.session.id;
-        
         res.render('index.jade', {
             locals : {
                 port    : port,
@@ -140,44 +138,25 @@ app.get('/', function(req, res) {
 });
 
 // Start up the application and connect to the mongo 
-// database if not part of another module or clustered
+// database if not part of another module or clustered, 
+// configure the Mongoose model schemas, setting them to 
+// our database instance. The DNode middleware will need 
+// to be configured with the database references.
 if (!module.parent) {
-    // Set models to mongoose
     Schemas.defineModels(Mongoose, function() {
-        app.User         = Mongoose.model('user');
-        app.Room         = Mongoose.model('room');
-        app.User         = Mongoose.model('token');
-        app.Token        = Mongoose.model('message');
-        app.Session      = Mongoose.model('session');
-        app.Application  = Mongoose.model('application');
-        app.Conversation = Mongoose.model('conversation');
-        
-        db = Mongoose.connect(database);
-        crud.config(db, function() {
-            // Placeholder
-        });
+        database = Mongoose.connect(dbpath);
+        middleware.crud.config(database);
+        middleware.pubsub.config(pub, sub);
+        middleware.auth.config(database, session);
     });
-    
-    // Configure the pubsub middleware
-    pubsub.config(Redis, {
-        port     : redisConfig.port,
-        host     : redisConfig.host,
-        options  : redisConfig.options,
-        password : redisConfig.password,
-        authcb   : function(){}
-    }, function() {
-        // Placeholder
-    });
-    
-    // Start the application
     app.listen(port);
 }
 
-// Configure DNode middleware
+// Attatch the DNode middleware and connect
 DNode()
-    .use(pubsub)    // Pub/sub channel support
-    .use(crud)      // Backbone integration
-    .use(avatar)    // Gravatar integration
-    .use(Auth)                 // Authentication support
-    .use(Misc)                 // Misc. resources
-    .listen(app)               // Start your engines!
+    .use(middleware.pubsub) // Pub/sub channel support
+    .use(middleware.crud)   // Backbone integration
+    .use(middleware.avatar) // Gravatar integration
+    .use(middleware.auth)   // Authentication support
+    .use(middleware.misc)   // Misc. resources
+    .listen(app)            // Start your engines!

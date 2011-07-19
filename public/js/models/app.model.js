@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Application model
     // -----------------
     
@@ -13,12 +13,9 @@
   
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
-    var Models;
-    if (typeof exports !== 'undefined') {
-        module.exports = Models;
-    } else {
-        Models = root.Models || (root.Models = {});
-    }
+    var Models = root.Models;
+    if (typeof Models === 'undefined') Models = root.Models = {};
+    if (typeof exports !== 'undefined') module.exports = Models;
     
     // Extend the Backbone 'model' object and add it to the 
     // namespaced model container
@@ -28,17 +25,10 @@
         type     : 'application',
         urlRoot  : 'app',
         
-        // Model defaults
-        defaults : {
-            server  : 's1',
-            visits  : 0,
-            users   : [],
-            rooms   : []
-        },
-        
         //###initialize
         // Model constructor
         initialize : function(options) {
+            this.server = options.server;
             
             // Current user collection
             this.users     = new Models.UserCollection();
@@ -61,7 +51,7 @@
             // starting, ensuring that rooms and users are loaded before
             // trying to execute the current hash location
             
-            var history = _.after(3, function() {
+            var history = _.after(2, function() {
                 Backbone.history.start();
             });
             var self = this;
@@ -115,7 +105,6 @@
                                 root.user.loadFavorites();
                             });
                             
-                            history();
                             session._id && self.view.toggleNav();
                             
                             // Sync up with the Server through DNode, Backbone will
@@ -169,4 +158,4 @@
             });
         },
     });
-}).call(this)
+//})()

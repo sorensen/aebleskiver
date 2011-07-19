@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // User model
     // ----------
     
@@ -13,12 +13,9 @@
   
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
-    var Models;
-    if (typeof exports !== 'undefined') {
-        module.exports = Models;
-    } else {
-        Models = root.Models || (root.Models = {});
-    }
+    var Models = root.Models;
+    if (typeof Models === 'undefined') Models = root.Models = {};
+    if (typeof exports !== 'undefined') module.exports = Models;
     
     // User
     Models.UserModel = Backbone.Model.extend({
@@ -176,4 +173,4 @@
         url  : 'users',
         sync : _.sync
     });
-})()
+//})()

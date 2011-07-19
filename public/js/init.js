@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // App Initialization
     // ------------------
     
@@ -17,14 +17,16 @@
         
         // Create the application router, this will only
         // need to be created once, even if we reconnect
-        routing = _.once(function() {
+        routing = _.once(function(remote) {
         
             // Wait for the DOM to render
             $(function() {
-                new Routers.Application();
+                new Routers.Application({ 
+                    server : remote
+                });
             });
         }),
-        connect   = function() {
+        connect = function() {
             // Restart the socket connection
             initialize();
             if (!connected) {
@@ -39,14 +41,12 @@
     
         // Socket connection has been terminated
         con.on('end', function() {
-            console.log('Disconnected.');
             connected = false;
             refresh = setTimeout(connect, 500);
         });
         
         // Socket connection established
         con.on('ready', function() {
-            console.log('Connected.');
             connected = true;
             clearTimeout(refresh);
         });
@@ -64,13 +64,15 @@
             .use(reconnect)
             .use(middleware.crud)
             .use(middleware.pubsub)
-            .use(middleware.avatar)
-            .use(Auth)
-            .use(Misc)
+            .use(avatar)
+            .use(auth)
+            .use(misc)
             .connect(function(remote) {
+                // Set the server for model and views, then 
+                // start the main router for the application
                 Server = remote;
-                routing();
+                routing(remote);
             });
     };
     initialize();
-})()
+//})()

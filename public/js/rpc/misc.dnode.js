@@ -1,22 +1,22 @@
-﻿//    Aebleskiver
+//    Aebleskiver
 //    (c) 2011 Beau Sorensen
 //    Aebleskiver may be freely distributed under the MIT license.
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Miscellaneous middleware
     // ------------------------
     
+    // Save a reference to the global object.
+    var root = this;
+    
     // The top-level namespace. All public classes and modules will
-    // be attached to this. Exported for both CommonJS and the browser.
-    var Misc;
-    if (typeof exports !== 'undefined') {
-        Misc = exports;
-    }
+    // be attached to this.
+    var misc = root.misc;
     
     // Remote protocol
-    Misc = function(client, con) {
+    misc = function(client, con) {
     
         _.extend(this, {
             // Personal conversation initialization, 
@@ -43,8 +43,6 @@
         });
     };
     
-    // CommonJS browser export
-    if (typeof exports === 'undefined') {
-        this.Misc = Misc;
-    }
-})()
+    if (typeof root.misc === 'undefined') root.misc = misc;
+    if (typeof exports !== 'undefined') module.exports = misc;
+//})()

@@ -38,27 +38,41 @@ or just `app.js` for the single process.
 
 ### Project dependancies (npm)
 
-These packages can all be installed via 'npm install package'
+These packages can all be installed via 'npm'
 
-* [dnode @ 0.6.10](http://github.com/substack/dnode)
-* [socket.io @ 0.6.17](http://github.com/LearnBoost/Socket.IO-node)
-* [backbone @ 0.3.3](http://github.com/documentcloud/backbone)
-* [underscore @ 1.1.5](http://github.com/documentcloud/underscore)
-* [connect @ 1.4.1](http://github.com/senchalabs/connect)
-* [express @ 2.1.1](http://github.com/visionmedia/express)
-* [jade @ 0.10.1](http://github.com/visionmedia/jade)
-* [cluster @ 0.6.3](http://github.com/LearnBoost/cluster)
-* [cluster-live @ 0.0.3](http://github.com/visionmedia/cluster-live)
-* [node-gravatar @ 1.0.0](http://github.com/arnabc/node-gravatar)
-* [node-uuid @ 1.1.0](http://github.com/broofa/node-uuid)
-* [mongoose @ 1.3.0](http://github.com/LearnBoost/mongoose)
-* [connect-mongodb @ 0.3.0](http://github.com/kcbanner/connect-mongo)
-* mongodb @ 0.9.4-1
-* [bcrypt @ 0.2.3](http://github.com/ncb000gt/node.bcrypt.js)
-* [redis @ 0.6.0](http://github.com/mranney/node_redis)
-* [connect-redis @ 1.0.0](http://github.com/visionmedia/connect-redis)
-* [keys @ 0.1.2](http://github.com/visionmedia/keys)
-
+    express 2.4.3
+        mime 1.2.2
+        qs 0.2.0
+        connect 1.6.0
+    dnode 0.7.3
+        traverse 0.3.9
+        dnode-protocol 0.0.10
+        lazy 1.0.6
+        socket.io 0.6.18
+        browserify 1.1.4
+    backbone 0.5.1
+        underscore 1.1.7
+    jade 0.13.0
+    mongoose 1.7.3
+        hooks 0.1.9
+        colors 0.5.0
+        mongodb 0.9.6-7
+    bcrypt 0.2.3
+        nodeunit 0.5.3
+    redis 0.6.6
+    mongodb 1.0.0rc2
+        mongodb 0.9.6-7
+        connect 1.5.1
+    node-gravatar 1.0.0
+    node-uuid 1.2.0
+    cluster 0.6.4
+        log 1.2.0
+    cluster-live 0.0.3
+        jade 0.9.3
+        socket.io 0.6.18
+        stylus 0.9.2
+    backbone-dnode
+    
 ### Docco (optional)
 
 You can optionally install (Docco)[https://github.com/jashkenas/docco] if you decide

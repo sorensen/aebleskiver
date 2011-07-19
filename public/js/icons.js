@@ -4,10 +4,14 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Raphael icon support
     // --------------------
     
+    // Save a reference to the global object.
+    var root = this;
+    var _ = root._;
+
     // Icon paths are taken from http://raphaeljs.com/icons/ 
     // and are licensed under MIT, http://raphaeljs.com/license.html
 
@@ -43,7 +47,7 @@
         
         // ###Icon definitions
         // Raphael rendering paths
-        icons = {
+        vectors = {
             "?"          : "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.328,24.371h-2.707v-2.596h2.707V24.371zM17.328,19.003v0.858h-2.707v-1.057c0-3.19,3.63-3.696,3.63-5.963c0-1.034-0.924-1.826-2.134-1.826c-1.254,0-2.354,0.924-2.354,0.924l-1.541-1.915c0,0,1.519-1.584,4.137-1.584c2.487,0,4.796,1.54,4.796,4.136C21.156,16.208,17.328,16.627,17.328,19.003z",
             i            : "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M14.757,8h2.42v2.574h-2.42V8z M18.762,23.622H16.1c-1.034,0-1.475-0.44-1.475-1.496v-6.865c0-0.33-0.176-0.484-0.484-0.484h-0.88V12.4h2.662c1.035,0,1.474,0.462,1.474,1.496v6.887c0,0.309,0.176,0.484,0.484,0.484h0.88V23.622z",
             $            : "M16,1.466C7.973,1.466,1.466,7.973,1.466,16c0,8.027,6.507,14.534,14.534,14.534c8.027,0,14.534-6.507,14.534-14.534C30.534,7.973,24.027,1.466,16,1.466z M17.255,23.88v2.047h-1.958v-2.024c-3.213-0.44-4.621-3.08-4.621-3.08l2.002-1.673c0,0,1.276,2.223,3.586,2.223c1.276,0,2.244-0.683,2.244-1.849c0-2.729-7.349-2.398-7.349-7.459c0-2.2,1.738-3.785,4.137-4.159V5.859h1.958v2.046c1.672,0.22,3.652,1.1,3.652,2.993v1.452h-2.596v-0.704c0-0.726-0.925-1.21-1.959-1.21c-1.32,0-2.288,0.66-2.288,1.584c0,2.794,7.349,2.112,7.349,7.415C21.413,21.614,19.785,23.506,17.255,23.88z",
@@ -181,75 +185,83 @@
             lab          : "M22.562,25.85l-4.729-6.564v-5.647h0.88c0,0,1.017,0.333,1.017-0.918v-1.016c0,0-0.06-0.879-1.076-0.879l-5.411,0.039c0,0-1.016,0.333-1.016,0.879v0.977c0,0-0.079,0.899,0.938,0.899h0.978v5.725l-4.787,6.584c0,0-4.015,4.553,0.146,4.611h13.002C22.504,30.538,26.725,30.898,22.562,25.85zM15.535,8.948c0.277,0,0.502-0.225,0.502-0.503c0-0.278-0.225-0.503-0.502-0.503c-0.278,0-0.503,0.225-0.503,0.503C15.032,8.723,15.256,8.948,15.535,8.948zM12.706,7.111c0.793,0,1.437-0.643,1.437-1.436c0-0.792-0.644-1.436-1.437-1.436S11.27,4.882,11.27,5.675C11.27,6.469,11.913,7.111,12.706,7.111zM18.342,6.096c1.297,0,2.346-1.05,2.346-2.344c0-1.295-1.049-2.345-2.346-2.345c-1.294,0-2.344,1.049-2.344,2.345C15.998,5.046,17.048,6.096,18.342,6.096z",
             umbrella     : "M17.081,4.065V3.137c0,0,0.104-0.872-0.881-0.872c-0.928,0-0.891,0.9-0.891,0.9v0.9C4.572,3.925,2.672,15.783,2.672,15.783c1.237-2.98,4.462-2.755,4.462-2.755c4.05,0,4.481,2.681,4.481,2.681c0.984-2.953,4.547-2.662,4.547-2.662c3.769,0,4.509,2.719,4.509,2.719s0.787-2.812,4.557-2.756c3.262,0,4.443,2.7,4.443,2.7v-0.058C29.672,4.348,17.081,4.065,17.081,4.065zM15.328,24.793c0,1.744-1.8,1.801-1.8,1.801c-1.885,0-1.8-1.801-1.8-1.801s0.028-0.928-0.872-0.928c-0.9,0-0.957,0.9-0.957,0.9c0,3.628,3.6,3.572,3.6,3.572c3.6,0,3.572-3.545,3.572-3.545V13.966h-1.744V24.793z"
         };
-        
-    // Add to the existing underscore utility functions
-    _.mixin({
-        // ###icon
-        // Create and render an icon, applying the default settings
-        // if none are provided, to a given DOM selector
-        icon : function(name, selector, options) {
-            options || (options = {});
-        
-            // Cannot continue without a DOM selector
-            // and a valid icon path
-            if (!selector || !name) {
-                throw new Error("Icon name and selector required.");
-                return;
-            } else if (!icons[name]) {
-                throw new Error("Invalid icon.");
-                return;
-            }
-            
-            // Option overrides
-            options.width    || (options.width    = width);
-            options.height   || (options.height   = height);
-            options.stroke   || (options.stroke   = stroke);
-            options.fill     || (options.fill     = fill);
-            options.none     || (options.none     = none);
-            options.selected || (options.selected = selected);
-        
-            // Initialize canvas and draw
-            var paper = Raphael(selector, width, height),
-                // Create the outline path
-                path = paper
-                        .path(icons[name])
-                        .attr(options.stroke)
-                        .translate(4, 4)
-                        .scale(options.width / width, options.width / width),
-                // Fill the icon in
-                Icon = paper
-                        .path(icons[name])
-                        .attr(options.fill)
-                        .translate(4, 4)
-                        .scale(options.width / width, options.width / width);
-            
-            // Apply interaction events
-            /**
-            paper
-                .rect(0, 0, 32, 32)
-                .attr(options.none)
-                .click(function () {
-                    // Set icon as current and restore prev
-                    // selected icon to defaults
-                    current && current.attr(fill);
-                    current = Icon.attr(selected);
-                })
-                .hover(function () {
-                    path
-                        .stop()
-                        .animate({
-                            opacity: 1
-                        }, 200);
-                
-                }, function () {
-                    path
-                        .stop()
-                        .attr({
-                            opacity: 0
-                        });
-                });
-            **/
-            return this;
+    
+    // ###factory
+    // Create and render an icon, applying the default settings
+    // if none are provided, to a given DOM selector
+    var factory = function(name, selector, options) {
+        options || (options = {});
+    
+        // Cannot continue without a DOM selector
+        // and a valid icon path
+        if (!selector || !name) {
+            throw new Error("Icon name and selector required.");
+            return;
+        } else if (!vectors[name]) {
+            throw new Error("Invalid icon.");
+            return;
         }
-    });
-})();
+        
+        // Option overrides
+        options.width    || (options.width    = width);
+        options.height   || (options.height   = height);
+        options.stroke   || (options.stroke   = stroke);
+        options.fill     || (options.fill     = fill);
+        options.none     || (options.none     = none);
+        options.selected || (options.selected = selected);
+    
+        // Initialize canvas and draw
+        var paper = Raphael(selector, options.width, options.height);
+        
+        // Create the outline path
+        var path = paper
+            .path(vectors[name])
+            .attr(options.stroke)
+            .translate(4, 4)
+            .scale(options.width / width, options.width / width, 0, 0);
+            
+        // Fill the icon in
+        var Icon = paper
+            .path(vectors[name])
+            .attr(options.fill)
+            .translate(4, 4)
+            .scale(options.width / width, options.width / width, 0, 0);
+        
+        // Apply interaction events
+        paper
+            .rect(0, 0, 32, 32)
+            .attr(options.none)
+            .click(function () {
+            
+                // Set icon as current and restore prev
+                // selected icon to defaults
+                current && current.attr(fill);
+                current = Icon.attr(selected);
+            })
+            .hover(function () {
+                path
+                    .stop()
+                    .animate({
+                        opacity: 1
+                    }, 200);
+            
+            }, function () {
+                path
+                    .stop()
+                    .attr({
+                        opacity: 0
+                    });
+            })
+            .scale(options.width / width, options.width / width, 0, 0);
+        
+        return paper;
+    };
+
+    // Add as an underscore mixin if it exists, otherwise 
+    // attatch the function to the top level namespace
+    if (_ && typeof _ !== 'undefined') {
+        _.icon = factory;
+    } else {
+        root.icon = factory;
+    }
+//})();

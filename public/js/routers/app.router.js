@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Application
     // ----------
     
@@ -13,12 +13,9 @@
   
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
-    var Routers;
-    if (typeof exports !== 'undefined') {
-        module.exports = Routers;
-    } else {
-        Routers = root.Routers || (root.Routers = {});
-    }
+    var Routers = root.Routers;
+    if (typeof Routers === 'undefined') Routers = root.Routers = {};
+    if (typeof exports !== 'undefined') module.exports = Routers;
     
     // Main controller and router
     Routers.Application = Backbone.Router.extend({
@@ -30,29 +27,28 @@
             '/signup'    : 'signup',
             '/login'     : 'login',
             '/'          : 'home',
-            '*uri'       : 'invalid',
+            //'*uri'       : 'invalid',
         },
         
         initialize : function(options) {
             // Attach the application
             this.view = new Views.ApplicationView({
-                // Use existing DOM element
-                el : $('#application')
+                el     : $('#application'),
+                server : options.server || false
             });
             
             // Circular reference
-            this.view.controller = this;
-            this.view.statistics();
+            this.view.router = this;
         },
         
         home : function() {
-            this.view.statistics();
             this.view.deactivateRoom();
         },
         
         // Default action
         invalid : function(uri) {
-            this.saveLocation('/');
+            console.log('invalid route: ', uri);
+            this.navigate('/', true);
         },
         
         // Join a room room
@@ -81,4 +77,4 @@
             this.view.showSignup();
         },
     });
-})()
+//})()

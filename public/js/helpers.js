@@ -4,10 +4,17 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function(_) {
+//(function() {
     // Helper functions
     // ----------------
 
+    // Save a reference to the global object.
+    var root = this;
+  
+    // Require Underscore, if we're on the server, and it's not already present.
+    var _ = root._;
+    if (!_ && (typeof require !== 'undefined')) _ = require('underscore')._;
+    
     // Extend the underscore object and pass
     // it our hash of function mixins
     _.mixin({
@@ -70,4 +77,4 @@
             return text.replace(exp,"<a href='$1'>$1</a>"); 
         }
     });
-})(_)
+//})()

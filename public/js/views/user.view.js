@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // User views
     // ----------
     
@@ -13,12 +13,9 @@
   
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
-    var Views;
-    if (typeof exports !== 'undefined') {
-        module.exports = Views;
-    } else {
-        Views = root.Views || (root.Views = {});
-    }
+    var Views = root.Views;
+    if (typeof Views === 'undefined') Views = root.Views = {};
+    if (typeof exports !== 'undefined') module.exports = Views;
     
     //##User
     // Basic user view, used primarily for the list view 
@@ -331,4 +328,4 @@
             };
         }
     });
-})()
+//})()

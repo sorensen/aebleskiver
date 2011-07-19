@@ -1,23 +1,23 @@
-﻿//    Aebleskiver
+//    Aebleskiver
 //    (c) 2011 Beau Sorensen
 //    Aebleskiver may be freely distributed under the MIT license.
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Authentication Middleware
     // -------------------------
     
+    // Save a reference to the global object.
+    var root = this;
+    
     // The top-level namespace. All public classes and modules will
-    // be attached to this. Exported for both CommonJS and the browser.
-    var Auth;
-    if (typeof exports !== 'undefined') {
-        Auth = exports;
-    }
+    // be attached to this. 
+    var auth = root.auth;
     
     // Add to the main namespace with the Auth middleware
     // for DNode, accepts a socket client and connection
-    Auth = function(client, con) {
+    auth = function(client, con) {
         _.extend(this, {
         
             //###registered
@@ -34,8 +34,6 @@
         });
     };
     
-    // CommonJS browser export
-    if (typeof exports === 'undefined') {
-        this.Auth = Auth;
-    }
-})()
+    if (typeof root.auth === 'undefined') root.auth = auth;
+    if (typeof exports !== 'undefined') module.exports = auth;
+//})()

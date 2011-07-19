@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
+//(function() {
     // Room room Views
     // -----------------
     
@@ -13,12 +13,9 @@
   
     // The top-level namespace. All public classes and modules will
     // be attached to this. Exported for both CommonJS and the browser.
-    var Views;
-    if (typeof exports !== 'undefined') {
-        module.exports = Views;
-    } else {
-        Views = root.Views || (root.Views = {});
-    }
+    var Views = root.Views;
+    if (typeof Views === 'undefined') Views = root.Views = {};
+    if (typeof exports !== 'undefined') module.exports = Views;
     
     // Both the simple 'Room' view and the full 'MainRoom'
     // view share the same room model, with the main difference
@@ -133,7 +130,7 @@
                 .removeClass('active')
                 .removeClass('current')
                 .addClass('inactive');
-        },
+        }
     });
     
     //##RoomMainView
@@ -400,7 +397,7 @@
                 displayName : displayName,
                 avatar      : root.user.get('avatar')
             };
-        },
+        }
     });
     
     //##ConversationView
@@ -517,8 +514,6 @@
         //###toggleOpen
         toggleOpen : function() {
             $(this.el).toggleClass('open');
-        },
-    
+        }
     });
-    
-})()
+//})()
