@@ -35,12 +35,4 @@ Cluster('./app')
             pass : ''
         }))
     .in('production')
-        .use(Cluster.stats({ 
-            connections   : true, 
-            lightRequests : true 
-        }))
-        .use(Live({
-            user : 'admin',
-            pass : 'aebleskiver'
-        }))
         .listen(80);
