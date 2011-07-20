@@ -14,12 +14,11 @@ var Cluster  = require('cluster'),
 
 // Start the cluster
 Cluster('./app')
-    .set('socket path', __dirname + '/socks')
-    .use(Cluster.logger(__dirname + '/logs'))
-    .use(Cluster.pidfiles(__dirname + '/pids'))
     .set('workers', 4)
     .in('development')
-        .listen(8080)
+        .set('socket path', __dirname + '/socks')
+        .use(Cluster.logger(__dirname + '/logs'))
+        .use(Cluster.pidfiles(__dirname + '/pids'))
         .use(Cluster.cli())
         .use(Cluster.repl(8000))
         .use(Cluster.debug())
@@ -34,5 +33,6 @@ Cluster('./app')
             user : '',
             pass : ''
         }))
+        .listen(8080)
     .in('production')
         .listen(80);
