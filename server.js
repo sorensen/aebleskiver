@@ -10,9 +10,7 @@
 var Cluster  = require('cluster'),
     Live     = require('cluster-live'),
     Mongoose = require('mongoose');
-    
-// Connect to the database
-Mongoose.connect('mongodb://localhost/aebleskiver');
+
 
 // Start the cluster
 Cluster('./app')
@@ -37,6 +35,10 @@ Cluster('./app')
             pass : ''
         }))
     .in('production')
+        .use(Cluster.stats({ 
+            connections   : true, 
+            lightRequests : true 
+        }))
         .use(Live({
             user : 'admin',
             pass : 'aebleskiver'
