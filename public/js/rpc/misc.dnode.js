@@ -45,4 +45,4 @@
     
     if (typeof root.misc === 'undefined') root.misc = misc;
     if (typeof exports !== 'undefined') module.exports = misc;
-//})()
+//})();

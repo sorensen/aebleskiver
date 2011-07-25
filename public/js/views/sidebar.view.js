@@ -5,8 +5,8 @@
 //    https://github.com/sorensen/aebleskiver
 
 //(function() {
-    // Application view
-    // -----------------
+    // Sidebar view
+    // ------------
     
     // Save a reference to the global object.
     var root = this;
@@ -20,8 +20,13 @@
     // Extend the Backbone 'view' object and add it to the 
     // namespaced view container
     Views.SidebarView = Backbone.View.extend({
+    
+        //###templates
+        // Predefined markdown templates for dynamic rendering
+        template      : _.template($('#sidebar-template').html()),
+        statsTemplate : _.template($('#application-stats-template').html()),
         
-        //##Interaction events
+        //###events
         // These are all interaction events between the 
         // user and this view's DOM interface
         events : {
@@ -36,17 +41,17 @@
         // property, the event bindings below are programmatic listeners
         // to model and collection changes
         initialize : function(options) {
+            console.log('sidebar', this);
             _.bindAll(this, 
-                'render', 'toggleNav', 'statistics', 'addRoom', 
-                'createRoom', 'allRooms', 
-                'roomsReady', 'addUser', 'allUsers', 'usersReady',
+                'render', 'statistics', 
+                'addUser', 'allUsers', 'usersReady',
+                'allRooms','addRoom', 'roomsReady'
             );
+            console.log('sidebar', this);
 
-            this.model.sidebar = this;
-            
             // Application model event bindings
             this.model.bind('change',    this.statistics);
-            
+
             // User collection event bindings
             this.model.users.bind('subscribe', this.usersReady);
             this.model.users.bind('add',       this.addUser);
@@ -59,26 +64,36 @@
             this.model.rooms.bind('change',    this.statistics);
             this.model.rooms.bind('reset',     this.allRooms);
             
-            // Set shortcuts to collection DOM
-            this.searchInput      = this.$('#search');
-            this.userList         = this.$('#users');
-            this.roomList         = this.$('#rooms');
-            this.sidebar          = this.$('#sidebar');
-            this.mainContent      = this.$('#main-content');
+            this.render();
             
-            // Internal sidebar settings, pull settings
-            // from the cookie and bootstrap if required
-            this.menuOpen = $.cookie('menuOpen')      || 'false';
-            if (this.menuOpen === 'true') {
-                $(this.el).addClass('menuOpen');
-            }
+            // Set shortcuts to collection DOM
+            this.searchInput = this.$('#search');
+            this.userList    = this.$('#users');
+            this.roomList    = this.$('#rooms');
+            this.stats       = this.$('#app-stats');
+            
+            console.log('sidebar', this);
         },
         
         //###render
         // Render template contents onto the DOM, adding
         // any effects afterwards, such as icons
         render : function() {
-            _.icon('power', 'start-menu-icon');
+            var highlight = {
+                    fill : {
+                        fill   : "#A90000", 
+                        stroke : "none"
+                    },
+                    none : {
+                        fill    : "#9A0000", 
+                        opacity : 0
+                    }
+                };
+            
+            this.icons = {
+                users : _.icon('chat',  'show-rooms', highlight),
+                rooms : _.icon('users', 'show-users', highlight)
+            };
             return this;
         },
         
@@ -91,28 +106,13 @@
                 totalUsers  = this.model.users.length || 0,
                 totalRooms  = this.model.rooms.length || 0;
             
-            this.$('#app-stats').html(Mustache.to_html(this.statsTemplate(), {
+            this.stats.html(Mustache.to_html(this.statsTemplate(), {
                 totalOnline : totalOnline,
                 totalUsers  : totalUsers,
                 totalRooms  : totalRooms,
                 version     : this.version
             }));
             return this;
-        },
-        
-        //###toggleSidebar
-        // Open or close the sidebar menu, setting a cookie
-        // to remember the setting
-        toggleSidebar : function() {
-            if (this.menuOpen == 'true') {
-                this.menuOpen = 'false';
-                $(this.el).removeClass('menuOpen');
-            }
-            else {
-                this.menuOpen = 'true';
-                $(this.el).addClass('menuOpen');
-            }
-            $.cookie('menuOpen', this.menuOpen);
         },
         
         //###searchOnEnter
@@ -146,9 +146,6 @@
         allRooms : function(rooms) {
             this.roomList.html('');
             this.model.rooms.each(this.addRoom);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###showRooms
@@ -167,16 +164,14 @@
             
             this.roomList
                 .append(view.el);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###deactivateRoom
         // Remove the current active room from the view,
         // as well as the DOM
         deactivateRoom : function() {
-            this.mainContent
+            console.log('deactivate', this);
+            this.view.mainContent
                 //.fadeOut(50, function(){
                 //    $(this).html('');
                 //});
@@ -185,6 +180,7 @@
             
             // Join Channel
             this.activeRoom && this.activeRoom.remove();
+            console.log('deactivate', this);
         },
         
         //###activateRoom
@@ -214,34 +210,30 @@
             this.activeRoom.view = this;
             
             var self = this;
-            this.mainContent
+            this.view.mainContent
                 .html(self.activeRoom.el)
                 .show();
             
-            // Create the icons for this view, should be done 
-            // on the room view, but the app needs to load it 
-            // into view first before icons can be loaded.
-            _.icon('view',   'add-favorite')
-            _.icon('noview', 'remove-favorite')
-            _.icon('cross',  'leave-room')
-            _.icon('quote',  'message-submit');
-            
             model[0].view && model[0].view.activate();
+            
+            this.activeRoom.icons = {
+                'watch'   : _.icon('view',   'add-favorite'),
+                'unwatch' : _.icon('noview', 'remove-favorite'),
+                'exit'    : _.icon('cross',  'leave-room'),
+                'send'    : _.icon('quote',  'message-submit')
+            };
         },
         
         //###usersReady
         // Users collection has been subscribed to
         usersReady : function() {
-            // Online user test
-            this.server.onlineUsers(function(resp) {
-                // Placeholder
-            });
+            // Placeholder
         },
         
         //###deactivateRoom
         // Remove user profile from DOM and view
         deactivateUser : function() {
-            this.mainContent
+            this.view.mainContent
                 .fadeOut(50, function(){
                     $(this).html('');
                 });
@@ -253,13 +245,11 @@
         // Show the user profile / main view
         activateUser : function(params) {
             this.deactivateUser();
-            
-            // Get model by ID
             var model = this.model.users.filter(function(user) {
                 return user.get('username') === params
                     || user.get('_id') === params;
             });
-            console.log('activateUser', model);
+
             if (!model || !model[0]) {
                 this.router.invalid();
                 return;
@@ -268,27 +258,23 @@
             this.activeUser = new Views.UserMainView({
                 model : model[0]
             });
-            console.log('activateUser', this.activeUser);
             
             // Make view accessable to inner-view
             this.activeUser.view = this;
             
             var self = this;
-            this.mainContent
+            this.view.mainContent
                 .html(self.activeUser.el)
                 .show()
                 .find('.avatar')
                 .fadeIn(1500);
-                
-            // Create the icons for this view, should be done 
-            // on the room view, but the app needs to load it 
-            // into view first before icons can be loaded.
-            _
-                .icon('star',  'add-friend')
-                .icon('star2', 'remove-friend')
-                .icon('mail',  'send-message')
-                .icon('cross', 'leave-profile')
-                .icon('quote', 'post-submit');
+            
+            this.activeUser.icons = {
+                'watch'   : _.icon('view',   'add-favorite'),
+                'unwatch' : _.icon('noview', 'remove-favorite'),
+                'exit'    : _.icon('cross',  'leave-room'),
+                'send'    : _.icon('quote',  'message-submit')
+            };
         },
         
         //###showUsers
@@ -303,9 +289,6 @@
         allUsers : function(users) {
             this.userList.html('');
             this.model.users.each(this.addUser);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###addUser
@@ -317,9 +300,6 @@
             
             this.userList
                 .append(view.el);
-            
-            // Refresh model statistics
-            this.statistics();
         }
     });
-//})()
+//})();

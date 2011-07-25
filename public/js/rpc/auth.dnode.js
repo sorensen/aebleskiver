@@ -36,4 +36,4 @@
     
     if (typeof root.auth === 'undefined') root.auth = auth;
     if (typeof exports !== 'undefined') module.exports = auth;
-//})()
+//})();

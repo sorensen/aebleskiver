@@ -86,4 +86,4 @@
             return new Date(message.get('created')).getTime();
         }
     });
-//})()
+//})();

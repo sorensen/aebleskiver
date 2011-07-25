@@ -516,4 +516,4 @@
             $(this.el).toggleClass('open');
         }
     });
-//})()
+//})();

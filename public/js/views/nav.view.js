@@ -5,8 +5,8 @@
 //    https://github.com/sorensen/aebleskiver
 
 //(function() {
-    // Application view
-    // -----------------
+    // Navigation view
+    // ---------------
     
     // Save a reference to the global object.
     var root = this;
@@ -21,14 +21,15 @@
     // namespaced view container
     Views.NavigationView = Backbone.View.extend({
     
-        //###Templates
+        //###templates
         // Predefined markdown templates for dynamic rendering
-        loginTemplate        : _.template($('#login-template').html()),
-        signupTemplate       : _.template($('#signup-template').html()),
-        settingsTemplate     : _.template($('#settings-template').html()),
-        createRoomTemplate   : _.template($('#create-room-template').html()),
+        template           : _.template($('#navigation-template').html()),
+        loginTemplate      : _.template($('#login-template').html()),
+        signupTemplate     : _.template($('#signup-template').html()),
+        settingsTemplate   : _.template($('#settings-template').html()),
+        createRoomTemplate : _.template($('#create-room-template').html()),
         
-        //##Interaction events
+        //###events
         // These are all interaction events between the 
         // user and this view's DOM interface
         events : {
@@ -63,15 +64,15 @@
         // property, the event bindings below are programmatic listeners
         // to model and collection changes
         initialize : function(options) {
-            this.server = options.server;
+            console.log('nav', this);
         
             _.bindAll(this, 
-                'render', 'toggleNav',
+                'render', 'toggleNav', 
                 'showCreateRoom', 'createRoom',
                 'authenticate', 'register', 'logout'
             );
-            this.model.navigation = this;
             this.render();
+            console.log('nav', this);
             
             // Set shortcuts to collection DOM
             this.loginDialog      = this.$('#login-dialog');
@@ -80,6 +81,7 @@
             this.settingsDialog   = this.$('#settings-dialog');
             this.overlay          = this.$('#overlay');
             
+            console.log('nav', this);
             // Navigation items for authentication toggling
             this.nav = {
                 signup     : this.$('#signup'),
@@ -88,8 +90,7 @@
                 settings   : this.$('#settings'),
                 createRoom : this.$('#create-room')
             };
-            this.nav.settings.hide();
-            this.nav.logout.hide();
+            console.log('nav', this);
         },
         
         //###render
@@ -98,13 +99,21 @@
         render : function() {
             var options = {
                 width  : 20,
-                height : 20
+                height : 20,
+                fill : {
+                    fill   : "#333", 
+                    stroke : "none"
+                },
+                none : {
+                    fill    : "#000", 
+                    opacity : 0
+                }
             };
-            
             // Create the icons for this view
-            _.icon('home', 'home', options)
-            _.icon('run', 'settings', options)
-            
+            this.icons = {
+                home     : _.icon('home', 'home', options),
+                settings : _.icon('run', 'settings', options)
+            };
             return this;
         },
         
@@ -114,13 +123,6 @@
             if (e.keyCode == 27) {
                 this.hideDialogs();
             }
-        },
-        
-        //###hideDialogs
-        // Remove all defined dialoges from the view
-        hideDialogs : function() {
-            this.$('.dialog').hide();
-            this.overlay.hide();
         },
         
         //###toggleNav
@@ -133,39 +135,11 @@
             this.nav.createRoom.fadeIn(150);
         },
         
-        //###createRoom
-        // Create new room room
-        createRoom : function() {
-            // User input
-            var name        = this.$('input[name="room"]'),
-                restricted  = this.$('input[name="restricted"]'),
-                description = this.$('textarea[name="description"]');
-            
-            // Validation
-            if (!name.val()) return;
-            
-            // Delegate to Backbone.sync
-            this.model.createRoom({
-                name        : name.val(),
-                user_id     : user.get('id') || user.id,
-                restricted  : restricted.val(),
-                description : description.val()
-            });
-            
-            // Should probably pass this in a success function
-            this.createRoomDialog.fadeOut(150);
+        //###hideDialogs
+        // Remove all defined dialoges from the view
+        hideDialogs : function() {
+            this.$('.dialog').hide();
             this.overlay.hide();
-            
-            // Reset fields
-            name.val('');
-            restricted.val('');
-            description.val('');
-        },
-        
-        //###createRoomOnEnter
-        // Create room keystroke listener
-        createRoomOnEnter : function(e) {
-            if (e.keyCode == 13) this.createRoom();
         },
         
         //###showCreateRoom
@@ -202,6 +176,41 @@
                 .find('input[name="room"]').focus();
         },
         
+        //###createRoom
+        // Create new room room
+        createRoom : function() {
+            // User input
+            var name        = this.$('input[name="room"]'),
+                restricted  = this.$('input[name="restricted"]'),
+                description = this.$('textarea[name="description"]');
+            
+            // Validation
+            if (!name.val()) return;
+            
+            // Delegate to Backbone.sync
+            this.model.createRoom({
+                name        : name.val(),
+                user_id     : root.user.get('id') || root.user.id,
+                restricted  : restricted.val(),
+                description : description.val()
+            });
+            
+            // Should probably pass this in a success function
+            this.createRoomDialog.fadeOut(150);
+            this.overlay.hide();
+            
+            // Reset fields
+            name.val('');
+            restricted.val('');
+            description.val('');
+        },
+        
+        //###createRoomOnEnter
+        // Create room keystroke listener
+        createRoomOnEnter : function(e) {
+            if (e.keyCode == 13) this.createRoom();
+        },
+
         //###showSettings
         // Show the login form
         showSettings : function() {
@@ -209,7 +218,7 @@
             this.hideDialogs();
             this.overlay.fadeIn(150);
             this.settingsDialog
-                .html(Mustache.to_html(this.settingsTemplate(), user.toJSON()))
+                .html(Mustache.to_html(this.settingsTemplate(), root.user.toJSON()))
                 .fadeIn(150, function() {
                 
                     // Apply happy validation schema, this might be 
@@ -248,7 +257,7 @@
                     displayName : this.$('input[name="displayname"]').val()
                 };
             
-            user.save(data, {
+            root.user.save(data, {
                 channel  : 'app:users',
                 finished : function(resp) {
                 }
@@ -312,7 +321,7 @@
                     },
                 };
             
-            user.authenticate(data, options, function(resp) {
+            root.user.authenticate(data, options, function(resp) {
                 self.toggleNav();
             });
             this.loginDialog.hide();
@@ -383,7 +392,7 @@
                     }
                 };
             
-            user.register(data, options, function(resp) {
+            root.user.register(data, options, function(resp) {
                 self.toggleNav();
             });
             this.signupDialog.hide();
@@ -400,15 +409,15 @@
         // Destroy the current user object and restore original
         // navigation display
         logout : function() {
-            user.logout({
-                token : this.sid
+            root.user.logout({
+                token : this.view.sid
             });
             
             this.friendList.html('');
             this.favoriteList.html('');
-            user = new Models.UserModel();
-            
             this.conversationList.html('');
+
+            root.user = new Models.UserModel();
             root.user.conversations = new Models.ConversationCollection();
             
             this.nav.signup.fadeIn(150);
@@ -417,4 +426,4 @@
             this.nav.logout.fadeOut(150);
         }
     });
-//})()
+//})();

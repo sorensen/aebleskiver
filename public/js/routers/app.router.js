@@ -20,6 +20,7 @@
     // Main controller and router
     Routers.Application = Backbone.Router.extend({
     
+        //###routes
         // Definitions
         routes : {
             '/rooms/:id' : 'joinRoom',
@@ -30,27 +31,27 @@
             //'*uri'       : 'invalid',
         },
         
+        //###initialize
         initialize : function(options) {
-            // Attach the application
             this.view = new Views.ApplicationView({
-                el     : $('#application'),
-                server : options.server || false
+                el : $('#application')
             });
-            
-            // Circular reference
             this.view.router = this;
         },
         
+        //###home
         home : function() {
             this.view.deactivateRoom();
         },
         
+        //###invalid
         // Default action
         invalid : function(uri) {
             console.log('invalid route: ', uri);
             this.navigate('/', true);
         },
         
+        //###joinRoom
         // Join a room room
         joinRoom : function(id) {
         
@@ -59,22 +60,13 @@
             this.view.activateRoom(id);
         },
         
+        //###viewProfile
         // View a user profile
         viewProfile : function(id) {
         
             // Make sure that the room has been 
             // loaded by the application first
             this.view.activateUser(id);
-        },
-        
-        // Show the login form
-        login : function() {
-            this.view.showLogin();
-        },
-        
-        // Show the login form
-        signup : function() {
-            this.view.showSignup();
-        },
+        }
     });
-//})()
+//})();

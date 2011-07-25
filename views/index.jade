@@ -1,135 +1,4 @@
-#map(style='width:500px;height:500px;z-index:9999;')
 #application
-  .wrapper
-    #header
-      nav#navigation
-        a#home.icon(href='/#/', title='Home', accesskey='H')&nbsp;
-        a#create-room(accesskey='C') Create Room
-        a#login(accesskey='L') Login
-        a#signup(accesskey='J') Join
-        a#settings.icon(title='Settings', accesskey='E')&nbsp;
-        a#logout(accesskey='O') Logout
-    
-    #sidebar-wrapper
-      a.heart(href='/')
-        .heart-left
-        .heart-right
-        .heart-content
-        
-      #sidebar
-        #sidebar-controls
-      
-        #sidebar-up
-          button#show-rooms(accesskey='R') Rooms
-          button#show-users(accesskey='U') Users
-        
-        #sidebar-content
-          #users
-          #rooms
-        
-        #search-form
-          button#search-now Go
-          .input-wrap
-            input#search(type='text', name='search', placeholder='Search', accesskey='S')
-          
-        #sidebar-down
-          //.statistics#app-stats
-    
-    #main
-      #main-tabs
-        button#news News
-        button#help Help
-        
-      #main-controls
-        .main-controls
-          button.new-room Create Channel
-        
-        .layout-controls
-          button.list List
-      
-      #main-content
-      #welcome-text
-        #fork-me
-          a.ribbon(href='https://github.com/sorensen/aebleskiver')
-            span Fork me on GitHub
-        
-        h1.title Welcome to &AElig;bleskiver!
-        p
-          | This is a real-time chat application, built with
-          | the Express.js and Backbone.js frameworks.
-          
-        p
-          | You can load up a chat room by clicking on one of
-          | the links in the sidebar menu.  There is also a 
-          | persistant members list there as well, where you 
-        
-        p
-          | Chat rooms and user profiles can either be added 
-          | as a 'favorite' or a 'friend', which are then 
-          | added to the lists on the bottom bar.
-        
-        p
-          | You may create your own chat room, which can be 
-          | then linked to for you and your friends. If too 
-          | many rooms appear, you can use the search bar below
-          | the list to filter them.  Room 'titles' and 
-          | 'descriptions' are both indexed.
-      
-  .dialog-wrapper#create-room-dialog
-  .dialog-wrapper#login-dialog
-  .dialog-wrapper#signup-dialog
-  .dialog-wrapper#settings-dialog
-  #footer
-    #start-menu
-      #start-menu-icon.icon(title='Menu', accesskey='M')
-      //.button.title.submit Menu
-      //  .heart(href='/')
-      //    .heart-left
-      //    .heart-right
-      //    .heart-content
-    
-    #friend-list
-      #friends-icon.icon(title='Friends', accesskey='F')
-      //.button.title Friends
-      .friend-wrapper
-        .heading Your Friends
-        .controls
-          .open
-          .close
-        .friends
-        
-    #favorite-list
-      #favorites-icon.icon(title='Favorites', accesskey='A')
-      //.button.title Favorites
-      .favorite-wrapper
-        .heading Your Favorites
-        .controls
-          .open
-          .close
-        .favorites
-    
-    #statistics
-      #stats-icon.icon(title='Statistics', accesskey='T')
-      .stats-wrapper
-        .heading Statistics
-        .controls
-          .open
-          .close
-        .stats
-          #app-stats.statistics
-    
-    #github
-      a(href='https://github.com/sorensen/aebleskiver', title='Fork me on GitHub!', accesskey='G')
-        #github-icon.icon
-      
-    #conversations
-    
-    #copyright
-      p &copy;
-    #authors
-      p.author Beau Sorensen
-  #overlay
-
 #templates!= partial('micros')
 
 //- Dependencies
@@ -164,8 +33,38 @@ script(type='text/javascript')
 //script(src='/js/rpc/avatar.dnode.js')
 //script(src='/js/rpc/misc.dnode.js')
 
+//- Helpers
+script(src='/js/google.js')
+script(src='/js/helpers.js')
+script(src='/js/icons.js')
+
+//- DNode Middleware
+script(src='/js/rpc/auth.dnode.js')
+script(src='/js/rpc/misc.dnode.js')
+script(src='/js/rpc/avatar.dnode.js')
+
+//- Models
+script(src='/js/models/message.model.js')
+script(src='/js/models/room.model.js')
+script(src='/js/models/user.model.js')
+script(src='/js/models/notification.model.js')
+script(src='/js/models/app.model.js')
+
+//- Views
+script(src='/js/views/user.view.js')
+script(src='/js/views/message.view.js')
+script(src='/js/views/room.view.js')
+script(src='/js/views/notification.view.js')
+script(src='/js/views/app.view.js')
+script(src='/js/views/nav.view.js')
+script(src='/js/views/sidebar.view.js')
+script(src='/js/views/footer.view.js')
+
+//- Routers
+script(src='/js/routers/app.router.js')
+
 //- Start application
-//script(src='/js/init.js')
+script(src='/js/init.js')
 
 //- Bootstrapped server settings
 script(type='text/javascript')

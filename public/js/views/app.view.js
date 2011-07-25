@@ -21,6 +21,8 @@
     // namespaced view container
     Views.ApplicationView = Backbone.View.extend({
     
+        el : $('#application'),
+    
         //###Templates
         // Predefined markdown templates for dynamic rendering
         template             : _.template($('#application-template').html()),
@@ -77,8 +79,6 @@
         // property, the event bindings below are programmatic listeners
         // to model and collection changes
         initialize : function(options) {
-            this.server = options.server;
-        
             _.bindAll(this, 
                 'render', 'toggleNav', 'statistics', 'addRoom', 
                 'showCreateRoom', 'createRoom', 'allRooms', 
@@ -91,9 +91,7 @@
 
             // Create and bind the application model to this view,
             // then create a circular reference for traversing
-            this.model = new Models.ApplicationModel({
-                server : this.server
-            });
+            this.model = new Models.ApplicationModel();
             this.model.view = this;
             
             // Application model event bindings
@@ -177,7 +175,9 @@
         // Render template contents onto the DOM, adding
         // any effects afterwards, such as icons
         render : function() {
-            var options = {
+            var content = this.model.toJSON(),
+                view    = Mustache.to_html(this.template(), content),
+                options = {
                     width  : 20,
                     height : 20,
                     fill : {
@@ -200,6 +200,8 @@
                     }
                 };
             
+            this.el.html(view);
+            
             // Enable access keys
             KeyCandy.init('#application', {
                 // Set the control key and menu key to
@@ -211,23 +213,10 @@
                 removeKey  : 16
             });
             
-            _.icon('home', 'map', {
-                width : 500,
-                height : 500
-            });
             // Create the icons for this view
-            _.icon('home', 'home', options);
-            _.icon('run', 'settings', options);
-            _.icon('power', 'start-menu-icon', {
-                fill : {
-                    fill   : "#333", 
-                    stroke : "none"
-                },
-                none : {
-                    fill    : "#000", 
-                    opacity : 0
-                }
-            });
+            _.icon('home',       'home', options);
+            _.icon('run',        'settings', options);
+            _.icon('power',      'start-menu-icon');
             _.icon('slideshare', 'friends-icon');
             _.icon('bookmark',   'favorites-icon');
             _.icon('i',          'stats-icon');
@@ -596,10 +585,7 @@
         //###usersReady
         // Users collection has been subscribed to
         usersReady : function() {
-            // Online user test
-            this.server.onlineUsers(function(resp) {
-                // Placeholder
-            });
+            // Placeholder
         },
         
         //###deactivateRoom
@@ -623,7 +609,6 @@
                 return user.get('username') === params
                     || user.get('_id') === params;
             });
-            console.log('activateUser', model);
             if (!model || !model[0]) {
                 this.router.invalid();
                 return;
@@ -632,7 +617,6 @@
             this.activeUser = new Views.UserMainView({
                 model : model[0]
             });
-            console.log('activateUser', this.activeUser);
             
             // Make view accessable to inner-view
             this.activeUser.view = this;
@@ -727,9 +711,6 @@
         allUsers : function(users) {
             this.userList.html('');
             this.model.users.each(this.addUser);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###addUser
@@ -741,9 +722,6 @@
             
             this.userList
                 .append(view.el);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###showLogin

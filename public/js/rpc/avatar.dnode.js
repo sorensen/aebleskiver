@@ -31,4 +31,4 @@
     
     if (typeof root.avatar === 'undefined') root.avatar = avatar;
     if (typeof exports !== 'undefined') module.exports = avatar;
-//})()
+//})();

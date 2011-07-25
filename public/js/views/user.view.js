@@ -54,6 +54,7 @@
             }
             var view = Mustache.to_html(this.template(), content);
             $(this.el).html(view);
+
             return this;
         },
         
@@ -182,6 +183,15 @@
             // Set shortcut methods for DOM items
             this.input    = this.$('.create-post');
             this.postList = this.$('.posts');
+            
+            /**
+            this.icons = {
+                watch   : _.icon('view',   'add-favorite'),
+                unwatch : _.icon('noview', 'remove-favorite'),
+                leave   : _.icon('cross',  'leave-room'),
+                send    : _.icon('quote',  'message-submit')
+            };
+            **/
             this.input.focus();
         },
         
@@ -328,4 +338,4 @@
             };
         }
     });
-//})()
+//})();

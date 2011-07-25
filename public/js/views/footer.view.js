@@ -5,8 +5,8 @@
 //    https://github.com/sorensen/aebleskiver
 
 //(function() {
-    // Application view
-    // -----------------
+    // Footer view
+    // -----------
     
     // Save a reference to the global object.
     var root = this;
@@ -20,8 +20,12 @@
     // Extend the Backbone 'view' object and add it to the 
     // namespaced view container
     Views.FooterView = Backbone.View.extend({
+    
+        //###templates
+        // Predefined markdown templates for dynamic rendering
+        template : _.template($('#footer-template').html()),
         
-        //##Interaction events
+        //###events
         // These are all interaction events between the 
         // user and this view's DOM interface
         events : {
@@ -35,13 +39,14 @@
         // property, the event bindings below are programmatic listeners
         // to model and collection changes
         initialize : function(options) {
+            console.log('footer', this);
             _.bindAll(this, 
-                'render', 'statistics', 'toggleSidebar',
+                'render', 'toggleSidebar',
                 'toggleFriendList', 'allFriends', 'addFriend',
                 'toggleFavoriteList', 'allFavorites', 'addFavorite',
                 'conversationsReady', 'allConversations', 'addConversation'
             );
-            this.model.footer = this;
+            this.model.footerView = this;
             
             // Conversation event bindings
             root.user.conversations.bind('subscribe', this.coversationsReady);
@@ -59,29 +64,33 @@
             
             // Internal sidebar settings, pull settings
             // from the cookie and bootstrap if required
+            this.menuOpen      = $.cookie('menuOpen')      || 'false';
             this.friendsOpen   = $.cookie('friendsOpen')   || 'false';
             this.favoritesOpen = $.cookie('favoritesOpen') || 'false';
             
+            if (this.menuOpen === 'true') {
+                $(this.view.el).addClass('menuOpen');
+            }
             if (this.friendsOpen === 'true') {
                 this.friends.addClass('open');
             }
             if (this.favoritesOpen === 'true') {
                 this.favorites.addClass('open');
             }
+            console.log('footer', this);
         },
         
         //###render
         // Render template contents onto the DOM, adding
         // any effects afterwards, such as icons
         render : function() {
-            _.icon('power',      'start-menu-icon');
-            _.icon('slideshare', 'friends-icon');
-            _.icon('bookmark',   'favorites-icon');
-            _.icon('i',          'stats-icon');
-            _.icon('github',     'github-icon');
-            _.icon('chat',       'show-rooms');
-            _.icon('users',      'show-users');
-            
+            this.icons = {
+                friends   : _.icon('slideshare', 'friends-icon'),
+                favorites : _.icon('bookmark',   'favorites-icon'),
+                stats     : _.icon('i',          'stats-icon'),
+                github    : _.icon('github',     'github-icon'),
+                menu      : _.icon('power',      'start-menu-icon')
+            };
             return this;
         },
         
@@ -126,9 +135,6 @@
         allFriends : function(friends) {
             this.friendList.html('');
             user.friends.each(this.addFriend);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###addFriend
@@ -167,9 +173,6 @@
         allFavorites : function(favorites) {
             this.favoriteList.html('');
             user.favorites.each(this.addFavorite);
-            
-            // Refresh model statistics
-            this.statistics();
         },
         
         //###addFavorite
@@ -185,7 +188,7 @@
         
         //###conversationsReady
         // Conversations have been subscribed to
-        conversationsReady : function(resp) {
+        conversationsReady : function() {
             // Placeholder
         },
         
@@ -207,4 +210,4 @@
                 .append(view.el);
         }
     });
-//})()
+//})();
