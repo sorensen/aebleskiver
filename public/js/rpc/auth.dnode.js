@@ -11,6 +11,10 @@
     // Save a reference to the global object.
     var root = this;
     
+    // Require Underscore, if we're on the server, and it's not already present.
+    var _ = root._;
+    if (!_ && (typeof require !== 'undefined')) _ = require('underscore')._;
+
     // The top-level namespace. All public classes and modules will
     // be attached to this. 
     var auth = root.auth;
