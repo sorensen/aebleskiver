@@ -9,19 +9,20 @@
 require.paths.unshift(__dirname + '/lib');
 
 // Project dependencies
-var express           = require('express'),
-    SessionStore      = require('connect-mongodb'),
-    Mongoose          = require('mongoose'),
-    Redis             = require('redis'),
-    Schemas           = require('schemas'),
-    middleware        = require('backbone-dnode'),
-    DNode             = require('dnode'),
-    browserify        = require('browserify'),
-    middleware.avatar = require('backbone-avatar'),
-    middleware.misc   = require('backbone-misc'),
-    middleware.auth   = require('backbone-auth'),
-    app               = module.exports = express.createServer();
+var express      = require('express'),
+    SessionStore = require('connect-mongodb'),
+    Mongoose     = require('mongoose'),
+    Redis        = require('redis'),
+    Schemas      = require('schemas'),
+    middleware   = require('backbone-dnode'),
+    DNode        = require('dnode'),
+    browserify   = require('browserify'),
+    app          = module.exports = express.createServer();
     
+middleware.avatar = require('backbone-avatar');
+middleware.misc   = require('backbone-misc');
+middleware.auth   = require('backbone-auth');
+
 // Configuration settings
 var cookieAge    = 60000 * 60 * 1,
     cacheAge     = 60000 * 60 * 24 * 365,
