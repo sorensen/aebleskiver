@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Room room Views
     // -----------------
     
@@ -247,6 +247,7 @@
             this.model && this.model.remove();
             this.model.messages.unsubscribe();
             $(this.el).remove();
+            return this;
         },
         
         //###statistics
@@ -273,19 +274,15 @@
                 || this.model.get('id') == root.user.id) {
                 return;
             }
-            var favorites = root.user.get('favorites') || [],          
-                find = _.indexOf(favorites, this.model.get('id'));
-            
-            if (find !== -1) {
-                return;
+            var favorites = root.user.get('favorites') || [],
+                found = _.indexOf(favorites, this.model.get('id'));
+                
+            if (!!~found) {            
+                favorites.push(this.model.get('id'));
+                root.user.set({favorites : _.unique(favorites)}).save();
+                root.user.favorites.add(this.model);
             }
-            favorites.push(this.model.get('id'));
-            
-            root.user.set({
-                favorites : _.unique(favorites)
-            }).save();
-            
-            root.user.favorites.add(this.model);
+            return this;
         },
         
         //###removeFromFavorites
@@ -305,13 +302,10 @@
             
             // Remove from model and save to server
             root.user.favorites
-                .remove(this.model, {
-                    silent : true
-                })
-                .set({
-                    favorites : favorites
-                })
+                .remove(this.model, {silent : true})
+                .set({favorites : favorites})
                 .save();
+            return this;
         },
         
         //###leave
@@ -327,6 +321,7 @@
         concurrency : function(message) {
             message.concurrent = (message.get('user_id') === this.lastPoster) ? true : false;
             this.lastPoster = message.get('user_id');
+            return this;
         },
         
         //###allMessages
@@ -339,7 +334,9 @@
                 .messageList
                 .delay(400)
                 .stop()
-                .animate({scrollTop : this.messageList[0].scrollHeight}, 1000, 'easeInExpo');
+                .scrollTop(this.messageList[0].scrollHeight);
+                
+            return this;
         },
         
         //###addMessage
@@ -362,8 +359,9 @@
             if (position + buffer >= height) {
                 this.messageList
                     .stop()
-                    .animate({scrollTop : height}, 500, 'easeInExpo');
+                    .animate({scrollTop : height}, 200, 'easeInExpo');
             }
+            return this;
         },
         
         //###createMessage
@@ -373,12 +371,14 @@
             if (!this.input.val()) return;
             this.model.messages.create(this.newAttributes());
             this.input.val('');
+            return this;
         },
         
         //###createMessageOnEnter
         // Create message keystroke listener
         createMessageOnEnter : function(e) {
             if (e.keyCode == 13) this.createMessage();
+            return this;
         },
         
         //###newAttributes
@@ -516,4 +516,5 @@
             $(this.el).toggleClass('open');
         }
     });
-//})();
+
+}).call(this)

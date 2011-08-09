@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Helper functions
     // ----------------
 
@@ -54,4 +54,5 @@
             return text.replace(exp,"<a href='$1'>$1</a>"); 
         }
     });
-//})()
+
+}).call(this)

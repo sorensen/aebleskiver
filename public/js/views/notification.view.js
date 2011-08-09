@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Notification view
     // -----------------
     
@@ -53,10 +53,9 @@
             
             // Post-formatting, done here as to prevent conflict
             // with Mustache HTML entity escapement
-            this.$('.message')
-                .html(Helpers.linkify(content.text));
-            
+            this.$('.message').html(Helpers.linkify(content.text));
             return this;
         }
     });
-//})();
+
+}).call(this)

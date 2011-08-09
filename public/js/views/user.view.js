@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // User views
     // ----------
     
@@ -230,18 +230,13 @@
             var friends = user.get('friends') || [],
                 find    = _.indexOf(friends, this.model.get('id'));
             
-            if (find !== -1) {
-                return;
+            if (!!~find) {
+                // Make sure we are not duplicating any friends by 
+                // ensuring that the array of keys is unique
+                friends.push(this.model.get('id'));
+                user.set({friends : _.unique(friends)}).save();
+                user.friends.add(this.model);
             }
-            friends.push(this.model.get('id'));
-            
-            // Make sure we are not duplicating any friends by 
-            // ensuring that the array of keys is unique
-            user.set({
-                friends : _.unique(friends)
-            }).save();
-            
-            user.friends.add(this.model);
         },
         
         //###removeFromFriends
@@ -261,12 +256,8 @@
             
             // Remove from model and save to server
             user.friends
-                .remove(this.model, {
-                    silent : true
-                })
-                .set({
-                    friends : friends
-                })
+                .remove(this.model, {silent : true})
+                .set({friends : friends})
                 .save();
         },
         
@@ -338,4 +329,5 @@
             };
         }
     });
-//})();
+
+}).call(this)

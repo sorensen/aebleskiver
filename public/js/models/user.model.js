@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // User model
     // ----------
     
@@ -173,4 +173,5 @@
         url  : 'users',
         sync : _.sync
     });
-//})();
+
+}).call(this)

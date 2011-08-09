@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Sidebar view
     // ------------
     
@@ -302,4 +302,5 @@
                 .append(view.el);
         }
     });
-//})();
+
+}).call(this)

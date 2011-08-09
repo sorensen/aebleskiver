@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Application view
     // -----------------
     
@@ -179,25 +179,7 @@
                 view    = Mustache.to_html(this.template(), content),
                 options = {
                     width  : 20,
-                    height : 20,
-                    fill : {
-                        fill   : "#333", 
-                        stroke : "none"
-                    },
-                    none : {
-                        fill    : "#000", 
-                        opacity : 0
-                    }
-                },
-                highlight = {
-                    fill : {
-                        fill   : "#A90000", 
-                        stroke : "none"
-                    },
-                    none : {
-                        fill    : "#9A0000", 
-                        opacity : 0
-                    }
+                    height : 20
                 };
             
             this.el.html(view);
@@ -221,8 +203,8 @@
             _.icon('bookmark',   'favorites-icon');
             _.icon('i',          'stats-icon');
             _.icon('github',     'github-icon');
-            _.icon('chat',       'show-rooms', highlight);
-            _.icon('users',      'show-users', highlight);
+            _.icon('chat',       'show-rooms');
+            _.icon('users',      'show-users');
             
             return this;
         },
@@ -878,4 +860,5 @@
             this.nav.logout.fadeOut(150);
         }
     });
-//})()
+
+}).call(this)

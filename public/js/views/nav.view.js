@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Navigation view
     // ---------------
     
@@ -426,4 +426,5 @@
             this.nav.logout.fadeOut(150);
         }
     });
-//})();
+
+}).call(this)

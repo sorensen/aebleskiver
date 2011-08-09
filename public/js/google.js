@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Google API
     // ----------
 
@@ -38,4 +38,5 @@
     wf.type  = 'text/javascript';
     wf.async = 'true';
     s.parentNode.insertBefore(wf, s);
-//})();
+
+}).call(this)

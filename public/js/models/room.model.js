@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Room models
     // -----------
     
@@ -55,7 +55,7 @@
         // Client side read validation, allowed to view if
         // user ID is not contained in the 'banned' array
         allowedToView : function(user) {
-            return _.indexOf(this.get('banned'), user.get('id')) === -1;
+            return !~_.indexOf(this.get('banned'), user.get('id'));
         }
     });
     
@@ -76,7 +76,7 @@
         // Client side view validation, only allowed to view if
         // the user ID has been white-listed in the 'allowed' array
         allowedToView : function(user) {
-            return _.indexOf(this.get('allowed'), user.get('id')) !== -1
+            return !!~_.indexOf(this.get('allowed'), user.get('id'))
                 || user.get('id') === this.get('user_id');
         }
     });
@@ -128,4 +128,5 @@
         url   : 'conversations',
         type  : 'conversation'
     });
-//})();
+
+}).call(this)

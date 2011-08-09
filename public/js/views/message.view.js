@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Message view
     // ------------
     
@@ -80,4 +80,5 @@
             return this;
         }
     });
-//})();
+
+}).call(this)

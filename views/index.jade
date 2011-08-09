@@ -1,73 +1,40 @@
+//-   Aebleskiver
+//-   (c) 2011 Beau Sorensen
+//-   Aebleskiver may be freely distributed under the MIT license.
+//-   For all details and documentation:
+//-   https://github.com/sorensen/aebleskiver
+
 #application
 #templates!= partial('micros')
 
 //- Dependencies
-//script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
-//script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
-//script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
-//script(src='//cdn.wijmo.com/external/raphael-min.js')
-//script(src='/js/vendor/jquery.cookie.js')
-//script(src='/js/vendor/keyCandy.js')
-//script(src='/js/vendor/happy.js')
-//script(src='/js/vendor/happy.methods.js')
-//script(src='/js/vendor/jquery.cssemoticons.js')
-//script(src='/js/vendor/underscore.js')
-//script(src='/js/vendor/backbone.js')
-//script(src='/js/vendor/mustache.js')
-//script(src='/js/vendor/json2.js')
+script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
+script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
+script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
+script(src='//cdn.wijmo.com/external/raphael-min.js')
+script(src='/js/vendor/jquery.cookie.js')
+script(src='/js/vendor/keyCandy.js')
+script(src='/js/vendor/happy.js')
+script(src='/js/vendor/happy.methods.js')
+script(src='/js/vendor/jquery.cssemoticons.js')
+script(src='/js/vendor/underscore.js')
+script(src='/js/vendor/backbone.js')
+script(src='/js/vendor/mustache.js')
+script(src='/js/vendor/json2.js')
 
-script(src='/js/vendor.js')
+//script(src='/js/vendor.js')
 //script(src='/js/compiled.js')
+
 script(src='/core.js')
 script(type='text/javascript')
   var DNode      = require('dnode'),
       middleware = require('backbone-dnode');
 
-//- Helpers
-//script(src='/js/google.js')
-//script(src='/js/helpers.js')
-//script(src='/js/icons.js')
-
-//- DNode Middleware
-//script(src='/js/rpc/auth.dnode.js')
-//script(src='/js/rpc/avatar.dnode.js')
-//script(src='/js/rpc/misc.dnode.js')
-
-//- Helpers
-script(src='/js/google.js')
-script(src='/js/helpers.js')
-script(src='/js/icons.js')
-
-//- DNode Middleware
-script(src='/js/rpc/auth.dnode.js')
-script(src='/js/rpc/misc.dnode.js')
-script(src='/js/rpc/avatar.dnode.js')
-
-//- Models
-script(src='/js/models/message.model.js')
-script(src='/js/models/room.model.js')
-script(src='/js/models/user.model.js')
-script(src='/js/models/notification.model.js')
-script(src='/js/models/app.model.js')
-
-//- Views
-script(src='/js/views/user.view.js')
-script(src='/js/views/message.view.js')
-script(src='/js/views/room.view.js')
-script(src='/js/views/notification.view.js')
-script(src='/js/views/app.view.js')
-script(src='/js/views/nav.view.js')
-script(src='/js/views/sidebar.view.js')
-script(src='/js/views/footer.view.js')
-
-//- Routers
-script(src='/js/routers/app.router.js')
-
 //- Start application
-script(src='/js/init.js')
+//script(src='/js/init.js')
 
 //- Bootstrapped server settings
 script(type='text/javascript')
-  port    = '!{locals.port}';
-  token   = '!{locals.token}';
-  version = '!{locals.version}';
+  var port    = '!{locals.port}',
+      token   = '!{locals.token}',
+      version = '!{locals.version}';

@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Notification model
     // ------------------
     
@@ -49,4 +49,5 @@
             return new Date(message.get('created')).getTime();
         }
     });
-//})();
+
+}).call(this)

@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Footer view
     // -----------
     
@@ -210,4 +210,5 @@
                 .append(view.el);
         }
     });
-//})();
+
+}).call(this)

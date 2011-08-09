@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Application
     // ----------
     
@@ -69,4 +69,5 @@
             this.view.activateUser(id);
         }
     });
-//})();
+
+}).call(this)

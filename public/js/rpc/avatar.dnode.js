@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/backbone-dnode
 
-//(function() {
+(function() {
     // Avatar middleware
     // -----------------
     
@@ -31,4 +31,5 @@
     
     if (typeof root.avatar === 'undefined') root.avatar = avatar;
     if (typeof exports !== 'undefined') module.exports = avatar;
-//})();
+
+}).call(this)

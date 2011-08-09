@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Raphael icon support
     // --------------------
     
@@ -259,9 +259,7 @@
 
     // Add as an underscore mixin if it exists, otherwise 
     // attatch the function to the top level namespace
-    if (_ && typeof _ !== 'undefined') {
-        _.icon = factory;
-    } else {
-        root.icon = factory;
-    }
-//})();
+    if (_ && typeof _ !== 'undefined') _.icon = factory;
+    else root.icon = factory;
+
+}).call(this)

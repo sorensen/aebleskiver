@@ -50,28 +50,30 @@ var pub = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.opt
 // Configure our browserified bundles, seperating them out to 
 // related packages for ease of development and debugging
 var core = browserify({
-        require : [
+        ignore : [
             'underscore',
             'backbone',
+        ],
+        require : [
             'dnode',
             'backbone-dnode'
         ],
         entry : [
-            /**
             __dirname + '/public/js/models/message.model.js',
-            __dirname + '/public/js/models/room.model.js',
             __dirname + '/public/js/models/user.model.js',
             __dirname + '/public/js/models/app.model.js',
+            __dirname + '/public/js/models/room.model.js',
             
             __dirname + '/public/js/views/message.view.js',
             __dirname + '/public/js/views/room.view.js',
             __dirname + '/public/js/views/user.view.js',
             __dirname + '/public/js/views/app.view.js',
             __dirname + '/public/js/views/footer.view.js',
+            /**
             __dirname + '/public/js/views/nav.view.js',
             __dirname + '/public/js/views/sidebar.view.js',
             __dirname + '/public/js/views/notification.view.js',
-
+            **/
             __dirname + '/public/js/routers/app.router.js',
 
             __dirname + '/public/js/rpc/auth.dnode.js',
@@ -82,9 +84,9 @@ var core = browserify({
             __dirname + '/public/js/helpers.js',
             __dirname + '/public/js/icons.js',
             __dirname + '/public/js/init.js'
-            **/
         ],
-        mount   : '/core.js'
+        mount  : '/core.js',
+        filter : require('uglify-js')
     });
 
 // Create the mongo session store for express and 

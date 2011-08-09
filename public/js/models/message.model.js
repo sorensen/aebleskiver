@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Message models
     // --------------
     
@@ -86,4 +86,5 @@
             return new Date(message.get('created')).getTime();
         }
     });
-//})();
+
+}).call(this)

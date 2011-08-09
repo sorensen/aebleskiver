@@ -4,16 +4,19 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // App Initialization
     // ------------------
+
+    // Save a reference to the global object.
+    var root = this;
     
     // Predefined storage containers and connection
     // related placeholders
-    var Store = this.Store = {},
+    var connected  = false,
+        Store      = root.Store = {},
         initialize,
         refresh,
-        connected = false,
         
         // Create the application router, this will only
         // need to be created once, even if we reconnect
@@ -75,4 +78,5 @@
             });
     };
     initialize();
-//})()
+
+}).call(this)

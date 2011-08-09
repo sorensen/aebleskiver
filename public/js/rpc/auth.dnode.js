@@ -4,7 +4,7 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-//(function() {
+(function() {
     // Authentication Middleware
     // -------------------------
     
@@ -40,4 +40,5 @@
     
     if (typeof root.auth === 'undefined') root.auth = auth;
     if (typeof exports !== 'undefined') module.exports = auth;
-//})();
+
+}).call(this)
