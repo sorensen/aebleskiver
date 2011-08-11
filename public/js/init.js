@@ -4,10 +4,10 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
-    // App Initialization
-    // ------------------
+// App Initialization
+// ------------------
 
+(function() {
     // Save a reference to the global object.
     var root = this;
     
@@ -39,7 +39,9 @@
         };
     
     // Setup the reconnection handler for re-establishing the 
-    // DNode socket connection in case of disconnect
+    // DNode socket connection in case of disconnect, this can 
+    // likely be removed on the next update of DNode/Socket.io, 
+    // as reconnect methods are now built in
     var reconnect = function(client, con) {
     
         // Socket connection has been terminated

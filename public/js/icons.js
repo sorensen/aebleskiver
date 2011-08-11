@@ -4,10 +4,10 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
+// Raphael icon support
+// --------------------
+
 (function() {
-    // Raphael icon support
-    // --------------------
-    
     // Save a reference to the global object.
     var root = this;
     var _ = root._;

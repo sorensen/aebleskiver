@@ -4,10 +4,10 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
-    // Google API
-    // ----------
+// Google API
+// ----------
 
+(function() {
     // Font family definitions to be loaded, this should 
     // be trimmed to only the families used in production
     WebFontConfig = {
@@ -34,6 +34,7 @@
     // webfont declarations to be loaded
     var wf   = document.createElement('script'),
         s    = document.getElementsByTagName('script')[0];
+    
     wf.src   = '//ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
     wf.type  = 'text/javascript';
     wf.async = 'true';

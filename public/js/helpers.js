@@ -4,10 +4,10 @@
 //    For all details and documentation:
 //    https://github.com/sorensen/aebleskiver
 
-(function() {
-    // Helper functions
-    // ----------------
+// Helper functions
+// ----------------
 
+(function() {
     // Save a reference to the global object.
     var root = this;
   
