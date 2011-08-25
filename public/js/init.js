@@ -24,7 +24,7 @@
         
             // Wait for the DOM to render
             $(function() {
-                new Routers.Application({ 
+                root.App = new Routers.Application({ 
                     server : remote
                 });
             });

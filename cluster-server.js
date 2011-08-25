@@ -10,9 +10,8 @@
 var Cluster  = require('cluster')
     Live     = require('cluster-live');
 
-
 // Start the cluster
-Cluster('./app')
+Cluster('./server')
     .set('workers', 4)
     .in('development')
         .set('socket path', __dirname + '/socks')

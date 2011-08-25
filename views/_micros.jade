@@ -36,7 +36,7 @@ script#application-template(type='text/template')
         
         #search-form
           button#search-now Go
-          .input-wrap
+          span.input-wrap
             input#search(type='text', name='search', placeholder='Search', accesskey='S')
           
         #sidebar-down
@@ -135,6 +135,8 @@ script#application-template(type='text/template')
       p &copy;
     #authors
       p.author Beau Sorensen
+  #spinner
+    #inner-spinner
   #overlay
 //- Navigation
 script#navigation-template(type='text/template')
@@ -165,7 +167,7 @@ script#sidebar-template(type='text/template')
     
     #search-form
       button#search-now Go
-      .input-wrap
+      span.input-wrap
         input#search(type='text', name='search', placeholder='Search', accesskey='S')
       
     #sidebar-down
@@ -244,7 +246,7 @@ script#friend-chat-template(type='text/template')
   .messages
   .message-form
     button.submit Send
-    .input-wrap
+    span.input-wrap
       input.create-message(type='text', name='message', placeholder='Say something...', length='255')
     
 //- User profile
@@ -282,7 +284,7 @@ script#user-template(type='text/template')
      .posts
      .post-form
        .icon#post-submit(title='Submit Post')
-       .input-wrap
+       span.input-wrap
           input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255', accesskey='I')
     
 //- User listing
@@ -322,7 +324,7 @@ script#conversation-template(type='text/template')
   .messages
   .message-form
     button.submit Send
-    .input-wrap
+    span.input-wrap
       input.create-message(type='text', name='message', placeholder='Say something...', length='255')
   
 //- Room
@@ -345,7 +347,7 @@ script#room-template(type='text/template')
   .messages
   .message-form
     .icon#message-submit(title='Send Message')
-    .input-wrap
+    span.input-wrap
       input.create-message(type='text', name='message', placeholder='Say something...', length='255', accesskey='I')
 
 //- Room listing
@@ -393,31 +395,31 @@ script#settings-template(type='text/template')
     .content
       p
         label(for='settings-username') ID: 
-        .input-wrap
+        span.input-wrap
           input#settings-id(type='text', name='id', disabled='disabled', value='{{ id }}')
       p
         label(for='settings-username') Username: 
-        .input-wrap
+        span.input-wrap
           input#settings-username(type='text', name='username', disabled='disabled', value='{{ username }}')
       p
         label(for='settings-displayname') Display Name: (optional)
-        .input-wrap
+        span.input-wrap
           input#settings-displayname(type='text', name='displayname', value='{{ displayName }}')
       p
         label(for='settings-email') Email: 
-        .input-wrap
+        span.input-wrap
           input#settings-email(type='text', name='email', value='{{ email }}')
       p
         label(for='settings-bio') Bio: 
-        .input-wrap
+        span.input-wrap
           textarea#settings-bio(name='bio', rows='3') {{ bio }}
       p
         label(for='settings-password') Password: 
-        .input-wrap
+        span.input-wrap
           input#settings-password(type='password', name='password')
       p
         label(for='settings-password-confirm') Confirm Password: 
-        .input-wrap
+        span.input-wrap
           input#settings-password-confirm(type='password', name='password_confirm')
     .controls
       button.submit#settings-submit Save
@@ -431,19 +433,19 @@ script#signup-template(type='text/template')
     .content
       p
         label(for='signup-username') Username: 
-        .input-wrap
+        span.input-wrap
           input#signup-username(type='text', name='username')
       p
         label(for='signup-displayname') Display Name: (optional)
-        .input-wrap
+        span.input-wrap
           input#signup-displayname(type='text', name='displayname')
       p
         label(for='signup-email') Email: 
-        .input-wrap
+        span.input-wrap
           input#signup-email(type='text', name='email')
       p
         label(for='signup-password') Password: 
-        .input-wrap
+        span.input-wrap
           input#signup-password(type='password', name='password')
     .controls
       button.submit#signup-submit Signup
@@ -457,11 +459,11 @@ script#login-template(type='text/template')
     .content
       p
         label(for='login-username') Username: 
-        .input-wrap
+        span.input-wrap
           input#login-username(type='text', name='username')
       p
         label(for='login-password') Password: 
-        .input-wrap
+        span.input-wrap
           input#login-password(type='password', name='password')
     .controls
       button.submit#login-submit Login
@@ -475,15 +477,15 @@ script#create-room-template(type='text/template')
     .content
       p
         label(for='create-room-name') Name: 
-        .input-wrap
+        span.input-wrap
           input#create-room-name(type='text', name='room', placeholder='Room name')
       p
         label(for='create-room-description') Description:
-        .input-wrap
+        span.input-wrap
           textarea#create-room-description(type='text', name='description', placeholder='Description')
       p
         label(for='create-room-restricted') Private room:
-        .input-wrap
+        span.input-wrap
           input#create-room-restricted(type='checkbox', name='restricted')
     .controls
       button.submit#create-room-submit Create

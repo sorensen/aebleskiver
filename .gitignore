@@ -37,3 +37,4 @@ build/buildinfo.properties
 build/config/buildinfo.properties
 
 _dev
+node_modules

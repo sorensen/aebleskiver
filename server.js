@@ -14,6 +14,7 @@ require.paths.unshift(__dirname + '/lib');
 
 // Include all project dependencies
 var express      = require('express'),
+    Mongo        = require('mongodb'),
     SessionStore = require('connect-mongodb'),
     Mongoose     = require('mongoose'),
     Redis        = require('redis'),
@@ -29,12 +30,12 @@ var express      = require('express'),
 // Configuration
 // -------------
 
-// General settings
+// Settings
 var cookieAge    = 60000 * 60 * 1,
     cacheAge     = 60000 * 60 * 24 * 365,
     secret       = 'abcdefghijklmnopqrstuvwxyz',
     token        = '',
-    port         = 3000,
+    port         = 8080,
     production   = 80,
     staticViews  = __dirname + '/public',
     dbpath       = 'mongodb://localhost/aebleskiver',
@@ -52,12 +53,56 @@ var cookieAge    = 60000 * 60 * 1,
         password : ''
     };
 
-// Create the mongo session store for express and 
-// authentication middleware
-var session = new SessionStore({
-    dbname   : dbpath,
-    username : sessionConfig.username,
-    password : sessionConfig.password
+// Establish a direct connection with MongoDB for the 
+// connect-mongodb session store
+var mongoConfig = new Mongo.Server('localhost', 27017, {
+        auto_reconnect : true,
+        native_parser  : true
+    }),
+    mongoDb = new Mongo.Db('aelbeskiver', mongoConfig, {}),
+    session = new SessionStore({db : mongoDb});
+
+// Configure our browserified bundles, seperating them out to 
+// related packages for ease of development and debugging
+var core = browserify({
+    ignore : [
+        'underscore',
+        'backbone',
+    ],
+    require : [
+        'dnode',
+        'backbone-dnode'
+    ],
+    entry : [
+        // Models
+        __dirname + '/lib/models/message.model.js',
+        __dirname + '/lib/models/user.model.js',
+        __dirname + '/lib/models/app.model.js',
+        __dirname + '/lib/models/room.model.js',
+        
+        // Views
+        __dirname + '/lib/views/message.view.js',
+        __dirname + '/lib/views/room.view.js',
+        __dirname + '/lib/views/user.view.js',
+        __dirname + '/lib/views/app.view.js',
+        __dirname + '/lib/views/footer.view.js',
+        
+        // Routers
+        __dirname + '/lib/routers/app.router.js',
+
+        // DNode middleware
+        __dirname + '/lib/rpc/browser/auth.dnode.js',
+        __dirname + '/lib/rpc/browser/avatar.dnode.js',
+        __dirname + '/lib/rpc/browser/misc.dnode.js',
+        
+        // General
+        __dirname + '/public/js/google.js',
+        __dirname + '/public/js/helpers.js',
+        __dirname + '/public/js/icons.js',
+        __dirname + '/public/js/init.js'
+    ],
+    mount  : '/core.js'
+    //filter : require('uglify-js')
 });
 
 // Server configuration, set the server view settings to 
@@ -83,49 +128,7 @@ app.configure('development', function(){
         dumpExceptions : true, 
         showStack      : true 
     }));
-    
-    // Configure our browserified bundles, seperating them out to 
-    // related packages for ease of development and debugging
-    var core = browserify({
-        ignore : [
-            'underscore',
-            'backbone',
-        ],
-        require : [
-            'dnode',
-            'backbone-dnode'
-        ],
-        entry : [
-            // Models
-            __dirname + '/lib/models/message.model.js',
-            __dirname + '/lib/models/user.model.js',
-            __dirname + '/lib/models/app.model.js',
-            __dirname + '/lib/models/room.model.js',
-            
-            // Views
-            __dirname + '/lib/views/message.view.js',
-            __dirname + '/lib/views/room.view.js',
-            __dirname + '/lib/views/user.view.js',
-            __dirname + '/lib/views/app.view.js',
-            __dirname + '/lib/views/footer.view.js',
-            
-            // Routers
-            __dirname + '/lib/routers/app.router.js',
 
-            // DNode middleware
-            __dirname + '/lib/rpc/browser/auth.dnode.js',
-            __dirname + '/lib/rpc/browser/avatar.dnode.js',
-            __dirname + '/lib/rpc/browser/misc.dnode.js',
-            
-            // General
-            __dirname + '/public/js/google.js',
-            __dirname + '/public/js/helpers.js',
-            __dirname + '/public/js/icons.js',
-            __dirname + '/public/js/init.js'
-        ],
-        mount  : '/core.js',
-        filter : require('uglify-js')
-    });
     app.use(core);
 });
 
@@ -142,22 +145,25 @@ app.configure('production', function() {
 // Create the publish and subscribe clients for redis to 
 // send to the DNode pubsub middleware
 var pub = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.options),
-    sub = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.options)
+    sub = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.options),
+    rdb = Redis.createClient(redisConfig.port, redisConfig.host, redisConfig.options);
+
 
 // Start up the application and connect to the mongo 
 // database if not part of another module or clustered, 
 // configure the Mongoose model schemas, setting them to 
 // our database instance. The DNode middleware will need 
 // to be configured with the database references.
-if (!module.parent) {
-    Schemas.defineModels(Mongoose, function() {
-        database = Mongoose.connect(dbpath);
-        middleware.crud.config(database);
-        middleware.pubsub.config(pub, sub);
-        auth.config(database, session);
+Schemas.defineModels(Mongoose, function() {
+    database = Mongoose.connect(dbpath);
+    middleware.crud.config(database);
+    middleware.pubsub.config({
+        publish   : pub,
+        subscribe : sub,
+        database  : rdb
     });
-    app.listen(port);
-}
+    auth.config(database, session);
+});
 
 // Routes
 // ------
@@ -175,6 +181,10 @@ app.get('/', function(req, res) {
         });
     });
 });
+
+if (!module.parent) {
+    app.listen(port);
+}
 
 // Initialize
 // ----------

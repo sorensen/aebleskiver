@@ -1,6 +1,6 @@
 @import url('aebleskiver/jquery-ui-1.8.11.aebleskiver.css');
-@import url('//cdn.wijmo.com/jquery.wijmo-open.1.1.5.css');
-@import url('../js/vendor/jquery.cssemoticons.css');
+@import url('wijmo-open.css');
+@import url('jquery.cssemoticons.css');
 
 html, body, div, span, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -473,7 +473,7 @@ input[type='submit']:active,
 
 html {
     height: 100%;
-    background: #8d8d8d;
+    background: #d8d8d8;
     overflow: hidden;
 }
 body {
@@ -1674,27 +1674,49 @@ body {
         #rooms .stat .value 
         {
         }
-        
+ 
 /**
     Modal / Dialog box
 **/
-#overlay {
-    display: none;
-    background: #666;
-    opacity: .50;
-    filter: Alpha(Opacity=50);
-    z-index: 1001;
-    position: absolute;
-    top: 0; left: 0;
-    height: 100%; width: 100%;
-}
-.dialog-wrapper {
+.dialog-wrapper,
+#spinner,
+#overlay
+{
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     display: none;
+}
+#spinner {
+    background: #c8c8c8;
+    opacity: 0.8;
+    filter: Alpha(Opacity=80);
+    z-index: 1002;
+}
+#inner-spinner {
+    background: #5d5d5d;
+    color: white;
+    float: left;
+    width: 160px;
+    height: 160px;
+    -webkit-border-radius: 15px;
+       -moz-border-radius: 15px;
+            border-radius: 15px;
+    top: 50%;
+    left: 50%;
+    margin-top: -80px;
+    margin-left: -80px;
+    position: absolute;
+    opacity: .90;
+    filter: Alpha(Opacity=90);
+}
+#overlay {
+    background: #666;
+    opacity: .50;
+    filter: Alpha(Opacity=50);
+    z-index: 1001;
 }
 .dialog {
     outline: 0px;
@@ -1776,41 +1798,7 @@ body {
         .dialog .controls button {
             margin-left: 5px;
         }
-
-
-/**
-    Webcam
-**/
-#open-webcam {
-    display: none;
-}
-.webcam {
-    display: none;
-    width: auto;
-}
-    .webcam .camera {
-        border: 2px solid #AAA;
-        margin: 15px;
-        height: 240px;
-        width: 319px;
-        overflow: hidden;
-    }
-    .webcam button {
-        height: 30px;
-        padding: 0 15px;
-        font-size: 13px;
-        font-weight: bold;
-    }
-    #test {
-        margin-left: 230px;
-        margin-top: 20px;
-    }
-    .webcam .list {
-        display: none;
-        list-style: none outside;
-        margin: 15px;
-    }
-    
+ 
 /**
     Custom helpers
 **/
@@ -1835,94 +1823,6 @@ body {
                      M11=0.9914448613738104, M12=-0.13052619222005157,M21=0.13052619222005157, M22=0.9914448613738104, sizingMethod='auto expand');
                zoom: 1;
 }
-
-/**
-    Danish heart
-**/
-
-.heart {
-    position: absolute;
-    left: 77px;
-    width: 3em;
-    height: 3em;
-    font-size: 16px;
-    z-index: 5;
-    top: 60px;
-    cursor: pointer;
-    opacity: 0.75;
-}
-#sidebar-wrapper .heart {
-    display: none;
-}
-    .heart:hover {
-        opacity: 0.85;
-        font-size: 17px;
-        left: 75px;
-        top: 58px;
-    }
-    .heart-left,
-    .heart-right {
-           -moz-border-radius: 100%;
-        -webkit-border-radius: 100%;
-                border-radius: 100%;
-        top: -30%;
-    }
-    .heart-left,
-    .heart-right,
-    .heart-bottom,
-    .heart-content {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        z-index: 4;
-    }
-    .heart-left {
-        z-index: 4;
-        background: #c4f074;
-        left: -30%;
-           -moz-box-shadow: inset 0.1em 0.1em 0.1em #aaa, -1px -1px 0 #3d3d3d;
-        -webkit-box-shadow: inset 0.1em 0.1em 0.1em #aaa, -1px -1px 0 #3d3d3d;
-                box-shadow: inset 0.1em 0.1em 0.1em #aaa, -1px -1px 0 #3d3d3d;
-    }
-    .heart-right {
-        z-index: 3;
-        background: #fff;
-        right: -30%;
-           -moz-box-shadow: inset -0.1em 0.1em 0.25em #aaa, -1px -1px 0 #3d3d3d;
-        -webkit-box-shadow: inset -0.1em 0.1em 0.25em #aaa, -1px -1px 0 #3d3d3d;
-                box-shadow: inset -0.1em 0.1em 0.25em #aaa, -1px -1px 0 #3d3d3d;
-    }
-    .heart-content {
-        border-radius: 7% 0;
-        top: 0;
-        left: 0;
-        zoom: 1;
-        z-index: 4;
-           -moz-transform: rotate(45deg);
-             -o-transform: rotate(45deg);
-        -webkit-transform: rotate(45deg);
-            -ms-transform: rotate(45deg);
-                transform: rotate(45deg);  
-                   filter: progid:DXImageTransform.Microsoft.Matrix(
-                     M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476, sizingMethod='auto expand');
-        
-        background-color: #fff;
-        background-image: 
-            -webkit-linear-gradient(45deg, #c4f074 25%, transparent 25%, transparent 75%, #c4f074 75%, #c4f074), 
-            -webkit-linear-gradient(45deg, #c4f074 25%, transparent 25%, transparent 75%, #c4f074 75%, #c4f074);
-        background-size: 2em 2em;
-        background-position: 0 0, 1em 1em;
-            
-           -moz-box-shadow: inset -0.075em -0.075em 0.2em #bbb;
-        -webkit-box-shadow: inset -0.075em -0.075em 0.2em #bbb;
-                box-shadow: inset -0.075em -0.075em 0.2em #bbb;
-    }
-        .heart:hover .heart-left {
-        }
-        .heart:hover .heart-right {
-        }
-        .heart:hover .heart-content {
-        }
 
 .keycandy:before, 
 .keycandy *[accesskey]:before {
