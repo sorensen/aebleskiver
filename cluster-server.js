@@ -20,7 +20,6 @@ Cluster('./server')
         .use(Cluster.cli())
         .use(Cluster.repl(8000))
         .use(Cluster.debug())
-        .use(Cluster.reload(['lib', 'vendor', 'app.js']))
         .use(Cluster.stats({ 
             connections   : true, 
             lightRequests : true 

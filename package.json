@@ -1,50 +1,54 @@
-{ 
-    "name"         : "aebleskiver", 
-    "description"  : "Realtime pubsub chat application", 
-    "version"      : "0.3.4",
-    "homepage"     : "http://sorensen.github.com/aebleskiver",
-    "repository" : {
-        "type" : "git", 
-        "url"  : "http://github.com/sorensen/aebleskiver.git" 
-    },
-    "directories" : {
-        "lib" : "."
-    },
-    "keywords" : [
-        "backbone", 
-        "redis", 
-        "pubsub", 
-        "dnode", 
-        "mongo"
-    ],
-    "main"         : "./server",
-    "dependencies" : {
-        "backbone"        : "0.5.3",
-        "underscore"      : "1.1.7",
-        "dnode"           : "0.8.1",
-        "backbone-dnode"  : "0.3.2",
-        "browserify"      : "1.4.2",
-        "mongoose"        : "1.8.3",
-        "mongoose-auth"   : "0.0.11",
-        "node-gravatar"   : "1.0.0",
-        "bcrypt"          : "0.2.4",
-        "connect"         : "1.6.2",
-        "connect-mongodb" : "1.0.0",
-        "cluster"         : "0.7.1",
-        "cluster-live"    : "0.0.3",
-        "express"         : "2.4.4",
-        "jade"            : "0.14.2",
-        "node-gravatar"   : "1.0.0",
-        "node-uuid"       : "1.2.0",
-        "mongodb"         : "0.9.6-10",
-        "uglify-js"       : "1.0.6"
-    }, 
-    "engines" : {
-        "node" : ">= 0.4.1 < 0.5.0"
-    },
-    "author" : {
-        "name"  : "Beau Sorensen",
-        "email" : "mail@beausorensen.com",
-        "url"   : "http://beausorensen.com"
-    }
+{
+  "name"        : "aebleskiver",
+  "description" : "Realtime pubsub chat application",
+  "version"     : "0.3.4-3",
+  "homepage"    : "http://sorensen.github.com/aebleskiver",
+  "repository" : {
+    "type" : "git",
+    "url"  : "http://github.com/sorensen/aebleskiver.git"
+  },
+  "directories" : {
+    "lib" : "."
+  },
+  "keywords" : [
+    "backbone",
+    "redis",
+    "pubsub",
+    "dnode",
+    "mongo"
+  ],
+  "main": "./server",
+  "dependencies" : {
+    "backbone"        : "0.5.3",
+    "underscore"      : "1.1.7",
+    "dnode"           : "0.8.1",
+    "backbone-dnode"  : "0.3.2",
+    "browserify"      : "1.4.2",
+    "mongoose"        : "1.8.3",
+    "mongoose-auth"   : "0.0.11",
+    "redis"           : "0.6.7",
+    "node-gravatar"   : "1.0.0",
+    "bcrypt"          : "0.2.4",
+    "connect"         : "1.6.2",
+    "connect-mongodb" : "1.0.0",
+    "cluster"         : "0.7.1",
+    "cluster-live"    : "0.0.3",
+    "express"         : "2.4.4",
+    "jade"            : "0.14.2",
+    "node-uuid"       : "1.2.0",
+    "mongodb"         : "0.9.6-10",
+    "uglify-js"       : "1.0.6"
+  },
+  "engines" : {
+    "node" : ">= 0.4.1 < 0.5.0"
+  },
+  "author" : {
+    "name"  : "Beau Sorensen",
+    "email" : "mail@beausorensen.com",
+    "url"   : "http://beausorensen.com"
+  },
+  "subdomain" : "aebleskiver",
+  "scripts" : {
+    "start" : "server.js"
+  }
 }

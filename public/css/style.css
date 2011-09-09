@@ -90,7 +90,7 @@ pre {
 
 textarea { overflow: auto; } /* www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
 
-.ie6 legend, .ie7 legend { margin-left: -7px; } 
+.ie6 legend, .ie7 legend { margin-left: -7px; }
 
 /* Align checkboxes, radios, text inputs with their label by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
 input[type="radio"] { vertical-align: text-bottom; }
@@ -149,19 +149,19 @@ a:hover { color: #036; }
 /**
     Colors: Blackcurrent Birds by auzulkc
     See: http://kuler.adobe.com/
-    
+
     94b24d - Pale green
     d3ff82 - Lime green
-    
+
         e8febe - lighter
         b4e064 - darker
-    
+
     363d52 - Slate
     121d2b - Dark slate
     111b1c - Dark gray
-    
+
     Greens:
-        
+
         eaffc3
         dffca9
         d3ff82
@@ -171,20 +171,47 @@ a:hover { color: #036; }
         a0cd4d
         94bf43
         7ea633
-        
+
 **/
+
+
+/**
+    Custom helpers
+**/
+.rounded {
+     -moz-border-radius: 8px;
+  -webkit-border-radius: 8px;
+          border-radius: 8px;
+}
+.transition {
+     -moz-transition: all 0.3s ease-out;
+       -o-transition: all 0.3s ease-out;
+  -webkit-transition: all 0.3s ease-out;
+          transition: all 0.3s ease-out;
+}
+.rotate {
+     -moz-transform: rotate(7.5deg);
+       -o-transform: rotate(7.5deg);
+  -webkit-transform: rotate(7.5deg);
+      -ms-transform: rotate(7.5deg);
+          transform: rotate(7.5deg);
+             filter: progid:DXImageTransform.Microsoft.Matrix(
+                     M11=0.9914448613738104, M12=-0.13052619222005157,M21=0.13052619222005157, M22=0.9914448613738104, sizingMethod='auto expand');
+               zoom: 1;
+}
+
 /**
     Template
 **/
 #port,
-#token, 
+#token,
 #version,
 #rooms .stat .title,
 #sidebar-down,
 #footer .title,
 #main-content
-{ 
-    display: none; 
+{
+    display: none;
 }
 
 /**
@@ -203,7 +230,7 @@ a:hover { color: #036; }
     border-right: 0;
 }
 **/
-    
+
 /**
     Top Rounded corners
 **/
@@ -240,7 +267,7 @@ body .ui-dialog,
 #navigation,
 #navigation li,
 #main,
-#main-content, 
+#main-content,
 #sidebar,
 #sidebar-wrapper,
 #sidebar-controls,
@@ -269,7 +296,7 @@ body .ui-dialog,
 }
 .main-room .name,
 .user-profile .name,
-#sidebar-controls 
+#sidebar-controls
 {
     background-color: #eee;
     background-image: -moz-linear-gradient(top, #eee, #fff);
@@ -277,7 +304,7 @@ body .ui-dialog,
     background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #eee),color-stop(1, #fff));
     background-image: -webkit-linear-gradient(#eee, #fff);
     background-image: linear-gradient(top, #eee, #fff);
-    
+
     background-color: #efefef;
     background-image: -moz-linear-gradient(top, #efefef, #dddddd);
     background-image: -o-linear-gradient(top, #efefef, #dddddd);
@@ -295,7 +322,7 @@ body .ui-dialog,
     background-image: -webkit-linear-gradient(#fff, #eee);
     background-image: linear-gradient(top, #fff, #eee);
             filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#eee');
-            
+
     background-color: #efefef;
     background-image: -moz-linear-gradient(top, #efefef, #dddddd);
     background-image: -o-linear-gradient(top, #efefef, #dddddd);
@@ -312,17 +339,17 @@ h1,h2,h3,h4,h5,h6 {
     margin: 0;
     font-weight: normal;
 }
-h1 { 
+h1 {
     font-size: 22px;
     /* margin: 20px 20px 0; */
 }
-h2 { 
+h2 {
     font-size: 22px;
 }
-h3 { 
+h3 {
     font-size: 18px;
 }
-h4,h5,h6 { 
+h4,h5,h6 {
     font-size: 18px;
 }
 label {
@@ -371,7 +398,7 @@ textarea
     background-image: linear-gradient(top, #fff, #efefef);
               filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#efefef');
 }
-textarea { 
+textarea {
     height: auto;
     min-height: 75px;
     padding: 7px;
@@ -385,7 +412,7 @@ input[type='submit']
        -moz-box-shadow: 1px 1px 1px #aaa;
     -webkit-box-shadow: 1px 1px 1px #aaa;
             box-shadow: 1px 1px 1px #aaa;
-                    
+
     text-shadow: 1px 1px 1px white;
     text-align: center;
     text-decoration: none;
@@ -399,7 +426,7 @@ input[type='submit']
     zoom: 1;
     overflow: visible;
     font-size: 13px;
-    
+
     background-color: #eee;
     background-image: -moz-linear-gradient(top, #eee, #ddd);
     background-image: -o-linear-gradient(top, #eee, #ddd);
@@ -414,7 +441,7 @@ button:hover,
        -moz-box-shadow: 1px 1px 1px #666;
     -webkit-box-shadow: 1px 1px 1px #666;
             box-shadow: 1px 1px 1px #666;
-            
+
     background-color: #e0e0e0;
     background-image: -moz-linear-gradient(top, #e0e0e0, #d0d0d0);
     background-image: -o-linear-gradient(top, #e0e0e0, #d0d0d0);
@@ -424,13 +451,13 @@ button:hover,
               filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#e0e0e0', EndColorStr='#d0d0d0');
 }
 .message-form button,
-input[type='submit'], 
-.submit 
+input[type='submit'],
+.submit
 {
     color: #444;
     text-shadow: 1px 1px 1px white;
     font-weight: bold;
-    
+
     background-color: #dffca9;
     background-image: -moz-linear-gradient(top, #dffca9, #b9e567);
     background-image: -o-linear-gradient(top, #dffca9, #b9e567);
@@ -440,8 +467,8 @@ input[type='submit'],
             filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#dffca9', EndColorStr='#b9e567');
 }
 .message-form button:hover,
-input[type='submit']:hover, 
-.submit:hover 
+input[type='submit']:hover,
+.submit:hover
 {
     background-color: #d3ff82;
     background-image: -moz-linear-gradient(top, #d3ff82, #acd959);
@@ -452,7 +479,7 @@ input[type='submit']:hover,
             filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#d3ff82', EndColorStr='#acd959');
 }
 .message-form button:active,
-input[type='submit']:active, 
+input[type='submit']:active,
 .submit:active
 {
     background-color: #C4F074;
@@ -492,19 +519,19 @@ body {
         font-family: Collegiate, sans-serif;
         letter-spacing: -.1px;
         line-height: 1.4;
-        
+
         opacity: 0.95;
         padding: 6px 0;
         position: relative;
         top: 50px;
         display: block;
-        
+
            -moz-box-shadow: 0 0 13px #888;
         -webkit-box-shadow: 0 0 13px #888;
-        
+
         background: -webkit-gradient(linear, left bottom, left top, from(#9A0000), to(#A90000));
         background: -webkit-gradient(linear, left bottom, left top, from(#9A0000), to(#A90000));
-        
+
            -moz-transform: rotate(45deg);
         -webkit-transform: rotate(45deg);
         right: -30px;
@@ -537,7 +564,7 @@ body {
     width: 100%;
     z-index: 9;
     height: 29px;
-    
+
     border-bottom: 1px solid #AAA;
     border-left: 1px solid #aaa;
     border-right: 1px solid #dedede;
@@ -572,7 +599,7 @@ body {
         top: 0;
         bottom: 0;
         color: #891100;
-        
+
         color: #45281C;
         text-decoration: none;
         text-shadow: 0 1px 0 rgba(255, 255, 255, .3);
@@ -727,7 +754,7 @@ body {
             border-bottom: 1px solid #aaa;
             background: white;
         }
-    
+
 #conversations {
     height: 50px;
     font-size: 10px;
@@ -802,8 +829,8 @@ body {
                     width: 100%;
                     height: 38px;
                 }
-            
-            
+
+
     .conversation.open .destroy {
         top: -241px;
         right: -3px;
@@ -819,7 +846,7 @@ body {
         padding: 0 10px;
         margin: 0;
         text-align: left;
-        
+
            -moz-box-shadow: none;
         -webkit-box-shadow: none;
                 box-shadow: none;
@@ -943,11 +970,11 @@ body {
             background: #f5f5f5;
             left: 8px;
             padding-top: 12px;
-            
+
                -moz-border-radius: 4px;
             -webkit-border-radius: 4px;
                     border-radius: 4px;
-                    
+
                -moz-box-shadow: inset 1px 1px 3px #5d5d5d;
             -webkit-box-shadow: inset 1px 1px 3px #5d5d5d;
                     box-shadow: inset 1px 1px 3px #5d5d5d;
@@ -980,8 +1007,8 @@ body {
         background: #EEE;
         clear: both;
     }
-    
-    
+
+
 /**
     Search form
 **/
@@ -1016,7 +1043,7 @@ body {
            -moz-border-radius: 0 20px 20px 0;
         -webkit-border-radius: 0 20px 20px 0;
                 border-radius: 0 20px 20px 0;
-        
+
            -moz-box-shadow: none;
         -webkit-box-shadow: none;
                 box-shadow: none;
@@ -1036,7 +1063,7 @@ body {
     }
     #rooms {
     }
-        .user, 
+        .user,
         .room {
             min-height: 45px;
             border-right: 1px solid #aaa;
@@ -1053,7 +1080,7 @@ body {
             background-image: linear-gradient(top, #eee, #ddd);
                       filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#eee', EndColorStr='#ddd');
         }
-        .user:hover, 
+        .user:hover,
         .room:hover {
             color: #000;
             background-color: #d3ff82;
@@ -1064,7 +1091,7 @@ body {
             background-image: linear-gradient(top, #d3ff82, #b4e064);
                       filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#d3ff82', EndColorStr='#b4e064');
         }
-        #users .user:first-child, 
+        #users .user:first-child,
         #rooms .room:first-child {
             border-top: 0;
         }
@@ -1079,7 +1106,7 @@ body {
                     width: 30px;
                     height: 30px;
                 }
-        #users .user.current, 
+        #users .user.current,
         #rooms .room.current {
             background-color: #fff;
             background-image: -webkit-gradient(linear,left top,left bottom,color-stop(0, #fff),color-stop(1, #eee));
@@ -1098,7 +1125,7 @@ body {
             background-image: -webkit-linear-gradient(left, #fff, #fafafa);
             background-image: linear-gradient(left, #fff, #fafafa);
                       filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#fafafa');
-        
+
         }
             .room.active a, .room.active a:hover {
                 color: #000;
@@ -1142,7 +1169,7 @@ body {
             margin: 5px;
             padding: 5px;
         }
-    
+
     #room-form {
         font-size: 14px;
     }
@@ -1158,7 +1185,7 @@ body {
         padding: 3px 5px;
         width: 62%;
     }
-    
+
     body .ui-widget {
         font-family: 'Droid Sans', Arial, sans-serif;
         font-size: 14px;
@@ -1169,18 +1196,18 @@ body {
         right: 5px;
         width: 40px;
         padding: 0 0 0 8px;
-        
+
         top: 0;
         height: 45px;
         /*
         top: 5px;
         height: 50px;
         background: white;
-        
+
            -moz-box-shadow: inset 1px 1px 3px #5d5d5d;
         -webkit-box-shadow: inset 1px 1px 3px #5d5d5d;
                 box-shadow: inset 1px 1px 3px #5d5d5d;
-        
+
            -moz-border-radius: 4px 0 4px 40px;
         -webkit-border-radius: 4px 0 4px 40px;
                 border-radius: 4px 0 4px 40px;
@@ -1262,7 +1289,7 @@ body {
                      -o-transform: rotate(45deg);
                 -webkit-transform: rotate(45deg);
                     -ms-transform: rotate(45deg);
-                        transform: rotate(45deg);  
+                        transform: rotate(45deg);
                            filter: progid:DXImageTransform.Microsoft.Matrix(
                                    M11=0.7071067811865476, M12=-0.7071067811865475, M21=0.7071067811865475, M22=0.7071067811865476, sizingMethod='auto expand');
                              zoom: 1;
@@ -1385,7 +1412,7 @@ body {
     .room .destroy {
         display: none;
     }
-    
+
 /**
     User profile specifics
 **/
@@ -1428,14 +1455,14 @@ body {
             width: 100%;
         }
             .details div:first-child {
-                border-top: 0; 
+                border-top: 0;
             }
         .details .title {
             font-weight: bold;
             margin-right: 5px;
         }
         .details .value {
-        
+
         }
         .picture {
             text-align: center;
@@ -1477,14 +1504,14 @@ body {
         .main-room .controls .icon {
         }
     .wall {
-    
+
     }
         .wall .posts {
             top: 220px;
             border-top: 1px solid #E1E1E1;
         }
         .post-form {
-        
+
         }
 
 
@@ -1536,7 +1563,7 @@ body {
         overflow: hidden;
     }
         .concurrent {
-        
+
         }
             .concurrent .username,
             .concurrent .small-avatar {
@@ -1671,10 +1698,38 @@ body {
             color: #444;
         }
         .main-room .stat .value,
-        #rooms .stat .value 
+        #rooms .stat .value
         {
         }
- 
+
+/**
+    Home view
+.home {
+    background-color: #efefef;
+}
+    .home #sidebar-wrapper,
+    .home #sidebar {
+        width: 100%;
+        right: 0;
+        overflow: hidden;
+    }
+    .home #sidebar {
+        margin: 20px;
+        top: 10px;
+    }
+    .home .user,
+    .home .room {
+        height: 100px;
+        width: auto;
+        margin: 5px;
+        float: left;
+    }
+    .home #welcome-text {
+        display: none;
+    }
+**/
+
+
 /**
     Modal / Dialog box
 **/
@@ -1798,38 +1853,16 @@ body {
         .dialog .controls button {
             margin-left: 5px;
         }
- 
-/**
-    Custom helpers
-**/
-.rounded {
-     -moz-border-radius: 8px;
-  -webkit-border-radius: 8px;
-          border-radius: 8px;
-}
-.transition {
-     -moz-transition: all 0.3s ease-out;
-       -o-transition: all 0.3s ease-out;
-  -webkit-transition: all 0.3s ease-out;
-          transition: all 0.3s ease-out;  
-}
-.rotate {
-     -moz-transform: rotate(7.5deg);
-       -o-transform: rotate(7.5deg);
-  -webkit-transform: rotate(7.5deg);
-      -ms-transform: rotate(7.5deg);
-          transform: rotate(7.5deg);  
-             filter: progid:DXImageTransform.Microsoft.Matrix(
-                     M11=0.9914448613738104, M12=-0.13052619222005157,M21=0.13052619222005157, M22=0.9914448613738104, sizingMethod='auto expand');
-               zoom: 1;
-}
 
-.keycandy:before, 
+/**
+    KeyCandy overrides
+**/
+.keycandy:before,
 .keycandy *[accesskey]:before {
 	position: absolute;
 	border: 1px solid #ccc;
 	z-index: 999;
-    
+
 	font: 16px/24px Arial,Helvetica,sans-serif;
 	text-align: center;
 	text-decoration: none;
@@ -1838,15 +1871,15 @@ body {
     font-weight: bold;
 	vertical-align: middle;
 	color: #333;
-    
+
 	   -moz-border-radius: 6px 6px 4px 4px;
 	-webkit-border-radius: 6px 6px 4px 4px;
 	        border-radius: 6px 6px 4px 4px;
-            
+
        -moz-box-shadow: 1px 1px 1px #333;
     -webkit-box-shadow: 1px 1px 1px #333;
             box-shadow: 1px 1px 1px #333;
-    
+
     background-color: #dffca9;
     background-image: -moz-linear-gradient(top, #dffca9, #b9e567);
     background-image: -o-linear-gradient(top, #dffca9, #b9e567);
