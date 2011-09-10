@@ -1,7 +1,7 @@
 {
   "name"        : "aebleskiver",
   "description" : "Realtime pubsub chat application",
-  "version"     : "0.3.4-3",
+  "version"     : "0.3.4-4",
   "homepage"    : "http://sorensen.github.com/aebleskiver",
   "repository" : {
     "type" : "git",
@@ -17,7 +17,7 @@
     "dnode",
     "mongo"
   ],
-  "main": "./server",
+  "main": "server.js",
   "dependencies" : {
     "backbone"        : "0.5.3",
     "underscore"      : "1.1.7",
