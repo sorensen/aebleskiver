@@ -9,6 +9,7 @@
 *.vi
 *~
 *.sublime-project
+.monitor
 
 # OS or Editor folders
 .DS_Store

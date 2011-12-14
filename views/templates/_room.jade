@@ -1,0 +1,20 @@
+
+  h1.name
+    span.headline {{ name }}
+    .controls
+      .icon#add-favorite(title='Add to Favorites', accesskey='W')&nbsp;
+      .icon#remove-favorite(title='Remove from Favorites', accesskey='Q')&nbsp;
+      .icon#leave-room(title='Leave Room', accesskey='X')&nbsp;
+      .admin-controls
+        button.delete-room.delete Delete Room
+        button.ban-user Ban User
+        button.invite-user Invite User
+      
+    p.description {{ description }}
+  .statistics.room-stats
+  
+  .users
+  .messages
+  .message-form
+    span.input-wrap
+      input.create-message(type='text', name='message', placeholder='Say something...', length='255', accesskey='I')

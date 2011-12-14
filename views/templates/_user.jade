@@ -1,0 +1,36 @@
+
+  h1.name
+    span.headline
+      {{ username }}
+      span.displayname ({{ displayName }})
+    .controls
+      span.icon#add-friend(title='Add to Friends', accesskey='W') +
+      span.icon#remove-friend(title='Remove from Friends', accesskey='U') -
+      span.icon#send-message(title='Send a Message', accesskey='M') Send a Message
+      span.icon#leave-profile(title='Leave Profile', accesskey='X')
+      
+  .statistics.user-stats
+  .picture: img(src='{{ avatar }}')
+  .details
+    .created
+      span.title Joined 
+      abbr.value(title='{{ created }}') {{ created }}
+    .last-online
+      span.title Last Online
+      abbr.value(title='{{ modified }}') {{ modified }}
+    .status
+      span.title Status
+      span.value {{ status }}
+    .email
+      span.title Email
+      span.value {{ email }}
+    .bio
+      span.title Bio
+      span.value {{ bio }}
+  
+   .wall
+     .posts
+     .post-form
+       .icon#post-submit(title='Submit Post')
+       span.input-wrap
+          input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255', accesskey='I')

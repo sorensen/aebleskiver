@@ -1,0 +1,48 @@
+
+{ "session": {}
+, "redis": {
+    "options": {
+      "parser": "javascript"
+    , "return_buffer": false
+    }
+  }
+, "mongo": {
+    "options": {
+      "auto_reconnect": true
+    , "native_parser": true
+    }
+  }
+, "port": 8080
+, "cache": { "age": 3600000 }
+, "cookie": { "age": 3600000 }
+
+, "development": {
+    "session": {
+      "secret": "abcdefg"
+    , "username": ""
+    , "password": ""
+    }
+  , "redis": {
+      "host": "127.0.0.1"
+    , "port": 6379
+    }
+  , "mongo": {
+      "host": "mongodb://localhost:27017/aebleskiver"
+    , "port": 27017
+    , "name": "aebleskiver"
+    }
+  , "port": 3000
+  }
+
+, "testing": {
+  }
+
+, "production": {
+    "session": {
+      "secret": "somethingelse"
+    , "username": ""
+    , "password": ""
+    }
+  , "port": 8080
+  }
+}

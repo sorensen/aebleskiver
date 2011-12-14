@@ -1,0 +1,22 @@
+
+  #signup-form.dialog
+    .title
+      h3 Signup
+    
+    .content
+      p
+        label(for='signup-username') Username: 
+        span.input-wrap
+          input#signup-username(type='text', name='username')
+      p
+        label(for='signup-email') Email (optional): 
+        span.input-wrap
+          input#signup-email(type='text', name='email')
+      p
+        label(for='signup-password') Password: 
+        span.input-wrap
+          input#signup-password(type='password', name='password')
+    
+    .controls
+      button.button.primary.submit#signup-submit Signup
+      button.button.cancel Cancel

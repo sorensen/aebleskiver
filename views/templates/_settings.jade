@@ -1,0 +1,38 @@
+
+  #settings-form.dialog
+    .title
+      h3 Settings
+    
+    .content
+      p
+        label(for='settings-username') ID: 
+        span.input-wrap
+          input#settings-id(type='text', name='id', disabled='disabled', value='{{ id }}')
+      p
+        label(for='settings-username') Username: 
+        span.input-wrap
+          input#settings-username(type='text', name='username', disabled='disabled', value='{{ username }}')
+      p
+        label(for='settings-displayname') Display Name: (optional)
+        span.input-wrap
+          input#settings-displayname(type='text', name='displayname', value='{{ displayName }}')
+      p
+        label(for='settings-email') Email: 
+        span.input-wrap
+          input#settings-email(type='text', name='email', value='{{ email }}')
+      p
+        label(for='settings-bio') Bio: 
+        span.input-wrap
+          textarea#settings-bio(name='bio', rows='3') {{ bio }}
+      p
+        label(for='settings-password') Password: 
+        span.input-wrap
+          input#settings-password(type='password', name='password')
+      p
+        label(for='settings-password-confirm') Confirm Password: 
+        span.input-wrap
+          input#settings-password-confirm(type='password', name='password_confirm')
+    
+    .controls
+      button.button.submit.primary#settings-submit Save
+      button.button.cancel Cancel

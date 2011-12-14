@@ -1,0 +1,15 @@
+
+  //a.navigate(href='/rooms/{{ slug }}')
+  a.navigate
+    h3.name(title='{{ description }}')
+      span {{ name }}
+      span.destroy
+    p.description {{ description }}
+  .statistics.room-stats
+    .stat.total-messages
+      span.title Messages
+      span.value {{ totalMessages }}
+  .ranking
+    .rank {{ rank }}
+    .upvote: span.arrow-wrap: span.arrow &and;
+    .downvote: span.arrow-wrap: span.arrow &or;

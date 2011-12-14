@@ -1,43 +1,10 @@
-//-   Aebleskiver
-//-   (c) 2011 Beau Sorensen
-//-   Aebleskiver may be freely distributed under the MIT license.
-//-   For all details and documentation:
-//-   https://github.com/sorensen/aebleskiver
 
 #application
 #templates!= partial('micros')
 
-//- Dependencies
-//-script(src='//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js')
-//-script(src='//ajax.googleapis.com/ajax/libs/jqueryui/1.8.10/jquery-ui.js')
-//-script(src='//cdn.wijmo.com/jquery.wijmo-open.1.1.5.min.js')
-//-script(src='//cdn.wijmo.com/external/raphael-min.js')
-
-script(src='/js/vendor/jquery.min.js')
-script(src='/js/vendor/jquery-ui.min.js')
-script(src='/js/vendor/wijmo-open.min.js')
-script(src='/js/vendor/raphael-min.js')
-script(src='/js/vendor/underscore.js')
-script(src='/js/vendor/backbone.js')
-script(src='/js/vendor/mustache.js')
-script(src='/js/vendor/json2.js')
-script(src='/js/vendor/jquery.cookie.js')
-script(src='/js/vendor/keyCandy.js')
-script(src='/js/vendor/happy.js')
-script(src='/js/vendor/happy.methods.js')
-script(src='/js/vendor/jquery.cssemoticons.js')
-script(src='/js/vendor/spin.js')
-script(src='/js/vendor/jquery.masonry.min.js')
-
-//script(src='/vendor.js')
-
-script(src='/core.js')
-script(type='text/javascript')
-  var DNode      = require('dnode'),
-      middleware = require('backbone-dnode');
-
 //- Bootstrapped server settings
 script(type='text/javascript')
-  var port    = '!{locals.port}',
-      token   = '!{locals.token}',
-      version = '!{locals.version}';
+  var bootstrap = new Object(!{locals.bootstrap})
+    , user = new Object(!{locals.user})
+
+!= partial('includes')

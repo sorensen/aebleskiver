@@ -10,37 +10,22 @@ script#application-template(type='text/template')
   .wrapper
     #header
       nav#navigation
-        a#home.icon(href='/#/', title='Home', accesskey='H')&nbsp;
+        a#home.navigate(href='/', title='Home', accesskey='H') Home
         a#create-room(accesskey='C') Create Room
         a#login(accesskey='L') Login
         a#signup(accesskey='J') Join
-        a#settings.icon(title='Settings', accesskey='E')&nbsp;
+        a#settings(title='Settings', accesskey='E') Settings
         a#logout(accesskey='O') Logout
     
     #sidebar-wrapper
-      a.heart(href='/')
-        .heart-left
-        .heart-right
-        .heart-content
-        
       #sidebar
-        #sidebar-controls
-      
-        #sidebar-up
-          button#show-rooms(accesskey='R') Rooms
-          button#show-users(accesskey='U') Users
-        
         #sidebar-content
-          #users
           #rooms
         
         #search-form
-          button#search-now Go
-          span.input-wrap
-            input#search(type='text', name='search', placeholder='Search', accesskey='S')
-          
-        #sidebar-down
-          //.statistics#app-stats
+         button.button#search-now Go
+         span.input-wrap
+           input#search(type='text', name='search', placeholder='Search', accesskey='S')
     
     #main
       #main-tabs
@@ -55,174 +40,16 @@ script#application-template(type='text/template')
           button.list List
       
       #main-content
-      #welcome-text
-        #fork-me
-          a.ribbon(href='https://github.com/sorensen/aebleskiver')
-            span Fork me on GitHub
-        
-        h1.title Welcome to &AElig;bleskiver!
-        p
-          | This is a real-time chat application, built with
-          | the Express.js and Backbone.js frameworks.
-          
-        p
-          | You can load up a chat room by clicking on one of
-          | the links in the sidebar menu.  There is also a 
-          | persistant members list there as well, where you 
-        
-        p
-          | Chat rooms and user profiles can either be added 
-          | as a 'favorite' or a 'friend', which are then 
-          | added to the lists on the bottom bar.
-        
-        p
-          | You may create your own chat room, which can be 
-          | then linked to for you and your friends. If too 
-          | many rooms appear, you can use the search bar below
-          | the list to filter them.  Room 'titles' and 
-          | 'descriptions' are both indexed.
+      #splash
       
   .dialog-wrapper#create-room-dialog
   .dialog-wrapper#login-dialog
   .dialog-wrapper#signup-dialog
   .dialog-wrapper#settings-dialog
-  #footer
-    #start-menu
-      #start-menu-icon.icon(title='Menu', accesskey='M')
-      //.button.title.submit Menu
-      //  .heart(href='/')
-      //    .heart-left
-      //    .heart-right
-      //    .heart-content
-    
-    #friend-list
-      #friends-icon.icon(title='Friends', accesskey='F')
-      //.button.title Friends
-      .friend-wrapper
-        .heading Your Friends
-        .controls
-          .open
-          .close
-        .friends
-        
-    #favorite-list
-      #favorites-icon.icon(title='Favorites', accesskey='A')
-      //.button.title Favorites
-      .favorite-wrapper
-        .heading Your Favorites
-        .controls
-          .open
-          .close
-        .favorites
-    
-    #statistics
-      #stats-icon.icon(title='Statistics', accesskey='T')
-      .stats-wrapper
-        .heading Statistics
-        .controls
-          .open
-          .close
-        .stats
-          #app-stats.statistics
-    
-    #github
-      a(href='https://github.com/sorensen/aebleskiver', title='Fork me on GitHub!', accesskey='G')
-        #github-icon.icon
-      
-    #conversations
-    
-    #copyright
-      p &copy;
-    #authors
-      p.author Beau Sorensen
   #spinner
     #inner-spinner
   #overlay
-//- Navigation
-script#navigation-template(type='text/template')
-  a#home.icon(href='/#/', title='Home', accesskey='H')&nbsp;
-  a#create-room(accesskey='C') Create Room
-  a#login(accesskey='L') Login
-  a#signup(accesskey='J') Join
-  a#settings.icon(title='Settings', accesskey='E')&nbsp;
-  a#logout(accesskey='O') Logout
 
-//- Sidebar
-script#sidebar-template(type='text/template')
-  a.heart(href='/')
-    .heart-left
-    .heart-right
-    .heart-content
-    
-  #sidebar
-    #sidebar-controls
-  
-    #sidebar-up
-      button#show-rooms(accesskey='R') Rooms
-      button#show-users(accesskey='U') Users
-    
-    #sidebar-content
-      #users
-      #rooms
-    
-    #search-form
-      button#search-now Go
-      span.input-wrap
-        input#search(type='text', name='search', placeholder='Search', accesskey='S')
-      
-    #sidebar-down
-      //.statistics#app-stats
-
-//- Footer
-script#footer-template(type='text/template')
-  #start-menu
-    #start-menu-icon.icon(title='Menu', accesskey='M')
-    //.button.title.submit Menu
-    //  .heart(href='/')
-    //    .heart-left
-    //    .heart-right
-    //    .heart-content
-    
-  #friend-list
-    #friends-icon.icon(title='Friends', accesskey='F')
-    //.button.title Friends
-    .friend-wrapper
-      .heading Your Friends
-      .controls
-        .open
-        .close
-      .friends
-      
-  #favorite-list
-    #favorites-icon.icon(title='Favorites', accesskey='A')
-    //.button.title Favorites
-    .favorite-wrapper
-      .heading Your Favorites
-      .controls
-        .open
-        .close
-      .favorites
-  
-  #statistics
-    #stats-icon.icon(title='Statistics', accesskey='T')
-    .stats-wrapper
-      .heading Statistics
-      .controls
-        .open
-        .close
-      .stats
-        #app-stats.statistics
-  
-  #github
-    a(href='https://github.com/sorensen/aebleskiver', title='Fork me on GitHub!', accesskey='G')
-      #github-icon.icon
-    
-  #conversations
-  
-  #copyright
-    p &copy;
-  #authors
-    p.author Beau Sorensen
 
 //- Application statistics
 script#application-stats-template(type='text/template')
@@ -239,16 +66,7 @@ script#application-stats-template(type='text/template')
     span.title Version
     span.value {{ version }}
 
-//- Friend chat box
-script#friend-chat-template(type='text/template')
-  .title To: {{ username }}
-  .destroy
-  .messages
-  .message-form
-    button.submit Send
-    span.input-wrap
-      input.create-message(type='text', name='message', placeholder='Say something...', length='255')
-    
+
 //- User profile
 script#user-template(type='text/template')
   h1.name
@@ -286,47 +104,17 @@ script#user-template(type='text/template')
        .icon#post-submit(title='Submit Post')
        span.input-wrap
           input.create-post(type='text', name='post', placeholder='Write on {{ username }}&rsquo;s wall', length='255', accesskey='I')
-    
+
+
 //- User listing
 script#user-list-template(type='text/template')
-  a(href='/#/users/{{ username }}')
+  a.navigate(href='/users/{{ username }}')
     h3.name
       span.avatar: img(src='{{ avatar }}')
       span.username {{ displayName }}
   .statistics.user-stats
-  
-//- Friend listing
-script#friend-list-template(type='text/template')
-  h3.name
-    span.avatar: img(src='{{ avatar }}')
-    span.username {{ displayName }}
-  .statistics.user-stats
 
-//- User statistics
-script#user-stats-template(type='text/template')
-  .stat.total-messages
-    span.title Posts
-    span.value {{ totalPosts }}
-  
-//- Conversation
-script#conversation-template(type='text/template')
-  button.heading {{ name }}
-  span.destroy
-  .controls
-    button.add-favorite.submit(title='Add to Favorites') +
-    button.remove-favorite(title='Remove from Favorites') -
-    .admin-controls
-      button.delete-conversation.delete Delete Room
-      button.ban-user Ban User
-      button.invite-user Invite User
-  
-  .users
-  .messages
-  .message-form
-    button.submit Send
-    span.input-wrap
-      input.create-message(type='text', name='message', placeholder='Say something...', length='255')
-  
+
 //- Room
 script#room-template(type='text/template')
   h1.name
@@ -346,39 +134,35 @@ script#room-template(type='text/template')
   .users
   .messages
   .message-form
-    .icon#message-submit(title='Send Message')
     span.input-wrap
       input.create-message(type='text', name='message', placeholder='Say something...', length='255', accesskey='I')
 
+
 //- Room listing
 script#room-list-template(type='text/template')
-  a(href='/#/rooms/{{ slug }}')
+  //a.navigate
+  a.navigate(href='/rooms/{{ slug }}')
     h3.name(title='{{ description }}')
       span {{ name }}
       span.destroy
     p.description {{ description }}
   .statistics.room-stats
+    .stat.total-messages
+      span.title Messages
+      span.value {{ totalMessages }}
   .ranking
-  
-//- Room rankings
-script#room-rank-template(type='text/template')
-  .rank {{ rank }}
-  .upvote: span.arrow-wrap: span.arrow &and;
-  .downvote: span.arrow-wrap: span.arrow &or;
-  
-//- Room statistics
-script#room-stats-template(type='text/template')
-  .stat.total-messages
-    span.title Messages
-    span.value {{ totalMessages }}
-    
+    .rank {{ rank }}
+    .upvote: span.arrow-wrap: span.arrow &and;
+    .downvote: span.arrow-wrap: span.arrow &or;
+
+
 //- Single message
-script#message-list-template(type='text/template')
 script#message-template(type='text/template')
   span.small-avatar: img(src='{{ avatar }}')
-  a.username(href='#/users/{{ username }}') {{ displayName }}
+  a.navigate.username(href='/users/{{ username }}') {{ displayName }}
   span.data {{ text }}
   abbr.created.timeago(title='{{ created }}') {{ created }}
+
 
 //- Notification template
 script#notification-template(type='text/template')
@@ -387,11 +171,16 @@ script#notification-template(type='text/template')
     .type {{ type }}
     .message {{ message }}
 
+
+//- Dialoges
+//- --------
+
 //- Settings template
 script#settings-template(type='text/template')
   #settings-form.dialog
     .title
       h3 Settings
+    
     .content
       p
         label(for='settings-username') ID: 
@@ -421,41 +210,43 @@ script#settings-template(type='text/template')
         label(for='settings-password-confirm') Confirm Password: 
         span.input-wrap
           input#settings-password-confirm(type='password', name='password_confirm')
+    
     .controls
-      button.submit#settings-submit Save
-      button.cancel Cancel
-      
+      button.button.submit.primary#settings-submit Save
+      button.button.cancel Cancel
+
+
 //- Registration template
 script#signup-template(type='text/template')
   #signup-form.dialog
     .title
       h3 Signup
+    
     .content
       p
         label(for='signup-username') Username: 
         span.input-wrap
           input#signup-username(type='text', name='username')
       p
-        label(for='signup-displayname') Display Name: (optional)
-        span.input-wrap
-          input#signup-displayname(type='text', name='displayname')
-      p
-        label(for='signup-email') Email: 
+        label(for='signup-email') Email (optional): 
         span.input-wrap
           input#signup-email(type='text', name='email')
       p
         label(for='signup-password') Password: 
         span.input-wrap
           input#signup-password(type='password', name='password')
+    
     .controls
-      button.submit#signup-submit Signup
-      button.cancel Cancel
-        
+      button.button.primary.submit#signup-submit Signup
+      button.button.cancel Cancel
+
+
 //- Login template
 script#login-template(type='text/template')
   #login-form.dialog
     .title
       h3 Login
+    
     .content
       p
         label(for='login-username') Username: 
@@ -465,15 +256,18 @@ script#login-template(type='text/template')
         label(for='login-password') Password: 
         span.input-wrap
           input#login-password(type='password', name='password')
+    
     .controls
-      button.submit#login-submit Login
-      button.cancel Cancel
+      button.button.primary.submit#login-submit Login
+      button.button.cancel Cancel
+
 
 //- Create new room
 script#create-room-template(type='text/template')
   #create-room-form.dialog
     .title
       h3 Create a new room
+    
     .content
       p
         label(for='create-room-name') Name: 
@@ -487,6 +281,7 @@ script#create-room-template(type='text/template')
         label(for='create-room-restricted') Private room:
         span.input-wrap
           input#create-room-restricted(type='checkbox', name='restricted')
+    
     .controls
-      button.submit#create-room-submit Create
-      button.cancel Cancel
+      button.button.primary.submit#create-room-submit Create
+      button.button.cancel Cancel

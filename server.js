@@ -1,187 +1,251 @@
-//    Aebleskiver
-//    (c) 2011 Beau Sorensen
-//    Aebleskiver may be freely distributed under the MIT license.
-//    For all details and documentation:
-//    https://github.com/sorensen/aebleskiver
 
 // Application Server
 // ==================
 
-require.paths.unshift(__dirname + '/lib');
-
 // Dependencies
 // ------------
 
-// Include all project dependencies
-var express      = require('express'),
-    Mongo        = require('mongodb'),
-    SessionStore = require('connect-mongo'),
-    Mongoose     = require('mongoose'),
-    Redis        = require('redis'),
-    Schemas      = require('schemas'),
-    Backbone     = require('backbone'),
-    _            = require('underscore')._,
-    middleware   = require('backbone-dnode'),
-    avatar       = require('rpc/backbone-avatar'),
-    misc         = require('rpc/backbone-misc'),
-    auth         = require('rpc/backbone-auth'),
-    DNode        = require('dnode'),
-    browserify   = require('browserify'),
-    colors       = require('colors'),
-    sys          = require('sys'),
-    logo         = require('./logo'),
-    config       = require('./config'),
-    app          = module.exports = express.createServer();
+var express       = require('express')
+  , Mongo         = require('mongodb')
+  , Session       = require('connect-mongo')
+  , Mongoose      = require('mongoose')
+  , mongooseAuth  = require('mongoose-auth')
+  , Redis         = require('redis')
+  , _             = require('underscore')._
+  , Backbone      = require('backbone')
+  , browserify    = require('browserify')
+  , DNode         = require('dnode')
+  , BackboneDNode = require('backbone-dnode')
+  , colors        = require('colors')
+  , Schemas       = require(__dirname + '/lib/schemas')
+  , dnodeSession  = require(__dirname + '/lib/rpc/dnode-session')
+  , dnodeOnline   = require(__dirname + '/lib/rpc/dnode-online')
+  , auth          = require(__dirname + '/lib/rpc/backbone-auth')
+  , logo          = require(__dirname + '/logo')
+  , config        = require(__dirname + '/config.json')
+  , app           = module.exports = express.createServer()
 
 // Configuration
 // -------------
 
-// Settings
-var token        = '',
-    staticViews  = __dirname + '/public';
+var token = ''
 
-// Configure our browserified bundles, seperating them out to
-// related packages for ease of development and debugging
-var core = browserify({
-    ignore : [
-        'underscore',
-        'backbone',
-    ],
-    require : [
-        'dnode',
-        'backbone-dnode'
-    ],
-    entry : [
-        // Models
-        __dirname + '/lib/models/message.model.js',
-        __dirname + '/lib/models/user.model.js',
-        __dirname + '/lib/models/app.model.js',
-        __dirname + '/lib/models/room.model.js',
-
-        // Views
-        __dirname + '/lib/views/message.view.js',
-        __dirname + '/lib/views/room.view.js',
-        __dirname + '/lib/views/user.view.js',
-        __dirname + '/lib/views/app.view.js',
-        __dirname + '/lib/views/footer.view.js',
-
-        // Routers
-        __dirname + '/lib/routers/app.router.js',
-
-        // DNode middleware
-        __dirname + '/lib/rpc/browser/auth.dnode.js',
-        __dirname + '/lib/rpc/browser/avatar.dnode.js',
-        __dirname + '/lib/rpc/browser/misc.dnode.js',
-
-        // General
-        __dirname + '/public/js/google.js',
-        __dirname + '/public/js/helpers.js',
-        __dirname + '/public/js/icons.js',
-        __dirname + '/public/js/init.js'
-    ],
-    mount  : '/core.js',
-    watch  : true,
-    filter : require('uglify-js')
-});
-
-// Development specific configurations, make sure we can
-// see our errors and stack traces for debugging
+// Development
 app.configure('development', function(){
-    app.use(express.static(staticViews));
-    app.use(express.errorHandler({
-        dumpExceptions : true,
-        showStack      : true
-    }));
-    config = _.extend(config, config.development);
-});
+  app.use(express.static(__dirname + '/public'))
+  app.use(express.static(__dirname + '/lib/modules'))
+  app.use(express.static(__dirname + '/lib/rpc/browser'))
+  app.use(express.static(__dirname + '/node_modules/backbone-dnode/browser'))
+  
+  app.use(express.errorHandler({
+    dumpExceptions: true
+  , showStack: true
+  }))
+  
+  config = _.extend(config, config.development)
+})
 
-// Production specific configurations, set the caching life
-// for all public served files, change the port to production,
-// (joyent uses port 80), and add the error handlers.
+// Production
 app.configure('production', function() {
-    app.use(express.static(staticViews, {maxAge: config.cache.age}));
-    //app.use(express.static(__dirname + '/lib/compiled',        {maxAge: cacheAge}));
-    app.use(express.errorHandler());
-    config = _.extend(config, config.production);
-});
+  app.use(express.static(__dirname + '/public', {maxAge: config.cache.age}))
+  app.use(express.errorHandler())
+  config = _.extend(config, config.production)
 
-// Establish a direct connection with MongoDB for the
-// connect-mongo session store
-var session = new SessionStore({
-    db : config.mongo.name
-});
+  app.use(core)
+})
 
-// Create the publish and subscribe clients for redis to
-// send to the DNode pubsub middleware
-var pub = Redis.createClient(config.redis.port, config.redis.host, config.redis.options),
-    sub = Redis.createClient(config.redis.port, config.redis.host, config.redis.options),
-    rdb = Redis.createClient(config.redis.port, config.redis.host, config.redis.options);
+// Redis configuration
+var pub = Redis.createClient(config.redis.port, config.redis.host, config.redis.options)
+  , sub = Redis.createClient(config.redis.port, config.redis.host, config.redis.options)
+  , rdb = Redis.createClient(config.redis.port, config.redis.host, config.redis.options)
 
-// Server configuration, set the server view settings to
-// render in jade, set the session middleware and attatch
-// the browserified bundles to the app on the client side.
+// Session
+// -------
+
+var session = new Session({
+  db: config.mongo.name
+})
+
+// Server configuration
+// --------------------
+
 app.configure(function() {
-    app.use(express.bodyParser());
-    app.use(express.cookieParser());
-    app.use(express.methodOverride());
-    app.set('view engine', 'jade');
-    app.use(express.session({
-        cookie : {maxAge : config.cookie.age},
-        secret : config.session.secret,
-        store  : session
-    }));
+  app.use(express.bodyParser())
+  app.use(express.cookieParser())
+  app.use(express.methodOverride())
+  app.set('view engine', 'jade')
+  
+  app.use(express.session({
+    cookie: {maxAge: config.cookie.age}
+  , secret: config.session.secret
+  , store: session
+  }))
+})
 
-    app.use(core);
-});
+// Schemas
+// -------
 
-// Start up the application and connect to the mongo
-// database if not part of another module or clustered,
-// configure the Mongoose model schemas, setting them to
-// our database instance. The DNode middleware will need
-// to be configured with the database references.
-Schemas.defineModels(Mongoose, function() {
-    database = Mongoose.connect(config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.name);
-    middleware.crud.config(database);
-    middleware.pubsub.config({
-        publish   : pub,
-        subscribe : sub,
-        database  : rdb
-    });
-    auth.config(database, session);
-});
+var Room
+  , User
+  , Profile
+  , Token
+  , Message
+
+Schemas(Mongoose, function() {
+  database = Mongoose.connect(config.mongo.host)
+
+  Room = database.model('room')
+  Profile = database.model('profile')
+  Token = database.model('token')
+  User = database.model('user')
+  Message = database.model('message')
+})
+
+// Middleware
+// ----------
+
+function authFromToken(req, res, next) {
+  var cookie = JSON.parse(req.cookies.logintoken)
+  return next()
+
+  if (cookie && cookie.token) {
+    Token
+      .findOne({
+        _user: cookie._user
+      , series: cookie.series
+      , token: cookie.token 
+      })
+      .populate('_user')
+      .run(function(err, token) {
+        if (!token || !token._user) {
+          return next()
+        }
+        req.session._user = token._user._id
+        req.user = token._user
+
+        token.token = token.randomToken()
+        token.save(function() {
+          res.cookie('logintoken', token.cookieValue, { 
+            expires: new Date(Date.now() + 2 * 604800000)
+          , path: '/' 
+          })
+          next()
+        })
+      })
+  }
+}
+
+function loadUser(req, res, next) {
+  if (req.session._user) {
+    User.findById(req.session._user, function(err, user) {
+      if (user) {
+        req.user = user
+      }
+      next()
+    })
+  } else if (req.cookies.logintoken) {
+    authFromToken(req, res, next)
+  } else {
+    next()
+  }
+}
+
+function roomsAndProfiles(req, res, next) {
+  Room.find(function(err, rooms) {
+    req.rooms = rooms
+    Profile.find(function(err, profiles) {
+      req.profiles = profiles
+      next()
+    })
+  })
+}
 
 // Routes
 // ------
 
-// Main application
-app.get('/', function(req, res) {
-    req.session.regenerate(function () {
-        token = req.session.id;
-        res.render('index.jade', {
-            locals : {
-                port  : config.port,
-                token : token,
-            }
-        });
-    });
-});
+app.get('/', roomsAndProfiles, loadUser, function(req, res) {
+  res.render('index.jade', {
+    locals: {
+      bootstrap: JSON.stringify({
+        rooms: req.rooms
+      , profiles: req.profiles
+      })
+    , user: JSON.stringify(req.user || null)
+    }
+  })
+})
 
-if (!module.parent) {
-    app.listen(config.port);
-    logo.print();
-    console.log("Server configured for: ".green + (global.process.env.NODE_ENV || 'development') + " environment.".green);
-    console.log("Server listening on port: ".green + app.address().port);
-    console.log("");
-}
+app.get('/rooms/:slug', roomsAndProfiles, loadUser, function(req, res) {  
+  Room.findOne({
+    slug: req.params.slug
+  }
+  , function(err, doc) {
+    if (!doc) {
+      return res.redirect('home')
+    }
+    Message.find({
+      _room: doc._id
+    }
+    , function(err, messages) {
+      var all = {}
+      all[doc._id] = messages
+      
+      res.render('index.jade', {
+        locals: {
+          bootstrap: JSON.stringify({
+            rooms: req.rooms
+          , profiles: req.profiles
+          , room: doc
+          , messages: all
+          })
+        , user: JSON.stringify(req.user || null)
+        }
+      })
+    })
+  })
+})
 
 // Initialize
 // ----------
 
-// Attatch the DNode middleware and connect
+if (!module.parent) {
+  app.listen(config.port, function() {
+    logo.print()
+    console.log("Server configured for: ".green + (global.process.env.NODE_ENV || 'development') + " environment.".green)
+    console.log("Server listening on port: ".green + app.address().port)
+    console.log("")
+  })
+}
+
+// General error handling
+function errorHandler(client, conn) {
+  conn.on('error', function(err) {
+    console.log('Conn Error: ', err.stack)
+  })
+}
+
 DNode()
-    .use(middleware.pubsub) // Pub/sub channel support
-    .use(middleware.crud)   // Backbone integration
-    .use(avatar)            // Gravatar integration
-    .use(auth)              // Authentication support
-    .use(misc)              // Misc. resources
-    .listen(app)            // Start your engines!
+  .use(errorHandler)
+  .use(dnodeOnline({
+    database: rdb
+  , prefix: 'online:'
+  , remove: true
+  , offset: 6000 * 2
+  , interval: 6000 * 1
+  }))
+  .use(BackboneDNode.pubsub({
+    publish: pub
+  , subscribe: sub
+  , database: rdb
+  }))
+  .use(BackboneDNode.crud({
+    database: database
+  }))
+  .use(dnodeSession({
+    store: session
+  }))
+  .use(auth({
+    database: database
+  , store: session
+  }))
+  .listen(app)

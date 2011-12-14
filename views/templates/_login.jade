@@ -1,0 +1,18 @@
+
+  #login-form.dialog
+    .title
+      h3 Login
+    
+    .content
+      p
+        label(for='login-username') Username: 
+        span.input-wrap
+          input#login-username(type='text', name='username')
+      p
+        label(for='login-password') Password: 
+        span.input-wrap
+          input#login-password(type='password', name='password')
+    
+    .controls
+      button.button.primary.submit#login-submit Login
+      button.button.cancel Cancel

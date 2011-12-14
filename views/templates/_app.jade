@@ -1,0 +1,43 @@
+
+  .wrapper
+    #header
+      nav#navigation
+        a#home.navigate(href='/', title='Home', accesskey='H') Home
+        a#create-room(accesskey='C') Create Room
+        a#login(accesskey='L') Login
+        a#signup(accesskey='J') Join
+        a#settings(title='Settings', accesskey='E') Settings
+        a#logout(accesskey='O') Logout
+    
+    #sidebar-wrapper
+      #sidebar
+        #sidebar-content
+          #rooms
+        
+        #search-form
+         button.button#search-now Go
+         span.input-wrap
+           input#search(type='text', name='search', placeholder='Search', accesskey='S')
+    
+    #main
+      #main-tabs
+        button#news News
+        button#help Help
+        
+      #main-controls
+        .main-controls
+          button.new-room Create Channel
+        
+        .layout-controls
+          button.list List
+      
+      #main-content
+      #splash
+      
+  .dialog-wrapper#create-room-dialog
+  .dialog-wrapper#login-dialog
+  .dialog-wrapper#signup-dialog
+  .dialog-wrapper#settings-dialog
+  #spinner
+    #inner-spinner
+  #overlay
