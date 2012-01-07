@@ -24,7 +24,6 @@
   , "backbone-dnode"  : ">= 0.3.2"
   , "browserify"      : ">= 1.7.7"
   , "mongoose"        : ">= 2.3.12"
-  , "mongoose-auth"   : ">= 0.0.11"
   , "redis"           : ">= 0.6.7"
   , "node-gravatar"   : ">= 1.0.0"
   , "bcrypt"          : ">= 0.2.4"
@@ -37,6 +36,8 @@
   , "mongodb"         : ">= 0.9.7"
   , "uglify-js"       : ">= 1.0.6"
   , "colors"          : ">= 0.5.1"
+  , "dnode-cookie"    : ">= 0.0.1"
+  , "mongoose-troop"  : ">= 0.0.0"
   }
 , "engines" : {
     "node" : ">= 0.4.1 < 0.6.2"
