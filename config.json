@@ -31,7 +31,7 @@
     , "port": 27017
     , "name": "aebleskiver"
     }
-  , "port": 3000
+  , "port": 8080
   }
 
 , "testing": {

@@ -32,10 +32,9 @@ dwsync.xml
 .svn
 publish
 .idea
+_dev
+node_modules
 
 # build script local files
 build/buildinfo.properties
 build/config/buildinfo.properties
-
-_dev
-node_modules

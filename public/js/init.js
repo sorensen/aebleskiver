@@ -56,9 +56,10 @@ var Server
   
     DNode()
       .use(reconnect)
-      .use(root.dnodeBackbone)
+      .use(root.dnodeBackbone())
       .use(root.dnodeCookie)
       .connect(function(remote) {
+        Server = remote
         routing(remote)
       })
   }

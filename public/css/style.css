@@ -1078,13 +1078,14 @@ body {
     height: 100%;
 }
 #header {
-    width: 100%;
+    width: 120px;
     z-index: 9;
-    height: 29px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
 
-    border-bottom: 1px solid #AAA;
-    border-left: 1px solid #aaa;
-    border-right: 1px solid #dedede;
+    border-right: 1px solid #aaa;
+
     background-color: #EEE;
     background-image: -moz-linear-gradient(top, #EEE, #CCC);
     background-image: -o-linear-gradient(top, #EEE, #CCC);
@@ -1093,37 +1094,16 @@ body {
     background-image: linear-gradient(top, #EEE, #CCC);
               filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#EEE', EndColorStr='#CCC');
 }
-    #logo {
-        display: none;
-        position: absolute;
-        left: 0;
-        padding: 0 20px;
-        margin: 0;
-        font-size: 30px;
-        font-weight: bold;
-        text-shadow: 2px 2px 2px #fff;
-        line-height: 50px;
-        height: 50px;
-        top: 0;
-        bottom: 0;
-        color: #891100;
-
-        color: #45281C;
-        text-decoration: none;
-        text-shadow: 0 1px 0 rgba(255, 255, 255, .3);
-        filter: dropshadow(color=#BF8F6B,offX=0,offY=1);
-    }
 /**
     Main menu
 **/
 #navigation {
-    min-width: 300px;
     position: absolute;
-    height: 30px;
     margin: 0;
+    top: 0;
     left: 0;
     right: 0;
-    border-left: 1px solid #aaa;
+    bottom: 0;
     color: #444;
     list-style: none outside;
     text-shadow: 1px 1px 1px #fff;
@@ -1156,7 +1136,11 @@ body {
                       filter: progid:DXImageTransform.Microsoft.gradient(startColorStr='#fff', EndColorStr='#EFEFEF');
             }
     #navigation a {
-        height: 30px;
+        border-right: 0;
+        border-bottom: 1px solid #aaa;
+        margin: 0;
+        padding: 10px;
+        float: none;
         overflow: hidden;
         display: block;
     }
@@ -1175,13 +1159,13 @@ body {
     top: 0;
     bottom: 0;
     margin: 0;
-    left: 0;
+    left: 121px;
     overflow: hidden;
     position: absolute;
 }
 #sidebar {
     width: 200px;
-    top: 30px;
+    top: 0;
     bottom: 0;
     margin: 0;
     left: 0;
@@ -1234,6 +1218,7 @@ body {
         position: absolute;
         left: 0;
         right: 0;
+        border-right: 1px solid #aaa;
     }
 
 
@@ -1404,7 +1389,7 @@ body {
     Main content screens
 **/
 #main {
-    top: 30px;
+    top: 0;
     bottom: 0;
     margin: 0;
     position: absolute;
@@ -1421,7 +1406,7 @@ body {
         height: 100%;
         min-height: 153px;
         clear: both;
-        margin-left: 200px;
+        margin-left: 321px;
         min-width: 215px;
         position: absolute;
         right: 0;

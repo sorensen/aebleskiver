@@ -19,7 +19,7 @@ var express       = require('express')
   , colors        = require('colors')
   , Schemas       = require(__dirname + '/lib/schemas')
   , dnodeSession  = require(__dirname + '/lib/rpc/dnode-session')
-  , dnodeOnline   = require(__dirname + '/lib/rpc/dnode-online')
+  , dnodeOnline   = require('dnode-online')
   , auth          = require(__dirname + '/lib/rpc/backbone-auth')
   , logo          = require(__dirname + '/logo')
   , config        = require(__dirname + '/config.json')
@@ -36,6 +36,7 @@ app.configure('development', function(){
   app.use(express.static(__dirname + '/lib/modules'))
   app.use(express.static(__dirname + '/lib/rpc/browser'))
   app.use(express.static(__dirname + '/node_modules/backbone-dnode/browser'))
+  app.use(express.static(__dirname + '/node_modules/dnode-cookie/lib'))
   
   app.use(express.errorHandler({
     dumpExceptions: true
@@ -219,8 +220,8 @@ if (!module.parent) {
 
 // General error handling
 function errorHandler(client, conn) {
-  conn.on('error', function(err) {
-    console.log('Conn Error: ', err.stack)
+  conn.on('error', function(e) {
+    console.log('Conn Error: ', e.stack)
   })
 }
 
@@ -236,7 +237,6 @@ DNode()
   .use(BackboneDNode.pubsub({
     publish: pub
   , subscribe: sub
-  , database: rdb
   }))
   .use(BackboneDNode.crud({
     database: database
